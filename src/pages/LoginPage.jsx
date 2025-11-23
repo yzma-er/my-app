@@ -13,10 +13,8 @@ function LoginPage() {
   const role = new URLSearchParams(location.search).get("role") || "user";
 
   // ✅ Auto-detect backend (Laptop vs. Phone)
-  const backendURL =
-    window.location.hostname === "localhost"
-      ? "http://localhost:5000"
-      : "http://192.168.1.7:5000";
+  const res = await fetch(`${API_BASE_URL}/api/auth/login`, {...})
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
