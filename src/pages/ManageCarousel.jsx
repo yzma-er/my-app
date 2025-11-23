@@ -11,7 +11,7 @@ function ManageCarousel() {
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : "http://192.168.1.6:5000";
+      : "https://digital-guidance-api.onrender.com";
 
   const fetchImages = useCallback(async () => {
   const res = await axios.get(`${backendURL}/api/carousel`);
