@@ -1,0 +1,114 @@
+/* src/pages/RoleSelectionPage.css */
+.role-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* ✅ vertically centers content */
+  text-align: center;
+  color: #104C08;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Logo */
+.logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+/* Headings */
+.role-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+}
+
+.role-container h3 {
+  font-size: 1.4rem;
+  margin-bottom: 5px;
+  color: #104C08;
+}
+
+.role-container p {
+  font-size: 1rem;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Buttons */
+.button-group {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap; /* ✅ ensures wrapping on small screens */
+  justify-content: center;
+}
+
+.button-group button {
+  background-color: #104C08;
+  color: white;
+  padding: 12px 28px;
+  margin: 10px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 200px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.button-group button:hover {
+  background-color: #1C7C0F;
+  transform: scale(1.05);
+}
+
+/* ✅ Tablet view */
+@media (max-width: 768px) {
+  .logo {
+    width: 100px;
+  }
+
+  .role-container h2 {
+    font-size: 1.6rem;
+  }
+
+  .role-container h3 {
+    font-size: 1.2rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    width: 80%;
+  }
+
+  .button-group button {
+    width: 100%;
+    font-size: 15px;
+    padding: 10px 0;
+  }
+}
+
+/* ✅ Mobile view */
+@media (max-width: 480px) {
+  .logo {
+    width: 80px;
+  }
+
+  .role-container h2 {
+    font-size: 1.4rem;
+  }
+
+  .role-container h3 {
+    font-size: 1.1rem;
+  }
+
+  .role-container p {
+    font-size: 0.9rem;
+  }
+
+  .button-group button {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+  }
+}

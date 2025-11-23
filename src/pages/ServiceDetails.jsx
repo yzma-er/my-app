@@ -1,0 +1,264 @@
+// src/pages/ServiceDetails.jsx
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import axios from "axios";
+import "./Services.css";
+import { useNavigate } from "react-router-dom";
+
+function ServiceDetails() {
+  const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [rating, setRating] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [currentStep, setCurrentStep] = useState(1);
+  const navigate = useNavigate();
+
+  const serviceId = window.location.pathname.split("/").pop();
+
+  // backendURL as a stable memoized constant
+  const backendURL = useMemo(() => {
+    return window.location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : "http://192.168.1.7:5000";
+  }, []);
+
+  // THREE_DAYS_MS memoized
+  const THREE_DAYS_MS = useMemo(() => 3 * 24 * 60 * 60 * 1000, []);
+
+  // ✅ Fetch service details (memoized callback)
+  const fetchService = useCallback(async () => {
+    try {
+      const res = await axios.get(`${backendURL}/api/services/${serviceId}`);
+      setService(res.data);
+    } catch (err) {
+      console.error("❌ Error fetching service:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [backendURL, serviceId]);
+
+  useEffect(() => {
+    fetchService();
+  }, [fetchService]);
+
+  // ✅ Load saved progress
+  const STORAGE_KEY = `progress_${serviceId}`;
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      const now = Date.now();
+
+      if (now - data.timestamp < THREE_DAYS_MS) {
+        setCurrentStep(data.currentStep);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+        setCurrentStep(1);
+      }
+    }
+  }, [STORAGE_KEY, THREE_DAYS_MS]);
+
+  // ✅ Save progress to localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        currentStep,
+        timestamp: Date.now(),
+      })
+    );
+  }, [currentStep, STORAGE_KEY]);
+
+  // ✅ Handle feedback submission
+  const handleFeedbackSubmit = async () => {
+    if (rating === 0) {
+      alert("Please select a star rating before submitting.");
+      return;
+    }
+
+    try {
+      await axios.post(`${backendURL}/api/feedback`, {
+        service_id: serviceId,
+        service_name: service?.name || null,
+        step_number: currentStep,
+        rating,
+        comment: feedback,
+      });
+
+      alert("✅ Feedback submitted successfully!");
+      setRating(0);
+      setFeedback("");
+      setCurrentStep((prev) => prev + 1);
+    } catch (err) {
+      console.error("❌ Error submitting feedback:", err);
+      alert("Failed to submit feedback.");
+    }
+  };
+
+  // ✅ Reset progress manually
+  const handleResetProgress = () => {
+    if (window.confirm("Are you sure you want to reset your progress?")) {
+      localStorage.removeItem(STORAGE_KEY);
+      setCurrentStep(1);
+      alert("🔁 Progress has been reset!");
+    }
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (!service) return <p>❌ Service not found.</p>;
+
+  // Parse JSON steps safely
+  let steps = [];
+  try {
+    steps = JSON.parse(service.content || "[]");
+    if (!Array.isArray(steps)) steps = [];
+  } catch {
+    steps = [];
+  }
+
+  return (
+    <div className="medical-container">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate("/services")}
+        style={{
+          background: "#1C7C0F",
+          color: "white",
+          border: "none",
+          borderRadius: "25px",
+          padding: "8px 16px",
+          marginBottom: "15px",
+          cursor: "pointer",
+          fontWeight: "bold",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "5px",
+        }}
+      >
+        ← Back to Services
+      </button>
+
+      <h2 style={{ color: "#1C7C0F", marginBottom: "10px" }}>{service.name}</h2>
+
+      {/* Description (Above Video) */}
+      {service.description && (
+        <p
+          className="service-description"
+          style={{
+            marginBottom: "20px",
+            whiteSpace: "pre-line",
+            textAlign: "justify",
+          }}
+        >
+          {service.description}
+        </p>
+      )}
+
+      {/* Video */}
+      <div className="video-container">
+        {service.video ? (
+          <video controls>
+            <source src={`${backendURL}/videos/${service.video}`} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <p style={{ marginBottom: "20px" }}>🎥 No video uploaded for this service.</p>
+        )}
+      </div>
+
+      {/* Description 2 (Below Video) */}
+      {service.description2 && <p className="service-description2">{service.description2}</p>}
+
+      {/* Service Steps */}
+      {steps.map((step, index) => {
+        const stepNum = index + 1;
+        const isUnlocked = stepNum <= currentStep;
+        if (!isUnlocked) return null;
+
+        return (
+          <div key={index} className="info-section" style={{ marginBottom: "25px" }}>
+            <h3 style={{ color: "#1C7C0F" }}>{step.title}</h3>
+            <p style={{ whiteSpace: "pre-line" }}>{step.content}</p>
+
+            {/* Download Form (below step content) */}
+            {step.formFile && (
+              <div style={{ marginTop: "10px" }}>
+                <a
+                  href={`${backendURL}/forms/${step.formFile}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-block",
+                    background: "#1C7C0F",
+                    color: "white",
+                    padding: "8px 14px",
+                    borderRadius: "25px",
+                    textDecoration: "none",
+                    fontWeight: "bold",
+                  }}
+                >
+                  📄 Download Form
+                </a>
+              </div>
+            )}
+
+            {/* Feedback Section */}
+            {currentStep === stepNum && (
+              <div className="feedback-section">
+                <h3>Rate {step.title}</h3>
+
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      className={`star ${star <= rating ? "active" : ""}`}
+                      onClick={() => setRating(star)}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+
+                <textarea
+                  placeholder="Write your feedback (optional)..."
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                />
+
+                <button className="feedback-btn" onClick={handleFeedbackSubmit}>
+                  Submit Feedback
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Final Step */}
+      {currentStep > steps.length && (
+        <div className="info-section" style={{ textAlign: "center", marginTop: "20px" }}>
+          <h3>🎉 You’ve completed all steps for this service!</h3>
+          <p style={{ color: "#1C7C0F" }}>You can reset your progress if you wish to start again.</p>
+        </div>
+      )}
+
+      {/* Reset Progress Button */}
+      <div style={{ textAlign: "center", marginTop: "30px" }}>
+        <button
+          onClick={handleResetProgress}
+          style={{
+            background: "#b71c1c",
+            color: "white",
+            border: "none",
+            borderRadius: "25px",
+            padding: "10px 20px",
+            cursor: "pointer",
+          }}
+        >
+          🔁 Reset Progress
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default ServiceDetails;

@@ -1,0 +1,169 @@
+.feedback-container {
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  font-family: "Poppins", sans-serif;
+}
+
+/* Title */
+.feedback-container h2 {
+  text-align: center;
+  color: #1c7c0f;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+/* ✅ Summary Section */
+.summary-section {
+  background: #f6fff5;
+  border: 2px solid #104C08;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.summary-section h3 {
+  color: #1c7c0f;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.summary-card {
+  background: white;
+  border: 1px solid #bde3b2;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.summary-card strong {
+  color: #1c7c0f;
+  font-size: 16px;
+}
+
+/* ✅ Filter Dropdown */
+.filter-container {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-container label {
+  font-weight: bold;
+  color: #1c7c0f;
+}
+
+.filter-container select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #a0cfa3;
+  background: #f9fff9;
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.filter-container select:hover {
+  border-color: #1c7c0f;
+}
+
+/* ✅ Feedback Table */
+.feedback-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: white;
+}
+
+.feedback-table th,
+.feedback-table td {
+  border: 1px solid #e0e0e0;
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 15px;
+}
+
+.feedback-table th {
+  background: #1c7c0f;
+  color: white;
+  font-weight: 600;
+}
+
+.feedback-table tr:nth-child(even) {
+  background: #f8fff8;
+}
+
+.feedback-table tr:hover {
+  background: #eafaea;
+}
+
+/* ✅ Stars */
+.feedback-table td:nth-child(3) {
+  color: #ffb400;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+/* ✅ Delete Button */
+.delete-btn {
+  background: #b71c1c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 14px;
+}
+
+.delete-btn:hover {
+  background: #d32f2f;
+}
+
+/* ✅ Responsive Design */
+@media (max-width: 768px) {
+  .feedback-container {
+    padding: 20px;
+  }
+
+  .feedback-table th,
+  .feedback-table td {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .feedback-table th,
+  .feedback-table td {
+    font-size: 13px;
+  }
+}

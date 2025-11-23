@@ -1,0 +1,106 @@
+// src/pages/AdminDashboard.jsx
+import React, { useState } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import "./AdminDashboard.css";
+
+function AdminDashboard() {
+  const navigate = useNavigate();
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+
+  return (
+    <div
+  className="admin-dashboard"
+  style={{
+    backgroundImage: `url(${process.env.PUBLIC_URL + '/images/role-background.jpg'})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center center',
+    backgroundRepeat: 'no-repeat',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    overflow: 'auto',
+    display: 'flex',
+  }}
+>
+
+  {/* 🔹 Overlay for opacity control */}
+  <div
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.0)", // ← adjust last number for opacity
+      zIndex: 0,
+    }}
+  ></div>
+
+
+      {/* ☰ Menu toggle for mobile */}
+      <button className="menu-toggle" onClick={toggleSidebar}>
+        {isSidebarOpen ? <X size={28} /> : <Menu size={28} />}
+      </button>
+
+      {/* Sidebar */}
+      <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
+        <div className="sidebar-content">
+          <h2>Admin Panel</h2>
+          <nav>
+            <ul>
+              <li>
+                <Link to="/admin/services" onClick={() => setSidebarOpen(false)}>
+                  Manage Services
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/users" onClick={() => setSidebarOpen(false)}>
+                  Manage Users
+                </Link>
+              </li>
+              <li>  
+                <Link to="/admin/manage-carousel" onClick={() => setSidebarOpen(false)}>
+                  Manage Carousel
+                </Link>
+
+              </li>
+              <li>
+                <Link to="/admin/feedback" onClick={() => setSidebarOpen(false)}>
+                  View Feedback
+                </Link>
+              </li>
+              
+            </ul>
+          </nav>
+        </div>
+
+        {/* Logout always visible at bottom */}
+        <div className="sidebar-footer">
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="main-content">
+        <div className="dashboard-overlay">
+          <h1>Welcome to the Admin Dashboard</h1>
+          <Outlet />
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default AdminDashboard;

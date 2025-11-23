@@ -1,0 +1,259 @@
+.manage-users {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.manage-users h1 {
+  color: #2e7d32; /* green */
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: 600;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.manage-users table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.manage-users th,
+.manage-users td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.manage-users th {
+  background: #f0fdf4;
+  color: #2e7d32;
+}
+
+.delete-btn {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #c62828;
+}
+
+.edit-btn {
+  margin-left: 8px;
+  padding: 6px 12px;
+  background-color: #f0ad4e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  background-color: #ec971f;
+}
+
+/* ========== MODAL OVERLAY & ANIMATION ========== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========== MAIN MODAL CONTAINER ========== */
+.modal-large {
+  width: 90%;
+  max-width: 1150px;
+  background: #ffffff;
+  padding: 25px 30px;
+  border-radius: 18px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow-y: auto;
+  max-height: 90vh;
+  animation: slideUp 0.35s ease-in-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Close Button */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #004d00;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #b71c1c;
+  transform: scale(1.2);
+}
+
+/* Title */
+.modal-large h2 {
+  text-align: center;
+  color: #004d00;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+/* ========== FLEX LAYOUT (Horizontal on Desktop, Vertical on Mobile) ========== */
+.edit-modal-flex {
+  display: flex;
+  gap: 35px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Left Side: Live Preview */
+.edit-preview {
+  flex: 1.1;
+  background: #f9fff9;
+  border: 1px solid #b6e2b6;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+  max-height: 70vh;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+.edit-preview video {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.edit-preview h3 {
+  color: #145a14;
+  font-weight: bold;
+  margin: 8px 0 4px;
+}
+
+.edit-preview p {
+  color: #333;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+/* Right Side: Form */
+.edit-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.edit-form label {
+  font-weight: 600;
+  color: #1a651a;
+}
+
+.edit-form input,
+.edit-form textarea {
+  border: 1px solid #b6e2b6;
+  border-radius: 8px;
+  padding: 9px;
+  font-size: 15px;
+  width: 100%;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.edit-form input:focus,
+.edit-form textarea:focus {
+  border-color: #1a651a;
+  outline: none;
+}
+
+/* Buttons */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 30px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-btn {
+  background: #1c7c0f;
+}
+
+.save-btn:hover {
+  background: #16650c;
+  transform: scale(1.05);
+}
+
+.cancel-btn {
+  background: #b71c1c;
+}
+
+.cancel-btn:hover {
+  background: #8f1616;
+  transform: scale(1.05);
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 900px) {
+  .edit-modal-flex {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .edit-preview {
+    max-height: 300px;
+  }
+
+  .modal-large {
+    width: 95%;
+    padding: 20px;
+  }
+}
