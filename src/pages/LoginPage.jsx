@@ -9,12 +9,14 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ Detect role from query (e.g., /login?role=admin)
+  // 🔥 FIX: Correct backend URL (local = localhost, deployed = render)
+  const backendURL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : "https://digital-guidance-api.onrender.com";
+
+  // Detect role (user or admin)
   const role = new URLSearchParams(location.search).get("role") || "user";
-
-  // ✅ Auto-detect backend (Laptop vs. Phone)
-  const res = await fetch(`${API_BASE_URL}/api/auth/login`, {...})
-
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -55,7 +57,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-wrapper"> {/* ✅ wrapper added */}
+    <div className="login-wrapper">
       <div className="login-container">
         <div className="login-form">
           <h1>{role === "admin" ? "Admin Login" : "User Login"}</h1>
@@ -69,7 +71,6 @@ function LoginPage() {
               required
             />
 
-            {/* Password with show/hide toggle */}
             <div className="password-container">
               <input
                 type={showPassword ? "text" : "password"}
@@ -99,55 +100,3 @@ function LoginPage() {
 }
 
 export default LoginPage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
