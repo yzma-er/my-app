@@ -18,7 +18,7 @@ function ServicesPage() {
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : "http://192.168.1.7:5000";
+      : "https://digital-guidance-api.onrender.com";
 
   // ✅ Fetch services
   useEffect(() => {
