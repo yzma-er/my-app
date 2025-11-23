@@ -12,7 +12,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
   });
   const [preview, setPreview] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
-  const backendURL = "http://localhost:5000";
+  const backendURL = "https://digital-guidance-api.onrender.com";
 
   // ✅ Fetch service details
   useEffect(() => {
