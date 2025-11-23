@@ -1,5 +1,5 @@
 // src/config.js
-const API_BASE_URL = const API_BASE_URL = "https://digital-guidance-api.onrender.com";
+const API_BASE_URL = "https://digital-guidance-api.onrender.com";
   //window.location.hostname === "localhost"
     //? "http://localhost:5000"        // ✅ if running on your PC
     //: "https://digital-guidance-api.onrender.com"; 
