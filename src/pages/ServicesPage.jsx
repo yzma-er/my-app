@@ -36,17 +36,19 @@ function ServicesPage() {
   }, [backendURL]);
 
   // ✅ Fetch carousel images (from DB)
-  useEffect(() => {
-    const fetchCarousel = async () => {
-      try {
-        const res = await axios.get(`${backendURL}/api/carousel`);
-        setCarouselImages(res.data);
-      } catch (err) {
-        console.error("❌ Error fetching carousel:", err);
-      }
-    };
-    fetchCarousel();
-  }, [backendURL]);
+useEffect(() => {
+  const fetchCarousel = async () => {
+    try {
+      const res = await axios.get(`${backendURL}/api/carousel`);
+      setCarouselImages(res.data);
+    } catch (err) {
+      console.error("❌ Error fetching carousel:", err);
+    }
+  };
+
+  fetchCarousel();
+}, []); // run ONCE only
+
 
   // ✅ Auto-slide every 4 seconds
   useEffect(() => {
