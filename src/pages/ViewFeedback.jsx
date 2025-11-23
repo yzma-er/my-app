@@ -17,7 +17,7 @@ function ViewFeedback() {
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : "http://192.168.1.7:5000";
+      : "https://digital-guidance-api.onrender.com";
 
   // memoized fetch functions to satisfy eslint rules
   const fetchFeedback = useCallback(async () => {
