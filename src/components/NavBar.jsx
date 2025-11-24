@@ -47,7 +47,7 @@ function NavBar() {
       <div className={`navbar-links ${menuOpen ? "active" : ""}`}>
         
         <Link to="/about" onClick={closeMenu}>About</Link>
-        <button className="logout-btn" onClick={() => { handleLogout(); closeMenu(); }}>
+        <button className="logout-btn" onClick={() => { handleLogout(); }}>
           Logout
         </button>
       </div>
