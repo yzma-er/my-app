@@ -17,19 +17,14 @@ function NavBar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // ✅ MATCHES AdminDashboard logout behavior
   const handleLogout = () => {
     localStorage.removeItem("token");
-    alert("You’ve been logged out.");
-    navigate("/login");
+    navigate("/");   // ⬅ Sends user back to Role Selection page
   };
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const closeMenu = () => {
-    setMenuOpen(false);
-  };
+  const toggleMenu = () => setMenuOpen(!menuOpen);
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
@@ -45,9 +40,9 @@ function NavBar() {
       </div>
 
       <div className={`navbar-links ${menuOpen ? "active" : ""}`}>
-        
         <Link to="/about" onClick={closeMenu}>About</Link>
-        <button className="logout-btn" onClick={() => { handleLogout(); }}>
+
+        <button className="logout-btn" onClick={handleLogout}>
           Logout
         </button>
       </div>
