@@ -13,15 +13,21 @@ function ManageCarousel() {
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
 
+  // Fetch all carousel images (Cloudinary URLs)
   const fetchImages = useCallback(async () => {
-  const res = await axios.get(`${backendURL}/api/carousel`);
-  setImages(res.data);
-}, [backendURL]);
+    try {
+      const res = await axios.get(`${backendURL}/api/carousel`);
+      setImages(res.data);
+    } catch (error) {
+      console.error("Error fetching images:", error);
+    }
+  }, [backendURL]);
 
-useEffect(() => {
-  fetchImages();
-}, [fetchImages]);
+  useEffect(() => {
+    fetchImages();
+  }, [fetchImages]);
 
+  // Upload image to backend → backend uploads to Cloudinary
   const handleUpload = async () => {
     if (!file) return alert("Please select an image first!");
 
@@ -30,18 +36,31 @@ useEffect(() => {
     formData.append("title", title);
     formData.append("caption", caption);
 
-    await axios.post(`${backendURL}/api/carousel/upload`, formData);
-    alert("✅ Image uploaded!");
-    setFile(null);
-    setTitle("");
-    setCaption("");
-    fetchImages();
+    try {
+      await axios.post(`${backendURL}/api/carousel/upload`, formData);
+      alert("✅ Image uploaded!");
+
+      setFile(null);
+      setTitle("");
+      setCaption("");
+
+      fetchImages();
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("❌ Upload failed. Check console.");
+    }
   };
 
+  // Delete image (backend also removes from Cloudinary)
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this image?")) return;
-    await axios.delete(`${backendURL}/api/carousel/${id}`);
-    fetchImages();
+
+    try {
+      await axios.delete(`${backendURL}/api/carousel/${id}`);
+      fetchImages();
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
   };
 
   return (
@@ -50,27 +69,33 @@ useEffect(() => {
 
       <div className="upload-form">
         <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+
         <input
           type="text"
           placeholder="Title (optional)"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+
         <input
           type="text"
           placeholder="Caption (optional)"
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
         />
+
         <button onClick={handleUpload}>Upload</button>
       </div>
 
       <div className="carousel-grid">
         {images.map((img) => (
           <div key={img.id} className="carousel-card">
-            <img src={`${backendURL}/carousel_images/${img.image}`} alt={img.title} />
+            {/* Cloudinary URL */}
+            <img src={img.imageUrl} alt={img.title} />
+
             <p><strong>{img.title}</strong></p>
             <p>{img.caption}</p>
+
             <button onClick={() => handleDelete(img.id)}>Delete</button>
           </div>
         ))}
