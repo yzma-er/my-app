@@ -74,7 +74,8 @@ useEffect(() => {
           <div className="custom-carousel">
             <div className="carousel-slide fade">
               <img
-                src={`${backendURL}/carousel_images/${carouselImages[currentIndex].image}`}
+                src={carouselImages[currentIndex].image}
+
                 alt={carouselImages[currentIndex].title || "Carousel Image"}
                 className="carousel-image"
               />
