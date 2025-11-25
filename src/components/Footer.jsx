@@ -8,7 +8,7 @@ function Footer() {
       <div className="footer-container">
         {/* 🏛 Left Section */}
         <div className="footer-left">
-          <h3>NVSU Digital Guidance</h3>
+          <h3>ASP Digital Guidance</h3>
           <p>
             A centralized digital guide for accessing university services with
             ease and transparency.
