@@ -63,17 +63,13 @@
 }
 
 /* Buttons */
-/* Buttons */
 .button-group {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
-
-  /* Add space below buttons */
-  margin-bottom: 30px; /* adjust value as needed */
+  margin-bottom: 30px;
 }
-
 
 .button-group button {
   background-color: #104C08;
@@ -91,35 +87,22 @@
   background-color: #1C7C0F;
   transform: scale(1.05);
 }
-/* Use service-card design inside RoleSelectionPage */
-/* Card container */
-.role-cards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  width: 100%;
-  max-width: 500px;
-  margin-top: 20px;
-}
 
-/* Individual card */
-/* Fixed role-card with visible border */
-/* Individual card */
-/* Card container for multiple services/roles */
+/* Role cards grid */
 .role-cards {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 cards per row */
-  gap: 15px; /* space between cards */
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
   width: 100%;
-  max-width: 1200px; /* adjust based on your page width */
-  margin: 20px auto; /* center the grid */
+  max-width: 1200px;
+  margin: 20px auto;
   padding: 0 10px;
 }
 
-/* Individual service/role card */
+/* Individual cards */
 .role-card {
   background: #f7f7f7;
-  border: 3px solid #104C08; /* visible border */
+  border: 3px solid #104C08;
   border-radius: 10px;
   padding: 15px;
   text-align: center;
@@ -131,7 +114,7 @@
   justify-content: center;
   align-items: center;
 
-  min-height: 100px; /* short but fits text */
+  min-height: 100px;
 }
 
 .role-card:hover {
@@ -139,14 +122,12 @@
   transform: translateY(-2px);
 }
 
-/* Titles inside card */
 .role-card h3 {
   margin: 0 0 5px;
   color: #104C08;
   font-size: 18px;
 }
 
-/* Subtext inside card */
 .role-card p {
   margin: 0;
   color: #555;
@@ -155,14 +136,31 @@
   text-align: center;
 }
 
+/* Ratings button */
+.ratings-toggle-btn {
+  background-color: #104C08;
+  color: white;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 280px;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-top: 10px;
+}
+
+.ratings-toggle-btn:hover {
+  background-color: #1C7C0F;
+  transform: scale(1.05);
+}
 
 /* --------------------------
-   RESPONSIVE: TABLET
+   RESPONSIVE: TABLET (≤ 992px)
 --------------------------- */
-
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .carousel-container {
-    max-width: 90%;
+    max-width: 95%;
   }
 
   .logo {
@@ -173,37 +171,40 @@
     font-size: 1.6rem;
   }
 
-  .role-container h3 {
-    font-size: 1.2rem;
+  .role-cards {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px;
   }
 
   .button-group {
     flex-direction: column;
-    width: 80%;
+    width: 70%;
   }
 
   .button-group button {
     width: 100%;
-    font-size: 15px;
-    padding: 10px 0;
   }
 
-  .dropdown-toggle {
-    width: 100%;
-  }
-
-  .dropdown-menu {
-    width: 100%;
+  .ratings-toggle-btn {
+    width: 70%;
   }
 }
 
 /* --------------------------
-   RESPONSIVE: MOBILE
+   RESPONSIVE: MOBILE (≤ 600px)
 --------------------------- */
-
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .carousel-container {
+    width: 100%;
+    max-width: 100%;
     aspect-ratio: 4 / 3;
+    border-radius: 8px;
+  }
+
+  .carousel-image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
   }
 
   .logo {
@@ -222,33 +223,42 @@
     font-size: 0.9rem;
   }
 
+  .button-group {
+    width: 100%;
+    padding: 0 15px;
+  }
+
   .button-group button {
     width: 100%;
-    font-size: 14px;
-    background: #f7f7f7;
-    padding: 15px;
+    padding: 14px;
+    font-size: 15px;
     border-radius: 10px;
     border: 3px solid #104C08;
+    background: #f7f7f7;
+    color: #104C08;
   }
-}
-  
-/* src/pages/RoleSelectionPage.css */
 
-/* ... (existing styles) ... */
+  .ratings-toggle-btn {
+    width: 90%;
+    font-size: 15px;
+  }
 
-.ratings-toggle-btn {
-  background-color: #104C08;
-  color: white;
-  padding: 12px 28px;
-  border: none;
-  border-radius: 30px;
-  font-size: 16px;
-  cursor: pointer;
-  width: 280px;
-  transition: background-color 0.3s, transform 0.2s;
-}
+  .role-cards {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    gap: 12px;
+  }
 
-.ratings-toggle-btn:hover {
-  background-color: #1C7C0F;
-  transform: scale(1.05);
+  .role-card {
+    min-height: 110px;
+    padding: 12px;
+  }
+
+  .role-card h3 {
+    font-size: 16px;
+  }
+
+  .role-card p {
+    font-size: 13px;
+  }
 }
