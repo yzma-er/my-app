@@ -91,7 +91,7 @@
 }
 
 .custom-carousel {
-  width: 80%;
+  width: 100%;
   max-width: 900px; /* ✅ fixed size similar to your screenshot */
   height: 400px; /* ✅ set a consistent height */
   position: relative;
