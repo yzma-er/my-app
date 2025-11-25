@@ -14,13 +14,15 @@ function ServicesPage() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // ✅ Auto-detect backend (Laptop vs. Phone)
+  // Auto-detect backend (Localhost vs Web)
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
 
-  // ✅ Fetch services
+  // -------------------------------
+  // ✅ Fetch Services
+  // -------------------------------
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -35,31 +37,37 @@ function ServicesPage() {
     fetchServices();
   }, [backendURL]);
 
-  // ✅ Fetch carousel images (from DB)
-useEffect(() => {
-  const fetchCarousel = async () => {
-    try {
-      const res = await axios.get(`${backendURL}/api/carousel`);
-      setCarouselImages(res.data);
-    } catch (err) {
-      console.error("❌ Error fetching carousel:", err);
-    }
-  };
-
-  fetchCarousel();
-}, []); // run ONCE only
-
-
-  // ✅ Auto-slide every 4 seconds
+  // -------------------------------
+  // ✅ Fetch Carousel Images (Cloudinary URLs already stored in DB)
+  // -------------------------------
   useEffect(() => {
-    if (carouselImages.length > 0) {
-      const interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % carouselImages.length);
-      }, 4000);
-      return () => clearInterval(interval);
-    }
+    const fetchCarousel = async () => {
+      try {
+        const res = await axios.get(`${backendURL}/api/carousel`);
+        setCarouselImages(res.data);
+      } catch (err) {
+        console.error("❌ Error fetching carousel:", err);
+      }
+    };
+    fetchCarousel();
+  }, []);
+
+  // -------------------------------
+  // ✅ Auto-slide every 4 seconds
+  // -------------------------------
+  useEffect(() => {
+    if (carouselImages.length === 0) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
   }, [carouselImages]);
 
+  // -------------------------------
+  // Filter services by search
+  // -------------------------------
   const filteredServices = services.filter((service) =>
     service.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -68,14 +76,15 @@ useEffect(() => {
     <div className="services-container">
       <NavBar />
 
-      {/* ✅ Dynamic Carousel */}
+      {/* ----------------------- */}
+      {/* ✅ CAROUSEL */}
+      {/* ----------------------- */}
       <div className="carousel-container">
         {carouselImages.length > 0 ? (
           <div className="custom-carousel">
             <div className="carousel-slide fade">
               <img
-                src={carouselImages[currentIndex].image}
-
+                src={carouselImages[currentIndex].image} // Cloudinary URL
                 alt={carouselImages[currentIndex].title || "Carousel Image"}
                 className="carousel-image"
               />
@@ -89,7 +98,7 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* Optional Navigation Arrows */}
+            {/* Navigation arrows */}
             <button
               className="carousel-btn prev"
               onClick={() =>
@@ -102,12 +111,11 @@ useEffect(() => {
             >
               ❮
             </button>
+
             <button
               className="carousel-btn next"
               onClick={() =>
-                setCurrentIndex(
-                  (prevIndex) => (prevIndex + 1) % carouselImages.length
-                )
+                setCurrentIndex((prevIndex) => (prevIndex + 1) % carouselImages.length)
               }
             >
               ❯
@@ -118,7 +126,9 @@ useEffect(() => {
         )}
       </div>
 
-      {/* ✅ Search Bar */}
+      {/* ----------------------- */}
+      {/* ✅ SEARCH BAR */}
+      {/* ----------------------- */}
       <header>
         <input
           type="text"
@@ -129,7 +139,9 @@ useEffect(() => {
         />
       </header>
 
-      {/* ✅ Service List */}
+      {/* ----------------------- */}
+      {/* ✅ SERVICES LIST */}
+      {/* ----------------------- */}
       {loading ? (
         <div className="loader-container">
           <div className="loader"></div>
