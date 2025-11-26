@@ -4,27 +4,37 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './RoleSelectionPage.css';
 
+import StepRatingsModal from "../components/StepRatingsModal";
+
 function RoleSelectionPage() {
   const navigate = useNavigate();
   const images = ['/carousel1.jpg', '/carousel2.jpg', '/carousel3.jpg'];
+
   const [current, setCurrent] = useState(0);
-  const [showRatings, setShowRatings] = useState(false); 
+  const [showRatings, setShowRatings] = useState(false);
   const [services, setServices] = useState([]);
   const [feedback, setFeedback] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
+
+  // ⭐ MODAL STATES
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [stepRatings, setStepRatings] = useState([]);
 
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
 
+  // ⭐ FETCH SERVICES + FEEDBACK
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
       const [s, f] = await Promise.all([
-        axios.get(`${backendURL}/api/services`), 
+        axios.get(`${backendURL}/api/services`),
         axios.get(`${backendURL}/api/feedback`)
       ]);
+
       setServices(s.data);
       setFeedback(f.data);
     } catch (err) {
@@ -41,6 +51,7 @@ function RoleSelectionPage() {
     return () => clearInterval(pollingInterval);
   }, [fetchData]);
 
+  // ⭐ CAROUSEL AUTO-SLIDE
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent(prev => (prev + 1) % images.length);
@@ -48,7 +59,8 @@ function RoleSelectionPage() {
     return () => clearInterval(interval);
   }, [images.length]);
 
-  // Compute average ratings
+
+  // ⭐ COMPUTE AVERAGE RATINGS
   const serviceSummary = services.map((s) => {
     const serviceFeedback = feedback.filter(
       f => f.service_name?.trim().toLowerCase() === s.name.trim().toLowerCase()
@@ -62,9 +74,24 @@ function RoleSelectionPage() {
     return { ...s, avg, count: serviceFeedback.length };
   });
 
+
+  // ⭐ OPEN MODAL + LOAD STEP RATINGS
+  const openRatingsModal = async (service) => {
+    try {
+      const res = await axios.get(`${backendURL}/api/steps/ratings/${service.service_id}`);
+      setStepRatings(res.data);
+    } catch (err) {
+      console.error("❌ Failed to load step ratings:", err);
+    }
+
+    setSelectedService(service);
+    setModalOpen(true);
+  };
+
   return (
     <div className="role-container">
-      {/* Carousel */}
+
+      {/* ⭐ CAROUSEL */}
       <div className="carousel-container">
         <div
           className="carousel-track"
@@ -76,27 +103,27 @@ function RoleSelectionPage() {
         </div>
       </div>
 
-      {/* Logo and headings */}
+      {/* ⭐ LOGO AND HEADINGS */}
       <img src="/nvsu-logo.gif" alt="NVSU Logo" className="logo" />
       <h2>Nueva Vizcaya State University</h2>
       <h3>Auxiliary Services Program</h3>
       <p>Bayombong, Nueva Vizcaya</p>
 
-      {/* Buttons */}
+      {/* ⭐ ROLE BUTTONS */}
       <div className="button-group">
         <button onClick={() => navigate('/login?role=admin')}>Administrator</button>
         <button onClick={() => navigate('/login?role=user')}>User</button>
       </div>
 
-      {/* Toggle Button */}
-      <button 
+      {/* ⭐ TOGGLE SERVICE RATINGS */}
+      <button
         className="ratings-toggle-btn"
         onClick={() => setShowRatings(prev => !prev)}
       >
         {showRatings ? 'Hide Service Ratings' : 'View Service Ratings'}
       </button>
 
-      {/* Services + Ratings Section */}
+      {/* ⭐ SERVICE LIST + SUMMARY */}
       {showRatings && (
         <>
           {isLoading ? (
@@ -107,7 +134,7 @@ function RoleSelectionPage() {
                 <div
                   key={s.service_id}
                   className="role-card"
-                  onClick={() => navigate(`/service/${s.service_id}`)}
+                  onClick={() => openRatingsModal(s)}   // ⭐ open modal
                 >
                   <h3>{s.name}</h3>
                   <p>⭐ {s.avg} ({s.count})</p>
@@ -119,6 +146,15 @@ function RoleSelectionPage() {
           )}
         </>
       )}
+
+      {/* ⭐ STEP RATINGS MODAL */}
+      <StepRatingsModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        serviceName={selectedService?.name}
+        stepRatings={stepRatings}
+      />
+
     </div>
   );
 }
