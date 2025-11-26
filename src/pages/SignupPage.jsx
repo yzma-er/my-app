@@ -9,17 +9,25 @@ function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // 👁️ visibility toggles
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const navigate = useNavigate();
+
+  // 🔍 Email validation
+  const isValidEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
     if (!email || !password || !confirmPassword) {
       alert("Please fill in all fields.");
+      return;
+    }
+
+    if (password.length < 8) {
+      alert("Password must be at least 8 characters long.");
       return;
     }
 
@@ -58,14 +66,22 @@ function SignupPage() {
           <h3>Sign Up to Digital Guidance</h3>
 
           <form onSubmit={handleSignup}>
-            
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+
+            {/* EMAIL FIELD */}
+            <div className="password-container">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+
+              {/* Green check if email valid */}
+              {email && isValidEmail(email) && (
+                <span className="valid-check">✓</span>
+              )}
+            </div>
 
             {/* PASSWORD FIELD */}
             <div className="password-container">
@@ -82,6 +98,11 @@ function SignupPage() {
                 } toggle-icon`}
                 onClick={() => setShowPassword(!showPassword)}
               ></i>
+
+              {/* Green check if password >= 8 characters */}
+              {password.length >= 8 && (
+                <span className="valid-check">✓</span>
+              )}
             </div>
 
             {/* CONFIRM PASSWORD FIELD */}
@@ -99,6 +120,12 @@ function SignupPage() {
                 } toggle-icon`}
                 onClick={() => setShowConfirm(!showConfirm)}
               ></i>
+
+              {/* Green check if passwords match */}
+              {confirmPassword.length > 0 &&
+                confirmPassword === password && (
+                  <span className="valid-check">✓</span>
+                )}
             </div>
 
             <button type="submit">Sign Up</button>
