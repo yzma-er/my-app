@@ -78,7 +78,7 @@ function RoleSelectionPage() {
   // ⭐ OPEN MODAL + LOAD STEP RATINGS
   const openRatingsModal = async (service) => {
     try {
-      const res = await axios.get(`${backendURL}/api/steps/ratings/${service.service_id}`);
+      const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
       setStepRatings(res.data);
     } catch (err) {
       console.error("❌ Failed to load step ratings:", err);
