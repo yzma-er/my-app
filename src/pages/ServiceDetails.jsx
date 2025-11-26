@@ -14,17 +14,14 @@ function ServiceDetails() {
 
   const serviceId = window.location.pathname.split("/").pop();
 
-  // backendURL as a stable memoized constant
   const backendURL = useMemo(() => {
     return window.location.hostname === "localhost"
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
   }, []);
 
-  // THREE_DAYS_MS memoized
   const THREE_DAYS_MS = useMemo(() => 3 * 24 * 60 * 60 * 1000, []);
 
-  // ✅ Fetch service details (memoized callback)
   const fetchService = useCallback(async () => {
     try {
       const res = await axios.get(`${backendURL}/api/services/${serviceId}`);
@@ -40,7 +37,6 @@ function ServiceDetails() {
     fetchService();
   }, [fetchService]);
 
-  // ✅ Load saved progress
   const STORAGE_KEY = `progress_${serviceId}`;
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -57,7 +53,6 @@ function ServiceDetails() {
     }
   }, [STORAGE_KEY, THREE_DAYS_MS]);
 
-  // ✅ Save progress to localStorage
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
@@ -68,7 +63,7 @@ function ServiceDetails() {
     );
   }, [currentStep, STORAGE_KEY]);
 
-  // ✅ Handle feedback submission
+  // ⭐⭐⭐ FIXED HERE ⭐⭐⭐
   const handleFeedbackSubmit = async () => {
     if (rating === 0) {
       alert("Please select a star rating before submitting.");
@@ -77,7 +72,7 @@ function ServiceDetails() {
 
     try {
       await axios.post(`${backendURL}/api/feedback`, {
-        service_id: serviceId,
+        service_id: service?.service_id, // ✅ FIXED: Use real DB ID
         service_name: service?.name || null,
         step_number: currentStep,
         rating,
@@ -93,8 +88,8 @@ function ServiceDetails() {
       alert("Failed to submit feedback.");
     }
   };
+  // ⭐⭐⭐ END OF FIX ⭐⭐⭐
 
-  // ✅ Reset progress manually
   const handleResetProgress = () => {
     if (window.confirm("Are you sure you want to reset your progress?")) {
       localStorage.removeItem(STORAGE_KEY);
@@ -106,7 +101,6 @@ function ServiceDetails() {
   if (loading) return <p>Loading...</p>;
   if (!service) return <p>❌ Service not found.</p>;
 
-  // Parse JSON steps safely
   let steps = [];
   try {
     steps = JSON.parse(service.content || "[]");
@@ -117,7 +111,6 @@ function ServiceDetails() {
 
   return (
     <div className="medical-container">
-      {/* Back Button */}
       <button
         onClick={() => navigate("/services")}
         style={{
@@ -139,7 +132,6 @@ function ServiceDetails() {
 
       <h2 style={{ color: "#1C7C0F", marginBottom: "10px" }}>{service.name}</h2>
 
-      {/* Description (Above Video) */}
       {service.description && (
         <p
           className="service-description"
@@ -153,7 +145,6 @@ function ServiceDetails() {
         </p>
       )}
 
-      {/* Video */}
       <div className="video-container">
         {service.video ? (
           <video controls>
@@ -165,10 +156,8 @@ function ServiceDetails() {
         )}
       </div>
 
-      {/* Description 2 (Below Video) */}
       {service.description2 && <p className="service-description2">{service.description2}</p>}
 
-      {/* Service Steps */}
       {steps.map((step, index) => {
         const stepNum = index + 1;
         const isUnlocked = stepNum <= currentStep;
@@ -179,7 +168,6 @@ function ServiceDetails() {
             <h3 style={{ color: "#1C7C0F" }}>{step.title}</h3>
             <p style={{ whiteSpace: "pre-line" }}>{step.content}</p>
 
-            {/* Download Form (below step content) */}
             {step.formFile && (
               <div style={{ marginTop: "10px" }}>
                 <a
@@ -201,7 +189,6 @@ function ServiceDetails() {
               </div>
             )}
 
-            {/* Feedback Section */}
             {currentStep === stepNum && (
               <div className="feedback-section">
                 <h3>Rate {step.title}</h3>
@@ -233,15 +220,15 @@ function ServiceDetails() {
         );
       })}
 
-      {/* Final Step */}
       {currentStep > steps.length && (
         <div className="info-section" style={{ textAlign: "center", marginTop: "20px" }}>
           <h3>🎉 You’ve completed all steps for this service!</h3>
-          <p style={{ color: "#1C7C0F" }}>You can reset your progress if you wish to start again.</p>
+          <p style={{ color: "#1C7C0F" }}>
+            You can reset your progress if you wish to start again.
+          </p>
         </div>
       )}
 
-      {/* Reset Progress Button */}
       <div style={{ textAlign: "center", marginTop: "30px" }}>
         <button
           onClick={handleResetProgress}
