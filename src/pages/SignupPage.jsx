@@ -9,14 +9,11 @@ function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // 👁️ visibility toggles
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const navigate = useNavigate();
-
-  // 🔍 Email validation
-  const isValidEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -26,6 +23,7 @@ function SignupPage() {
       return;
     }
 
+    // 🔐 Minimum 8 characters
     if (password.length < 8) {
       alert("Password must be at least 8 characters long.");
       return;
@@ -66,19 +64,14 @@ function SignupPage() {
           <h3>Sign Up to Digital Guidance</h3>
 
           <form onSubmit={handleSignup}>
-
-            {/* EMAIL FIELD */}
-            <div className="password-container">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-
-              
-            </div>
+            
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
             {/* PASSWORD FIELD */}
             <div className="password-container">
@@ -95,12 +88,14 @@ function SignupPage() {
                 } toggle-icon`}
                 onClick={() => setShowPassword(!showPassword)}
               ></i>
-
-              {/* Green check if password >= 8 characters */}
-              {password.length >= 8 && (
-               
-              )}
             </div>
+
+            {/* ⚠️ Real-time password requirement message */}
+            {password.length > 0 && password.length < 8 && (
+              <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
+                Password must be at least 8 characters long.
+              </p>
+            )}
 
             {/* CONFIRM PASSWORD FIELD */}
             <div className="password-container">
@@ -117,13 +112,15 @@ function SignupPage() {
                 } toggle-icon`}
                 onClick={() => setShowConfirm(!showConfirm)}
               ></i>
-
-              {/* Green check if passwords match */}
-              {confirmPassword.length > 0 &&
-                confirmPassword === password && (
-                  
-                )}
             </div>
+
+            {/* ⚠️ Real-time confirm password mismatch */}
+            {confirmPassword.length > 0 &&
+              confirmPassword !== password && (
+                <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
+                  Passwords do not match.
+                </p>
+              )}
 
             <button type="submit">Sign Up</button>
           </form>
