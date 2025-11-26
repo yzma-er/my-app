@@ -121,14 +121,5 @@ html, body, #root {
   }
 }
 
-/* Green check indicator */
-.valid-check {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #1c7c0f;
-  font-weight: bold;
-  font-size: 18px;
-}
+
 
