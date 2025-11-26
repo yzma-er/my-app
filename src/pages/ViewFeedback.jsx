@@ -89,9 +89,7 @@ function ViewFeedback() {
     setSelectedService(service);
 
     try {
-      const res = await axios.get(
-        `${backendURL}/api/feedback/step-ratings/${service.service_id}`
-      );
+      const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
       setStepRatings(res.data);
     } catch (err) {
       console.error("❌ Error loading step ratings:", err);
