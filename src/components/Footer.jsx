@@ -1,5 +1,6 @@
 // src/components/Footer.jsx
 import React from "react";
+import { Link } from "react-router-dom"; // ✅ import Link
 import "./Footer.css";
 
 function Footer() {
@@ -8,7 +9,7 @@ function Footer() {
       <div className="footer-container">
         {/* 🏛 Left Section */}
         <div className="footer-left">
-          <h3>ASP Digital Guidance</h3>
+          <h3>NVSU Digital Guidance</h3>
           <p>
             A centralized digital guide for accessing university services with
             ease and transparency.
@@ -19,7 +20,9 @@ function Footer() {
         <div className="footer-links">
           <h4>Quick Links</h4>
           <ul>
-            <li><a href="/about">About</a></li>
+            <li>
+              <Link to="/about">About</Link> 
+            </li>
           </ul>
         </div>
 
@@ -35,7 +38,7 @@ function Footer() {
       <div className="footer-bottom">
         <p>
           © {new Date().getFullYear()} NVSU Digital Guidance | Developed by
-          Team  <strong>Ba</strong>
+          Team <strong>AXYLE</strong>
         </p>
       </div>
     </footer>
