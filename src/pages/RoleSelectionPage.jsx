@@ -105,8 +105,8 @@ function RoleSelectionPage() {
 
       {/* ⭐ LOGO AND HEADINGS */}
       <img src="/nvsu-logo.gif" alt="NVSU Logo" className="logo" />
-      <h2>Nueva Vizcaya State University</h2>
-      <h3>Auxiliary Services Program</h3>
+      <h2>Auxiliary Services Program</h2>
+      <h3>Nueva Vizcaya State University</h3>
       <p>Bayombong, Nueva Vizcaya</p>
 
       {/* ⭐ ROLE BUTTONS */}
