@@ -8,6 +8,7 @@ import ManageServices from "./pages/ManageServices";
 import ManageUsers from "./pages/ManageUsers";
 import ViewFeedback from "./pages/ViewFeedback";
 import ManageCarousel from "./pages/ManageCarousel";
+import About from "./pages/About";
 
 // User & Auth Pages
 import HomePage from "./pages/HomePage";
@@ -31,6 +32,7 @@ function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/About" element={<About />} /> 
           
 
 
