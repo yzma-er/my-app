@@ -77,10 +77,7 @@ function SignupPage() {
                 required
               />
 
-              {/* Green check if email valid */}
-              {email && isValidEmail(email) && (
-                <span className="valid-check">✓</span>
-              )}
+              
             </div>
 
             {/* PASSWORD FIELD */}
@@ -101,7 +98,7 @@ function SignupPage() {
 
               {/* Green check if password >= 8 characters */}
               {password.length >= 8 && (
-                <span className="valid-check">✓</span>
+               
               )}
             </div>
 
@@ -124,7 +121,7 @@ function SignupPage() {
               {/* Green check if passwords match */}
               {confirmPassword.length > 0 &&
                 confirmPassword === password && (
-                  <span className="valid-check">✓</span>
+                  
                 )}
             </div>
 
