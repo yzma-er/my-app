@@ -125,24 +125,27 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     setForm({ ...form, content: updated });
   };
 
-  // ✅ Save all changes
+  // ✅ FIXED: Save all changes - Send as JSON, not FormData
   const handleSave = async () => {
     try {
-      const formData = new FormData();
-      formData.append("name", form.name);
-      formData.append("description", form.description);
-      formData.append("description2", form.description2);
-      formData.append("content", JSON.stringify(form.content));
+      // Send as JSON data instead of FormData
+      const updateData = {
+        name: form.name,
+        description: form.description,
+        description2: form.description2,
+        content: JSON.stringify(form.content)
+      };
 
-      await axios.put(`${backendURL}/api/services/${serviceId}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await axios.put(`${backendURL}/api/services/${serviceId}`, updateData, {
+        headers: { "Content-Type": "application/json" },
       });
 
       alert("✅ Service updated successfully!");
       onSave();
     } catch (err) {
       console.error("❌ Error updating service:", err);
-      alert("Failed to update service.");
+      console.error("Error details:", err.response?.data);
+      alert("Failed to update service. Check console for details.");
     }
   };
 
