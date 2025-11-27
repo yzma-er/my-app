@@ -154,21 +154,34 @@ function ServiceDetails() {
           <div key={index} className="info-section" style={{ marginBottom: "25px" }}>
             <h3 style={{ color: "#1C7C0F" }}>{step.title}</h3>
             
-            {/* 🎥 Video for each step */}
+            {/* 🎥 Video for each step - RESPONSIVE */}
             {step.videoFile && (
-              <div style={{ marginTop: "12px", marginBottom: "15px" }}>
-                <video 
-                  controls 
-                  width="100%" 
-                  style={{ 
-                    borderRadius: "10px",
-                    maxWidth: "800px",
-                    maxHeight: "450px"
-                  }}
-                >
-                  <source src={step.videoFile} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+              <div style={{ 
+                marginTop: "12px", 
+                marginBottom: "15px",
+                width: "100%",
+                display: "flex",
+                justifyContent: "center"
+              }}>
+                <div style={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  position: "relative"
+                }}>
+                  <video 
+                    controls 
+                    style={{ 
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: "10px",
+                      maxHeight: "70vh",
+                      objectFit: "contain"
+                    }}
+                  >
+                    <source src={step.videoFile} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
               </div>
             )}
 
