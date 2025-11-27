@@ -166,7 +166,7 @@ function ServiceDetails() {
                     maxHeight: "450px"
                   }}
                 >
-                  <source src={`${backendURL}/videos/${step.videoFile}`} type="video/mp4" />
+                  <source src={step.videoFile} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
