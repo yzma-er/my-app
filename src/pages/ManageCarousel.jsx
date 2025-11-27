@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./ManageCarousel.css";
 
 function ManageCarousel() {
@@ -7,6 +8,7 @@ function ManageCarousel() {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
+  const navigate = useNavigate();
 
   const backendURL =
     window.location.hostname === "localhost"
@@ -66,6 +68,30 @@ function ManageCarousel() {
   return (
     <div className="manage-carousel">
       
+      {/* Back button */}
+      <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
+        <button
+          className="back-admin-btn"
+          onClick={() => navigate("/admin")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: "30px",
+            backgroundColor: "#1c7c0f",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "bold",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            position: "absolute",
+            left: 0,
+          }}
+        >
+          <span style={{ fontWeight: "bold", fontSize: "18px" }}>←</span>
+        </button>
+      </div>
+
       <h2>Manage Carousel Images</h2>
 
       <div className="upload-form">
