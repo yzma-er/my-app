@@ -7,6 +7,11 @@ function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showCreateAdmin, setShowCreateAdmin] = useState(false);
+  const [newAdminData, setNewAdminData] = useState({
+    email: "",
+    password: ""
+  });
   const navigate = useNavigate();
 
   // ✅ Auto-detect backend (Laptop vs. Phone)
@@ -50,6 +55,55 @@ function ManageUsers() {
   const filteredUsers = users.filter((u) =>
     `${u.email} ${u.role}`.toLowerCase().includes(search.toLowerCase())
   );
+
+  // ✅ Create Admin Account
+  const handleCreateAdmin = async () => {
+    if (!newAdminData.email || !newAdminData.password) {
+      alert("Please enter both email and password.");
+      return;
+    }
+
+    if (newAdminData.password.length < 6) {
+      alert("Password must be at least 6 characters long.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${backendURL}/api/admin/create-admin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: newAdminData.email,
+          password: newAdminData.password
+        }),
+      });
+
+      if (res.ok) {
+        alert("✅ Admin account created successfully!");
+        setNewAdminData({ email: "", password: "" });
+        setShowCreateAdmin(false);
+        
+        // Refresh users list
+        const usersRes = await fetch(`${backendURL}/api/admin/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (usersRes.ok) {
+          const data = await usersRes.json();
+          setUsers(data);
+        }
+      } else {
+        const error = await res.json();
+        alert(`❌ Failed to create admin: ${error.message || "Unknown error"}`);
+      }
+    } catch (err) {
+      console.error("❌ Error creating admin:", err);
+      alert("Failed to create admin account.");
+    }
+  };
 
   // ✅ Change password
   const handlePasswordChange = async (id) => {
@@ -131,21 +185,76 @@ function ManageUsers() {
 
       <h1>👥 Manage Users</h1>
 
-      {/* 🔍 Search Bar */}
-      <div className="search-container" style={{ marginBottom: "15px" }}>
-        <input
-          type="text"
-          placeholder="Search by email or role..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{
-            padding: "8px 12px",
-            width: "300px",
-            borderRadius: "25px",
-            border: "1px solid #ccc",
-          }}
-        />
+      {/* 🔍 Search Bar and Create Admin Button */}
+      <div className="search-create-container">
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search by email or role..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <button 
+          className="create-admin-btn"
+          onClick={() => setShowCreateAdmin(true)}
+        >
+          ➕ Create Admin
+        </button>
       </div>
+
+      {/* Create Admin Modal */}
+      {showCreateAdmin && (
+        <div className="modal-overlay">
+          <div className="modal-large">
+            <button 
+              className="close-btn" 
+              onClick={() => {
+                setShowCreateAdmin(false);
+                setNewAdminData({ email: "", password: "" });
+              }}
+            >
+              ✖
+            </button>
+            
+            <h2>Create Admin Account</h2>
+            
+            <div className="create-admin-form">
+              <input
+                type="email"
+                placeholder="Admin email"
+                value={newAdminData.email}
+                onChange={(e) => setNewAdminData({...newAdminData, email: e.target.value})}
+              />
+              <input
+                type="password"
+                placeholder="Admin password"
+                value={newAdminData.password}
+                onChange={(e) => setNewAdminData({...newAdminData, password: e.target.value})}
+              />
+              
+              <div className="modal-buttons">
+                <button 
+                  className="save-btn" 
+                  onClick={handleCreateAdmin}
+                >
+                  Create Admin
+                </button>
+                <button 
+                  className="cancel-btn" 
+                  onClick={() => {
+                    setShowCreateAdmin(false);
+                    setNewAdminData({ email: "", password: "" });
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 🧾 Users Table */}
       <table>
