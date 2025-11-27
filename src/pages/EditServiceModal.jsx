@@ -326,7 +326,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
               
                   {/* Step Video Upload */}
                   <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                    🎥 Step Video (optional)
+                    🎥 Step Video
                   </label>
                   <input
                     type="file"
@@ -362,7 +362,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   {/* Upload Form */}
                   <div style={{ marginBottom: "10px" }}>
                     <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                      📎 Upload Form (optional)
+                      📎 Upload Form
                     </label>
                     <input
                       type="file"
