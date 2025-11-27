@@ -1,42 +1,68 @@
-import React from "react";
+// src/components/StepRatingsModal.jsx
+import React, { useEffect, useState } from "react";
 import "./StepRatingsModal.css";
+import axios from "axios";
 
-function StepRatingsModal({ open, onClose, serviceName, stepRatings, steps }) {
+function StepRatingsModal({ open, onClose, serviceName, serviceId, stepRatings, serviceInfo }) {
+  
+  const backendURL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : "https://digital-guidance-api.onrender.com";
+
+  const [stepTitles, setStepTitles] = useState({});
+
+  // ⭐ Load step titles from service content JSON
+  useEffect(() => {
+    if (!serviceId) return;
+
+    const fetchService = async () => {
+      try {
+        const res = await axios.get(`${backendURL}/api/services/${serviceId}`);
+        let steps = [];
+
+        try {
+          steps = JSON.parse(res.data.content || "[]");
+        } catch {
+          steps = [];
+        }
+
+        // Map step numbers → titles
+        const titles = {};
+        steps.forEach((step, index) => {
+          titles[index + 1] = step.title || `Step ${index + 1}`;
+        });
+
+        setStepTitles(titles);
+      } catch (err) {
+        console.error("❌ Error loading step titles:", err);
+      }
+    };
+
+    fetchService();
+  }, [serviceId, backendURL]);
+
   if (!open) return null;
 
-  // Create a mapping: step_number → step.title
-  const stepTitleMap = {};
-  if (Array.isArray(steps)) {
-    steps.forEach((step, index) => {
-      stepTitleMap[index + 1] = step.title || `Step ${index + 1}`;
-    });
-  }
-
   return (
-    <div className="modal-overlay">
-      <div className="modal-box">
-        <button className="close-btn" onClick={onClose}>
-          ✖
-        </button>
+    <div className="ratings-modal-overlay">
+      <div className="ratings-modal">
+        <button className="close-btn" onClick={onClose}>✖</button>
 
-        <h2>⭐ Step Ratings for {serviceName}</h2>
+        <h2>📊 Step Ratings: {serviceName}</h2>
 
-        {stepRatings.length === 0 ? (
-          <p style={{ textAlign: "center", marginTop: "20px" }}>
-            No step ratings available for this service.
-          </p>
-        ) : (
-          <div className="step-ratings-list">
-            {stepRatings.map((item) => (
-              <div key={item.step_number} className="step-rating-card">
-                <h3>{stepTitleMap[item.step_number]}</h3>
-                <p>
-                  ⭐ <strong>{item.avg_rating}</strong> ({item.count} ratings)
-                </p>
+        <div className="step-ratings-list">
+          {stepRatings.length > 0 ? (
+            stepRatings.map((r, idx) => (
+              <div key={idx} className="step-rating-card">
+                <h3>{stepTitles[r.step_number] || `Step ${r.step_number}`}</h3>
+                <p>⭐ {r.avg_rating} ({r.count} ratings)</p>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <p>No ratings available for this service.</p>
+          )}
+        </div>
       </div>
     </div>
   );
