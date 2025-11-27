@@ -109,6 +109,8 @@ function RoleSelectionPage() {
       <h3>Nueva Vizcaya State University</h3>
       <p>Bayombong, Nueva Vizcaya</p>
 
+      <h2>Log in as</h2>
+
       {/* ⭐ ROLE BUTTONS */}
       <div className="button-group">
         <button onClick={() => navigate('/login?role=admin')}>Administrator</button>
