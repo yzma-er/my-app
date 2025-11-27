@@ -11,16 +11,15 @@
   box-sizing: border-box;
 }
 
-/* Carousel container */
+/* Carousel container: wide but not too tall */
 .carousel-container {
   width: 100%;
-  max-width: 800px;
-  aspect-ratio: 16 / 9;
+  max-width: 1200px; /* wider for big screens */
+  aspect-ratio: 3 / 1; /* wide and short */
   margin-bottom: 20px;
   overflow: hidden;
   position: relative;
   border-radius: 10px;
-  margin-top: 10px;
 }
 
 /* Slide track */
@@ -89,10 +88,10 @@
   transform: scale(1.05);
 }
 
-/* Role cards grid */
+/* Card container for multiple services/roles */
 .role-cards {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 15px;
   width: 100%;
   max-width: 1200px;
@@ -100,7 +99,7 @@
   padding: 0 10px;
 }
 
-/* Individual cards */
+/* Individual service/role card */
 .role-card {
   background: #f7f7f7;
   border: 3px solid #104C08;
@@ -109,12 +108,10 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
   min-height: 100px;
 }
 
@@ -137,31 +134,13 @@
   text-align: center;
 }
 
-/* Ratings button */
-.ratings-toggle-btn {
-  background-color: #104C08;
-  color: white;
-  padding: 12px 28px;
-  border: none;
-  border-radius: 30px;
-  font-size: 16px;
-  cursor: pointer;
-  width: 280px;
-  transition: background-color 0.3s, transform 0.2s;
-  margin-top: 10px;
-}
+/* Responsive adjustments */
 
-.ratings-toggle-btn:hover {
-  background-color: #1C7C0F;
-  transform: scale(1.05);
-}
-
-/* --------------------------
-   RESPONSIVE: TABLET (≤ 992px)
---------------------------- */
-@media (max-width: 992px) {
+/* Tablet */
+@media (max-width: 768px) {
   .carousel-container {
     max-width: 95%;
+    aspect-ratio: 3 / 1;
   }
 
   .logo {
@@ -172,40 +151,27 @@
     font-size: 1.6rem;
   }
 
-  .role-cards {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 600px;
+  .role-container h3 {
+    font-size: 1.2rem;
   }
 
   .button-group {
     flex-direction: column;
-    width: 70%;
+    width: 80%;
   }
 
   .button-group button {
     width: 100%;
-  }
-
-  .ratings-toggle-btn {
-    width: 70%;
+    font-size: 15px;
+    padding: 10px 0;
   }
 }
 
-/* --------------------------
-   RESPONSIVE: MOBILE (≤ 600px)
---------------------------- */
-@media (max-width: 600px) {
+/* Mobile */
+@media (max-width: 480px) {
   .carousel-container {
-    width: 100%;
+    aspect-ratio: 2.5 / 1;
     max-width: 100%;
-    aspect-ratio: 4 / 3;
-    border-radius: 8px;
-  }
-
-  .carousel-image {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
   }
 
   .logo {
@@ -224,42 +190,30 @@
     font-size: 0.9rem;
   }
 
-  .button-group {
-    width: 100%;
-    padding: 0 15px;
-  }
-
   .button-group button {
     width: 100%;
-    padding: 14px;
-    font-size: 15px;
+    font-size: 14px;
+    background: #f7f7f7;
+    padding: 15px;
     border-radius: 10px;
     border: 3px solid #104C08;
-    background: #104C08;
-    color: #f7f7f7;
   }
+}
 
-  .ratings-toggle-btn {
-    width: 90%;
-    font-size: 15px;
-  }
+/* Ratings toggle button */
+.ratings-toggle-btn {
+  background-color: #104C08;
+  color: white;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 280px;
+  transition: background-color 0.3s, transform 0.2s;
+}
 
-  .role-cards {
-    grid-template-columns: 1fr;
-    max-width: 100%;
-    gap: 12px;
-  }
-
-  .role-card {
-    min-height: 110px;
-    padding: 12px;
-  }
-
-  .role-card h3 {
-    font-size: 16px;
-  }
-
-  .role-card p {
-    font-size: 13px;
-  }
+.ratings-toggle-btn:hover {
+  background-color: #1C7C0F;
+  transform: scale(1.05);
 }
