@@ -109,7 +109,7 @@ function RoleSelectionPage() {
       <h3>Nueva Vizcaya State University</h3>
       <p>Bayombong, Nueva Vizcaya</p>
 
-      <h2>Log in as</h2>
+      <h1>Continue as:</h1>
 
       {/* ⭐ ROLE BUTTONS */}
       <div className="button-group">
