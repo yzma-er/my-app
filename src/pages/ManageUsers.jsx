@@ -63,8 +63,8 @@ function ManageUsers() {
       return;
     }
 
-    if (newAdminData.password.length < 6) {
-      alert("Password must be at least 6 characters long.");
+    if (newAdminData.password.length < 8) {
+      alert("Password must be at least 8 characters long.");
       return;
     }
 
@@ -200,7 +200,7 @@ function ManageUsers() {
           className="create-admin-btn"
           onClick={() => setShowCreateAdmin(true)}
         >
-          ➕ Create Admin
+          ➕ Create New Admin
         </button>
       </div>
 
