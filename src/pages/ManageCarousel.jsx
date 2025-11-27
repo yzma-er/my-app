@@ -92,7 +92,18 @@ function ManageCarousel() {
         </button>
       </div>
 
-      <h2>Manage Carousel Images</h2>
+      <h2
+          style={{
+            textAlign: "center",
+            margin: 0,
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "fit-content",
+          }}
+        >
+          Manage Carousel Images
+        </h2>
 
       <div className="upload-form">
         <input type="file" onChange={(e) => setFile(e.target.files[0])} />
