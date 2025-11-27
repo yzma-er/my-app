@@ -11,8 +11,6 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     description2: "",
     content: [],
   });
-  const [preview, setPreview] = useState(null);
-  const [videoFile, setVideoFile] = useState(null);
   const backendURL = "https://digital-guidance-api.onrender.com";
 
   // ✅ Fetch service details
@@ -69,17 +67,17 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     formData.append("video", file);
 
     try {
-      const res = await axios.post(`${backendURL}/api/services/upload/video`, formData, {
+      const res = await axios.post(`${backendURL}/api/services/upload/step-video`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       const updated = [...form.content];
-      updated[index].videoFile = res.data.filename;
+      updated[index].videoFile = res.data.url; // Store Cloudinary URL
       setForm({ ...form, content: updated });
 
       alert("✅ Step video uploaded successfully!");
     } catch (err) {
-      console.error("❌ Video upload error:", err);
+      console.error("❌ Step video upload error:", err);
       alert("Failed to upload step video.");
     }
   };
@@ -230,10 +228,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                         maxHeight: "300px"
                       }}
                     >
-                      <source
-                        src={`${backendURL}/videos/${step.videoFile}`}
-                        type="video/mp4"
-                      />
+                      <source src={step.videoFile} type="video/mp4" />
                     </video>
                   </div>
                 )}
@@ -326,7 +321,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
               
                   {/* Step Video Upload */}
                   <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                    🎥 Step Video
+                    🎥 Step Video (optional)
                   </label>
                   <input
                     type="file"
@@ -362,7 +357,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   {/* Upload Form */}
                   <div style={{ marginBottom: "10px" }}>
                     <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                      📎 Upload Form
+                      📎 Upload Form (optional)
                     </label>
                     <input
                       type="file"
