@@ -18,6 +18,71 @@
 }
 
 /* ============================
+   SEARCH AND CREATE CONTAINER
+============================ */
+.search-create-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-container input {
+  padding: 8px 12px;
+  width: 100%;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.create-admin-btn {
+  background: #1c7c0f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.create-admin-btn:hover {
+  background: #16650c;
+  transform: scale(1.05);
+}
+
+/* ============================
+   CREATE ADMIN FORM
+============================ */
+.create-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.create-admin-form input {
+  padding: 10px 12px;
+  border: 1px solid #b6e2b6;
+  border-radius: 8px;
+  font-size: 15px;
+  width: 100%;
+}
+
+.create-admin-form input:focus {
+  border-color: #1a651a;
+  outline: none;
+}
+
+/* ============================
    TABLE
 ============================ */
 .manage-users table {
@@ -95,6 +160,45 @@
 }
 
 /* ============================
+   MODAL BUTTONS
+============================ */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 30px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-btn {
+  background: #1c7c0f;
+}
+
+.save-btn:hover {
+  background: #16650c;
+  transform: scale(1.05);
+}
+
+.cancel-btn {
+  background: #b71c1c;
+}
+
+.cancel-btn:hover {
+  background: #8f1616;
+  transform: scale(1.05);
+}
+
+/* ============================
    RESPONSIVENESS
 ============================ */
 
@@ -102,6 +206,19 @@
 @media (max-width: 900px) {
   .manage-users {
     padding: 15px;
+  }
+  
+  .search-create-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-container {
+    max-width: 100%;
+  }
+  
+  .create-admin-btn {
+    align-self: flex-end;
   }
 }
 
@@ -134,6 +251,16 @@
     font-size: 13px;
     padding: 3px 10px;
   }
+  
+  .search-create-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .create-admin-btn {
+    align-self: stretch;
+    text-align: center;
+  }
 }
 
 /* ============================
@@ -164,7 +291,7 @@
 ============================ */
 .modal-large {
   width: 90%;
-  max-width: 1150px;
+  max-width: 500px;
   background: #ffffff;
   padding: 25px 30px;
   border-radius: 18px;
