@@ -1,5 +1,6 @@
 // src/pages/ViewFeedback.jsx
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ViewFeedback.css";
 import StepRatingsModal from "../components/StepRatingsModal";
@@ -8,6 +9,7 @@ function ViewFeedback() {
   const [feedback, setFeedback] = useState([]);
   const [services, setServices] = useState([]);
   const [filter, setFilter] = useState("All Services");
+  const navigate = useNavigate();
 
   // For modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -101,6 +103,31 @@ function ViewFeedback() {
 
   return (
     <div className="feedback-container">
+      
+      {/* Back button */}
+      <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
+        <button
+          className="back-admin-btn"
+          onClick={() => navigate("/admin")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: "30px",
+            backgroundColor: "#1c7c0f",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "bold",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            position: "absolute",
+            left: 0,
+          }}
+        >
+          <span style={{ fontWeight: "bold", fontSize: "18px" }}>←</span>
+        </button>
+      </div>
+
       <h2>📋 Feedback Records</h2>
 
       {/* Summary Section */}
