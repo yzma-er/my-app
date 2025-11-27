@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./Modal.css";
+import "./Services.css";
 
 function EditServiceModal({ service, onClose, refreshServices }) {
   const backendURL =
