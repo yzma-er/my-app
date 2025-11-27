@@ -51,34 +51,6 @@ function ManageUsers() {
     `${u.email} ${u.role}`.toLowerCase().includes(search.toLowerCase())
   );
 
-  // ✅ Change role
-  const handleRoleChange = async (id, newRole) => {
-    if (!window.confirm(`Change role to ${newRole}?`)) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${backendURL}/api/admin/users/${id}/role`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ role: newRole }),
-      });
-
-      if (res.ok) {
-        setUsers((prev) =>
-          prev.map((u) => (u.user_id === id ? { ...u, role: newRole } : u))
-        );
-        alert("✅ Role updated successfully!");
-      } else {
-        alert("❌ Failed to update role");
-      }
-    } catch (err) {
-      console.error("❌ Error updating role:", err);
-    }
-  };
-
   // ✅ Change password
   const handlePasswordChange = async (id) => {
     const newPassword = prompt("Enter new password:");
@@ -190,27 +162,23 @@ function ManageUsers() {
               <tr key={u.user_id}>
                 <td>{u.email}</td>
                 <td>
-                  <select
-                    value={u.role}
-                    onChange={(e) => handleRoleChange(u.user_id, e.target.value)}
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                  <span className="role-badge">{u.role}</span>
                 </td>
                 <td>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(u.user_id)}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    className="edit-btn"
-                    onClick={() => handlePasswordChange(u.user_id)}
-                  >
-                    Change Password
-                  </button>
+                  <div className="action-buttons">
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(u.user_id)}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      className="edit-btn"
+                      onClick={() => handlePasswordChange(u.user_id)}
+                    >
+                      Change Password
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))
