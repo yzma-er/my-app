@@ -57,6 +57,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 15px;
   transition: transform 0.3s ease;
+  position: relative;
 }
 
 .carousel-card:hover {
@@ -65,10 +66,18 @@
 
 .carousel-card img {
   width: 100%;
-  height: 150px; /* ✅ Fixed height */
-  object-fit: cover; /* ✅ FIXED: Keeps image cropped nicely */
+  height: 180px; /* Increased height for better visibility */
+  object-fit: cover; /* This crops the image to fit */
   border-radius: 8px;
   margin-bottom: 10px;
+  background-color: #f8f8f8; /* Fallback background */
+  border: 1px solid #ddd; /* Border to see image boundaries */
+}
+
+/* If images are too small, use contain instead */
+.carousel-card img[style*="border: 2px solid red"] {
+  object-fit: contain; /* Show entire image if there are issues */
+  background-color: #ffe6e6; /* Red background for failed images */
 }
 
 .carousel-card p {
@@ -85,8 +94,9 @@
   cursor: pointer;
   font-size: 14px;
   transition: background 0.3s;
+  margin-top: 10px;
 }
 
 .carousel-card button:hover {
-  background-color: #8a1010; /* ✅ FIXED: Removed extra # */
+  background-color: #8a1010;
 }
