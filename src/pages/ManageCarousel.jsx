@@ -118,24 +118,8 @@ function ManageCarousel() {
       <div className="carousel-grid">
         {images.map((img) => (
           <div key={img.id} className="carousel-card">
-            {/* Debug info - remove after testing */}
-            <div style={{ fontSize: '10px', color: 'red', marginBottom: '5px' }}>
-              URL: {img.imageUrl ? 'Present' : 'Missing'}
-            </div>
-            
-            {/* Cloudinary URL */}
-            <img 
-              src={img.imageUrl} 
-              alt={img.title || 'Carousel image'} 
-              onError={(e) => {
-                console.error('Image failed to load:', img.imageUrl);
-                e.target.style.border = '2px solid red';
-              }}
-              onLoad={(e) => {
-                console.log('Image loaded successfully:', img.imageUrl);
-                e.target.style.border = '2px solid green';
-              }}
-            />
+            {/* ✅ FIXED: Use 'image' instead of 'imageUrl' */}
+            <img src={img.image} alt={img.title || 'Carousel image'} />
 
             <p><strong>{img.title || 'No title'}</strong></p>
             <p>{img.caption || 'No caption'}</p>
@@ -143,16 +127,6 @@ function ManageCarousel() {
             <button onClick={() => handleDelete(img.id)}>Delete</button>
           </div>
         ))}
-      </div>
-
-      {/* Debug section - remove after testing */}
-      <div style={{ marginTop: '20px', padding: '10px', background: '#f5f5f5', borderRadius: '5px' }}>
-        <h4>Debug Info:</h4>
-        <p>Total images: {images.length}</p>
-        <p>Sample image data:</p>
-        <pre style={{ fontSize: '12px', overflow: 'auto' }}>
-          {JSON.stringify(images[0] || 'No images', null, 2)}
-        </pre>
       </div>
     </div>
   );
