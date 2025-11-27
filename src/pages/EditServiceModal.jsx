@@ -273,63 +273,96 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
 
             <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Steps</label>
             {form.content.map((step, index) => (
-              <div
-                key={index}
-                style={{
-                  background: "#f4fff4",
-                  padding: "10px",
-                  borderRadius: "10px",
-                  border: "1px solid #bde3b2",
-                  marginBottom: "10px",
-                }}
-              >
-                <h4 style={{ color: "#1C7C0F" }}>{step.title}</h4>
-                <textarea
-                  rows="6"
-                  value={step.content}
-                  onChange={(e) => handleStepChange(index, e.target.value)}
-                  placeholder={`Enter content for ${step.title}`}
-                  style={{ width: "100%", resize: "vertical" }}
-                />
-
-                <div style={{ marginTop: "8px" }}>
-                  <label>📎 Upload Form (optional)</label>
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={(e) => handleFormUpload(index, e)}
-                  />
-                  {step.formFile && (
-                    <p style={{ marginTop: "4px" }}>
-                      ✅ Uploaded:{" "}
-                      <a
-                        href={`${backendURL}/forms/${step.formFile}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: "#1C7C0F", textDecoration: "underline" }}
-                      >
-                        View Form
-                      </a>
-                    </p>
-                  )}
-                </div>
-
-                <button
+                <div
+                  key={index}
                   style={{
-                    background: "#b71c1c",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "20px",
-                    padding: "5px 12px",
-                    marginTop: "6px",
-                    cursor: "pointer",
+                    background: "#f4fff4",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    border: "1px solid #bde3b2",
+                    marginBottom: "10px",
                   }}
-                  onClick={() => removeStep(index)}
                 >
-                  🗑️ Remove
-                </button>
-              </div>
-            ))}
+                  {/* Step Title */}
+                  <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                    Step Title
+                  </label>
+                  <input
+                    type="text"
+                    value={step.title}
+                    onChange={(e) => {
+                      const updated = [...form.content];
+                      updated[index].title = e.target.value;
+                      setForm({ ...form, content: updated });
+                    }}
+                    style={{
+                      width: "100%",
+                      padding: "8px",
+                      marginBottom: "10px",
+                      borderRadius: "6px",
+                      border: "1px solid #bde3b2"
+                    }}
+                  />
+              
+                  {/* Step Content */}
+                  <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                    Step Content
+                  </label>
+                  <textarea
+                    rows="6"
+                    value={step.content}
+                    onChange={(e) => handleStepChange(index, e.target.value)}
+                    placeholder={`Enter content for ${step.title}`}
+                    style={{
+                      width: "100%",
+                      resize: "vertical",
+                      padding: "8px",
+                      borderRadius: "6px",
+                      border: "1px solid #bde3b2"
+                    }}
+                  />
+              
+                  {/* Upload Form */}
+                  <div style={{ marginTop: "8px" }}>
+                    <label>📎 Upload Form (optional)</label>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={(e) => handleFormUpload(index, e)}
+                    />
+                    {step.formFile && (
+                      <p style={{ marginTop: "4px" }}>
+                        ✅ Uploaded:{" "}
+                        <a
+                          href={`${backendURL}/forms/${step.formFile}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "#1C7C0F", textDecoration: "underline" }}
+                        >
+                          View Form
+                        </a>
+                      </p>
+                    )}
+                  </div>
+              
+                  {/* Remove Step Button */}
+                  <button
+                    style={{
+                      background: "#b71c1c",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "20px",
+                      padding: "6px 12px",
+                      marginTop: "10px",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => removeStep(index)}
+                  >
+                    🗑️ Remove Step
+                  </button>
+                </div>
+              ))}
+
 
             <button
               style={{
