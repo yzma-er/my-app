@@ -1,162 +1,45 @@
-// src/pages/RoleSelectionPage.jsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './RoleSelectionPage.css';
+import React from "react";
+import "./StepRatingsModal.css";
 
-import StepRatingsModal from "../components/StepRatingsModal";
+function StepRatingsModal({ open, onClose, serviceName, stepRatings, steps }) {
+  if (!open) return null;
 
-function RoleSelectionPage() {
-  const navigate = useNavigate();
-  const images = ['/carousel1.jpg', '/carousel2.jpg', '/carousel3.jpg'];
-
-  const [current, setCurrent] = useState(0);
-  const [showRatings, setShowRatings] = useState(false);
-  const [services, setServices] = useState([]);
-  const [feedback, setFeedback] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // ⭐ MODAL STATES
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
-  const [stepRatings, setStepRatings] = useState([]);
-
-  const backendURL =
-    window.location.hostname === "localhost"
-      ? "http://localhost:5000"
-      : "https://digital-guidance-api.onrender.com";
-
-  // ⭐ FETCH SERVICES + FEEDBACK
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [s, f] = await Promise.all([
-        axios.get(`${backendURL}/api/services`),
-        axios.get(`${backendURL}/api/feedback`)
-      ]);
-
-      setServices(s.data);
-      setFeedback(f.data);
-    } catch (err) {
-      console.error("❌ Error loading ratings:", err);
-      setServices([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [backendURL]);
-
-  useEffect(() => {
-    fetchData();
-    const pollingInterval = setInterval(() => fetchData(), 10000);
-    return () => clearInterval(pollingInterval);
-  }, [fetchData]);
-
-  // ⭐ CAROUSEL AUTO-SLIDE
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent(prev => (prev + 1) % images.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [images.length]);
-
-
-  // ⭐ COMPUTE AVERAGE RATINGS
-  const serviceSummary = services.map((s) => {
-    const serviceFeedback = feedback.filter(
-      f => f.service_name?.trim().toLowerCase() === s.name.trim().toLowerCase()
-    );
-
-    const avg =
-      serviceFeedback.length > 0
-        ? (serviceFeedback.reduce((sum, f) => sum + f.rating, 0) / serviceFeedback.length).toFixed(1)
-        : "N/A";
-
-    return { ...s, avg, count: serviceFeedback.length };
-  });
-
-
-  // ⭐ OPEN MODAL + LOAD STEP RATINGS
-  const openRatingsModal = async (service) => {
-    try {
-      const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
-      setStepRatings(res.data);
-    } catch (err) {
-      console.error("❌ Failed to load step ratings:", err);
-    }
-
-    setSelectedService(service);
-    setModalOpen(true);
-  };
+  // Create a mapping: step_number → step.title
+  const stepTitleMap = {};
+  if (Array.isArray(steps)) {
+    steps.forEach((step, index) => {
+      stepTitleMap[index + 1] = step.title || `Step ${index + 1}`;
+    });
+  }
 
   return (
-    <div className="role-container">
+    <div className="modal-overlay">
+      <div className="modal-box">
+        <button className="close-btn" onClick={onClose}>
+          ✖
+        </button>
 
-      {/* ⭐ CAROUSEL */}
-      <div className="carousel-container">
-        <div
-          className="carousel-track"
-          style={{ transform: `translateX(-${current * 100}%)` }}
-        >
-          {images.map((img, index) => (
-            <img key={index} src={img} alt={`Slide ${index + 1}`} className="carousel-image" />
-          ))}
-        </div>
+        <h2>⭐ Step Ratings for {serviceName}</h2>
+
+        {stepRatings.length === 0 ? (
+          <p style={{ textAlign: "center", marginTop: "20px" }}>
+            No step ratings available for this service.
+          </p>
+        ) : (
+          <div className="step-ratings-list">
+            {stepRatings.map((item) => (
+              <div key={item.step_number} className="step-rating-card">
+                <h3>{stepTitleMap[item.step_number]}</h3>
+                <p>
+                  ⭐ <strong>{item.avg_rating}</strong> ({item.count} ratings)
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      {/* ⭐ LOGO AND HEADINGS */}
-      <img src="/nvsu-logo.gif" alt="NVSU Logo" className="logo" />
-      <h2>Auxiliary Services Program</h2>
-      <h3>Nueva Vizcaya State University</h3>
-      <p>Bayombong, Nueva Vizcaya</p>
-
-      {/* ⭐ ROLE BUTTONS */}
-      <div className="button-group">
-        <button onClick={() => navigate('/login?role=admin')}>Administrator</button>
-        <button onClick={() => navigate('/login?role=user')}>User</button>
-      </div>
-
-      {/* ⭐ TOGGLE SERVICE RATINGS */}
-      <button
-        className="ratings-toggle-btn"
-        onClick={() => setShowRatings(prev => !prev)}
-      >
-        {showRatings ? 'Hide Service Ratings' : 'View Service Ratings'}
-      </button>
-
-      {/* ⭐ SERVICE LIST + SUMMARY */}
-      {showRatings && (
-        <>
-          {isLoading ? (
-            <p>Loading services...</p>
-          ) : serviceSummary.length > 0 ? (
-            <div className="role-cards">
-              {serviceSummary.map((s) => (
-                <div
-                  key={s.service_id}
-                  className="role-card"
-                  onClick={() => openRatingsModal(s)}   // ⭐ open modal
-                >
-                  <h3>{s.name}</h3>
-                  <p>⭐ {s.avg} ({s.count})</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>No services found or unable to load ratings.</p>
-          )}
-        </>
-      )}
-
-      {/* ⭐ STEP RATINGS MODAL */}
-      <StepRatingsModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        serviceName={selectedService?.name}
-        stepRatings={stepRatings}
-      />
-
     </div>
   );
 }
 
-export default RoleSelectionPage;
+export default StepRatingsModal;
