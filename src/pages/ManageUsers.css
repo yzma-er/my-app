@@ -41,6 +41,27 @@
 }
 
 /* ============================
+   ROLE BADGE
+============================ */
+.role-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ============================
+   ACTION BUTTONS CONTAINER
+============================ */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ============================
    BUTTONS
 ============================ */
 .delete-btn {
@@ -51,6 +72,7 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 .delete-btn:hover {
@@ -58,7 +80,6 @@
 }
 
 .edit-btn {
-  margin-left: 8px;
   padding: 6px 12px;
   background-color: #f0ad4e;
   color: white;
@@ -66,10 +87,53 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 .edit-btn:hover {
   background-color: #ec971f;
+}
+
+/* ============================
+   RESPONSIVENESS
+============================ */
+
+/* Tablet */
+@media (max-width: 900px) {
+  .manage-users {
+    padding: 15px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .manage-users {
+    padding: 15px;
+  }
+
+  .manage-users table {
+    font-size: 14px;
+    min-width: 500px; /* allow scroll on very small screens */
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .delete-btn,
+  .edit-btn {
+    padding: 5px 10px;
+    font-size: 13px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .role-badge {
+    font-size: 13px;
+    padding: 3px 10px;
+  }
 }
 
 /* ============================
@@ -138,163 +202,4 @@
   color: #004d00;
   font-weight: 700;
   margin-bottom: 25px;
-}
-
-/* ============================
-   MODAL FLEX LAYOUT
-============================ */
-.edit-modal-flex {
-  display: flex;
-  gap: 35px;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.edit-preview {
-  flex: 1.1;
-  background: #f9fff9;
-  border: 1px solid #b6e2b6;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
-  max-height: 70vh;
-  overflow-y: auto;
-  transition: all 0.3s ease;
-}
-
-.edit-preview video {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 12px;
-}
-
-.edit-preview h3 {
-  color: #145a14;
-  font-weight: bold;
-  margin: 8px 0 4px;
-}
-
-.edit-preview p {
-  color: #333;
-  font-size: 15px;
-  margin-bottom: 10px;
-}
-
-.edit-form {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.edit-form input,
-.edit-form textarea {
-  border: 1px solid #b6e2b6;
-  border-radius: 8px;
-  padding: 9px;
-  font-size: 15px;
-  width: 100%;
-}
-
-.edit-form input:focus,
-.edit-form textarea:focus {
-  border-color: #1a651a;
-  outline: none;
-}
-
-/* ============================
-   MODAL BUTTONS
-============================ */
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 15px;
-}
-
-.save-btn,
-.cancel-btn {
-  padding: 10px 24px;
-  border: none;
-  border-radius: 30px;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.save-btn {
-  background: #1c7c0f;
-}
-
-.save-btn:hover {
-  background: #16650c;
-  transform: scale(1.05);
-}
-
-.cancel-btn {
-  background: #b71c1c;
-}
-
-.cancel-btn:hover {
-  background: #8f1616;
-  transform: scale(1.05);
-}
-
-/* ============================
-   RESPONSIVENESS
-============================ */
-
-/* Tablet */
-@media (max-width: 900px) {
-  .edit-modal-flex {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .edit-preview {
-    max-height: 300px;
-  }
-
-  .modal-large {
-    width: 95%;
-    padding: 20px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  .manage-users {
-    padding: 15px;
-  }
-
-  .manage-users table {
-    font-size: 14px;
-    min-width: 500px; /* allow scroll on very small screens */
-  }
-
-  .delete-btn,
-  .edit-btn {
-    padding: 5px 10px;
-    font-size: 13px;
-  }
-
-  .modal-large {
-    width: 95%;
-    padding: 15px;
-  }
-
-  .edit-modal-flex {
-    flex-direction: column;
-  }
-
-  .modal-buttons {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .save-btn,
-  .cancel-btn {
-    width: 100%;
-  }
 }
