@@ -170,7 +170,7 @@
 /* Mobile */
 @media (max-width: 480px) {
   .carousel-container {
-    aspect-ratio: 2.5 / 1;
+    aspect-ratio: 2.5 / 2;
     max-width: 100%;
   }
 
@@ -197,6 +197,7 @@
     padding: 15px;
     border-radius: 10px;
     border: 3px solid #104C08;
+    color: black;
   }
 }
 
