@@ -1,68 +1,30 @@
-// src/components/StepRatingsModal.jsx
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./StepRatingsModal.css";
-import axios from "axios";
 
-function StepRatingsModal({ open, onClose, serviceName, serviceId, stepRatings, serviceInfo }) {
-  
-  const backendURL =
-    window.location.hostname === "localhost"
-      ? "http://localhost:5000"
-      : "https://digital-guidance-api.onrender.com";
-
-  const [stepTitles, setStepTitles] = useState({});
-
-  // ⭐ Load step titles from service content JSON
-  useEffect(() => {
-    if (!serviceId) return;
-
-    const fetchService = async () => {
-      try {
-        const res = await axios.get(`${backendURL}/api/services/${serviceId}`);
-        let steps = [];
-
-        try {
-          steps = JSON.parse(res.data.content || "[]");
-        } catch {
-          steps = [];
-        }
-
-        // Map step numbers → titles
-        const titles = {};
-        steps.forEach((step, index) => {
-          titles[index + 1] = step.title || `Step ${index + 1}`;
-        });
-
-        setStepTitles(titles);
-      } catch (err) {
-        console.error("❌ Error loading step titles:", err);
-      }
-    };
-
-    fetchService();
-  }, [serviceId, backendURL]);
-
+function StepRatingsModal({ open, onClose, serviceName, stepRatings }) {
   if (!open) return null;
 
   return (
-    <div className="ratings-modal-overlay">
-      <div className="ratings-modal">
-        <button className="close-btn" onClick={onClose}>✖</button>
+    <div className="modal-overlay">
+      <div className="modal-box">
+        <h2>⭐ Step Ratings — {serviceName}</h2>
 
-        <h2>📊 Step Ratings: {serviceName}</h2>
+        {stepRatings.length > 0 ? (
+          <ul className="step-list">
+            {stepRatings.map((step, i) => (
+              <li key={i} className="step-item">
+                <strong>Step {step.step_number}</strong>
+                <span>
+                  ⭐ {step.avg_rating} ({step.count})
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No ratings available for this service.</p>
+        )}
 
-        <div className="step-ratings-list">
-          {stepRatings.length > 0 ? (
-            stepRatings.map((r, idx) => (
-              <div key={idx} className="step-rating-card">
-                <h3>{stepTitles[r.step_number] || `Step ${r.step_number}`}</h3>
-                <p>⭐ {r.avg_rating} ({r.count} ratings)</p>
-              </div>
-            ))
-          ) : (
-            <p>No ratings available for this service.</p>
-          )}
-        </div>
+        <button className="close-btn" onClick={onClose}>Close</button>
       </div>
     </div>
   );
