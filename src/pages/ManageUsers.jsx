@@ -10,8 +10,11 @@ function ManageUsers() {
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [newAdminData, setNewAdminData] = useState({
     email: "",
-    password: ""
+    password: "",
+    confirmPassword: ""
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
   // ✅ Auto-detect backend (Laptop vs. Phone)
@@ -57,14 +60,22 @@ function ManageUsers() {
   );
 
   // ✅ Create Admin Account
-  const handleCreateAdmin = async () => {
-    if (!newAdminData.email || !newAdminData.password) {
-      alert("Please enter both email and password.");
+  const handleCreateAdmin = async (e) => {
+    e.preventDefault();
+
+    if (!newAdminData.email || !newAdminData.password || !newAdminData.confirmPassword) {
+      alert("Please fill in all fields.");
       return;
     }
 
+    // 🔐 Minimum 8 characters (matching SignupPage)
     if (newAdminData.password.length < 8) {
       alert("Password must be at least 8 characters long.");
+      return;
+    }
+
+    if (newAdminData.password !== newAdminData.confirmPassword) {
+      alert("Passwords do not match.");
       return;
     }
 
@@ -82,9 +93,11 @@ function ManageUsers() {
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         alert("✅ Admin account created successfully!");
-        setNewAdminData({ email: "", password: "" });
+        setNewAdminData({ email: "", password: "", confirmPassword: "" });
         setShowCreateAdmin(false);
         
         // Refresh users list
@@ -96,8 +109,7 @@ function ManageUsers() {
           setUsers(data);
         }
       } else {
-        const error = await res.json();
-        alert(`❌ Failed to create admin: ${error.message || "Unknown error"}`);
+        alert(`❌ ${data.message || "Failed to create admin account"}`);
       }
     } catch (err) {
       console.error("❌ Error creating admin:", err);
@@ -200,7 +212,7 @@ function ManageUsers() {
           className="create-admin-btn"
           onClick={() => setShowCreateAdmin(true)}
         >
-          ➕ Create New Admin
+          ➕ Create Admin
         </button>
       </div>
 
@@ -212,7 +224,9 @@ function ManageUsers() {
               className="close-btn" 
               onClick={() => {
                 setShowCreateAdmin(false);
-                setNewAdminData({ email: "", password: "" });
+                setNewAdminData({ email: "", password: "", confirmPassword: "" });
+                setShowPassword(false);
+                setShowConfirm(false);
               }}
             >
               ✖
@@ -220,38 +234,85 @@ function ManageUsers() {
             
             <h2>Create Admin Account</h2>
             
-            <div className="create-admin-form">
+            <form className="create-admin-form" onSubmit={handleCreateAdmin}>
               <input
                 type="email"
                 placeholder="Admin email"
                 value={newAdminData.email}
                 onChange={(e) => setNewAdminData({...newAdminData, email: e.target.value})}
+                required
               />
-              <input
-                type="password"
-                placeholder="Admin password"
-                value={newAdminData.password}
-                onChange={(e) => setNewAdminData({...newAdminData, password: e.target.value})}
-              />
-              
+
+              {/* PASSWORD FIELD */}
+              <div className="password-container">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter password"
+                  value={newAdminData.password}
+                  onChange={(e) => setNewAdminData({...newAdminData, password: e.target.value})}
+                  required
+                />
+                <i
+                  className={`fa-solid ${
+                    showPassword ? "fa-eye-slash" : "fa-eye"
+                  } toggle-icon`}
+                  onClick={() => setShowPassword(!showPassword)}
+                ></i>
+              </div>
+
+              {/* ⚠️ Real-time password requirement message */}
+              {newAdminData.password.length > 0 && newAdminData.password.length < 8 && (
+                <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
+                  Password must be at least 8 characters long.
+                </p>
+              )}
+
+              {/* CONFIRM PASSWORD FIELD */}
+              <div className="password-container">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  placeholder="Confirm password"
+                  value={newAdminData.confirmPassword}
+                  onChange={(e) => setNewAdminData({...newAdminData, confirmPassword: e.target.value})}
+                  required
+                />
+                <i
+                  className={`fa-solid ${
+                    showConfirm ? "fa-eye-slash" : "fa-eye"
+                  } toggle-icon`}
+                  onClick={() => setShowConfirm(!showConfirm)}
+                ></i>
+              </div>
+
+              {/* ⚠️ Real-time confirm password mismatch */}
+              {newAdminData.confirmPassword.length > 0 &&
+                newAdminData.confirmPassword !== newAdminData.password && (
+                  <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
+                    Passwords do not match.
+                  </p>
+                )}
+
               <div className="modal-buttons">
                 <button 
                   className="save-btn" 
-                  onClick={handleCreateAdmin}
+                  type="submit"
                 >
                   Create Admin
                 </button>
                 <button 
                   className="cancel-btn" 
+                  type="button"
                   onClick={() => {
                     setShowCreateAdmin(false);
-                    setNewAdminData({ email: "", password: "" });
+                    setNewAdminData({ email: "", password: "", confirmPassword: "" });
+                    setShowPassword(false);
+                    setShowConfirm(false);
                   }}
                 >
                   Cancel
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
