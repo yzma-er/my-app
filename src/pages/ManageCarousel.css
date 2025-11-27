@@ -7,7 +7,7 @@
 
 .manage-carousel h2 {
   font-size: 28px;
-  color: #1c7c0f;
+  color: #104C08;
   margin-bottom: 20px;
 }
 
@@ -29,7 +29,7 @@
 }
 
 .upload-form button {
-  background-color: #1c7c0f;
+  background-color: #155a0a;
   color: white;
   border: none;
   padding: 10px 18px;
@@ -40,7 +40,7 @@
 }
 
 .upload-form button:hover {
-  background-color: #155f0b;
+  background-color: #1c7c0f;
 }
 
 .carousel-grid {
@@ -88,5 +88,5 @@
 }
 
 .carousel-card button:hover {
-  background-color: #9a1414;
+  background-color: #8a1010;
 }
