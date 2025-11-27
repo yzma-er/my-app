@@ -416,7 +416,7 @@
 @media (max-width: 900px) {
   .service-item {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .button-group {
