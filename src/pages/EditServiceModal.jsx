@@ -220,15 +220,17 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
               }}>
                 <h4 style={{ color: "#1C7C0F" }}>{step.title}</h4>
                 
-                {/* Step Video Preview */}
+                {/* Step Video Preview - RESPONSIVE */}
                 {step.videoFile && (
-                  <div style={{ margin: "10px 0" }}>
+                  <div style={{ margin: "10px 0", width: "100%" }}>
                     <video
                       controls
                       style={{
                         width: "100%",
+                        height: "auto",
                         borderRadius: "10px",
-                        maxHeight: "300px"
+                        maxHeight: "300px",
+                        objectFit: "contain"
                       }}
                     >
                       <source src={step.videoFile} type="video/mp4" />
