@@ -63,7 +63,6 @@ function ServiceDetails() {
     );
   }, [currentStep, STORAGE_KEY]);
 
-  // ⭐⭐⭐ FIXED HERE ⭐⭐⭐
   const handleFeedbackSubmit = async () => {
     if (rating === 0) {
       alert("Please select a star rating before submitting.");
@@ -72,7 +71,7 @@ function ServiceDetails() {
 
     try {
       await axios.post(`${backendURL}/api/feedback`, {
-        service_id: service?.service_id, // ✅ FIXED: Use real DB ID
+        service_id: service?.service_id,
         service_name: service?.name || null,
         step_number: currentStep,
         rating,
@@ -88,7 +87,6 @@ function ServiceDetails() {
       alert("Failed to submit feedback.");
     }
   };
-  // ⭐⭐⭐ END OF FIX ⭐⭐⭐
 
   const handleResetProgress = () => {
     if (window.confirm("Are you sure you want to reset your progress?")) {
@@ -145,8 +143,6 @@ function ServiceDetails() {
         </p>
       )}
 
-      
-
       {service.description2 && <p className="service-description2">{service.description2}</p>}
 
       {steps.map((step, index) => {
@@ -157,18 +153,26 @@ function ServiceDetails() {
         return (
           <div key={index} className="info-section" style={{ marginBottom: "25px" }}>
             <h3 style={{ color: "#1C7C0F" }}>{step.title}</h3>
-            <p style={{ whiteSpace: "pre-line" }}>{step.content}</p>
-
-            {/* 🎥 Video per Step */}
+            
+            {/* 🎥 Video for each step */}
             {step.videoFile && (
               <div style={{ marginTop: "12px", marginBottom: "15px" }}>
-                <video controls width="100%" style={{ borderRadius: "10px" }}>
+                <video 
+                  controls 
+                  width="100%" 
+                  style={{ 
+                    borderRadius: "10px",
+                    maxWidth: "800px",
+                    maxHeight: "450px"
+                  }}
+                >
                   <source src={`${backendURL}/videos/${step.videoFile}`} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
             )}
 
+            <p style={{ whiteSpace: "pre-line" }}>{step.content}</p>
 
             {step.formFile && (
               <div style={{ marginTop: "10px" }}>
@@ -224,7 +228,7 @@ function ServiceDetails() {
 
       {currentStep > steps.length && (
         <div className="info-section" style={{ textAlign: "center", marginTop: "20px" }}>
-          <h3>🎉 You’ve completed all steps for this service!</h3>
+          <h3>🎉 You've completed all steps for this service!</h3>
           <p style={{ color: "#1C7C0F" }}>
             You can reset your progress if you wish to start again.
           </p>
