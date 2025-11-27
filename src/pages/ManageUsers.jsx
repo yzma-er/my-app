@@ -212,7 +212,7 @@ function ManageUsers() {
           className="create-admin-btn"
           onClick={() => setShowCreateAdmin(true)}
         >
-          ➕ Create Admin
+          ➕ Create New Admin
         </button>
       </div>
 
