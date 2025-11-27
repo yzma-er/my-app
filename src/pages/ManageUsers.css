@@ -330,3 +330,63 @@
   font-weight: 700;
   margin-bottom: 25px;
 }
+
+/* ============================
+   PASSWORD CONTAINER (from LoginPage.css)
+============================ */
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-container input {
+  width: 100%;
+  padding: 10px 40px 10px 12px;
+  border: 1px solid #b6e2b6;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.password-container input:focus {
+  border-color: #1a651a;
+  outline: none;
+}
+
+.toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  font-size: 16px;
+}
+
+.toggle-icon:hover {
+  color: #333;
+}
+
+/* ============================
+   CREATE ADMIN FORM
+============================ */
+.create-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.create-admin-form input {
+  padding: 10px 12px;
+  border: 1px solid #b6e2b6;
+  border-radius: 8px;
+  font-size: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.create-admin-form input:focus {
+  border-color: #1a651a;
+  outline: none;
+}
