@@ -145,16 +145,7 @@ function ServiceDetails() {
         </p>
       )}
 
-      <div className="video-container">
-        {service.video ? (
-          <video controls>
-            <source src={`${backendURL}/videos/${service.video}`} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        ) : (
-          <p style={{ marginBottom: "20px" }}>🎥 No video uploaded for this service.</p>
-        )}
-      </div>
+      
 
       {service.description2 && <p className="service-description2">{service.description2}</p>}
 
@@ -167,6 +158,17 @@ function ServiceDetails() {
           <div key={index} className="info-section" style={{ marginBottom: "25px" }}>
             <h3 style={{ color: "#1C7C0F" }}>{step.title}</h3>
             <p style={{ whiteSpace: "pre-line" }}>{step.content}</p>
+
+            {/* 🎥 Video per Step */}
+            {step.videoFile && (
+              <div style={{ marginTop: "12px", marginBottom: "15px" }}>
+                <video controls width="100%" style={{ borderRadius: "10px" }}>
+                  <source src={`${backendURL}/videos/${step.videoFile}`} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            )}
+
 
             {step.formFile && (
               <div style={{ marginTop: "10px" }}>
