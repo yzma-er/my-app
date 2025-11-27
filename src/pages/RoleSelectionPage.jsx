@@ -1,24 +1,22 @@
 // src/pages/RoleSelectionPage.jsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './RoleSelectionPage.css';
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./RoleSelectionPage.css";
 
 import StepRatingsModal from "../components/StepRatingsModal";
 
 function RoleSelectionPage() {
   const navigate = useNavigate();
+  const images = ["/carousel1.jpg", "/carousel2.jpg", "/carousel3.jpg"];
 
-  // STATIC carousel images
-  const images = ['/carousel1.jpg', '/carousel2.jpg', '/carousel3.jpg'];
   const [current, setCurrent] = useState(0);
-
   const [showRatings, setShowRatings] = useState(false);
   const [services, setServices] = useState([]);
   const [feedback, setFeedback] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Modal State
+  // ⭐ MODAL STATES
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [stepRatings, setStepRatings] = useState([]);
@@ -28,14 +26,15 @@ function RoleSelectionPage() {
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
 
-  // Fetch services + feedback
+  // ⭐ FETCH SERVICES + FEEDBACK
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
       const [s, f] = await Promise.all([
         axios.get(`${backendURL}/api/services`),
-        axios.get(`${backendURL}/api/feedback`)
+        axios.get(`${backendURL}/api/feedback`),
       ]);
+
       setServices(s.data);
       setFeedback(f.data);
     } catch (err) {
@@ -52,87 +51,77 @@ function RoleSelectionPage() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  // Carousel auto-rotate
+  // ⭐ CAROUSEL AUTO SLIDE
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
     }, 3000);
+
     return () => clearInterval(interval);
   }, [images.length]);
 
-  // Compute average per service
+  // ⭐ COMPUTE AVG RATINGS
   const serviceSummary = services.map((s) => {
     const serviceFeedback = feedback.filter(
-      f => f.service_name?.trim().toLowerCase() === s.name.trim().toLowerCase()
+      (f) =>
+        f.service_name?.trim().toLowerCase() ===
+        s.name.trim().toLowerCase()
     );
 
     const avg =
       serviceFeedback.length > 0
-        ? (serviceFeedback.reduce((sum, f) => sum + f.rating, 0) / serviceFeedback.length).toFixed(1)
+        ? (
+            serviceFeedback.reduce((sum, f) => sum + f.rating, 0) /
+            serviceFeedback.length
+          ).toFixed(1)
         : "N/A";
 
-    return {
-      ...s,
-      avg,
-      count: serviceFeedback.length,
-    };
+    return { ...s, avg, count: serviceFeedback.length };
   });
 
-  // -------------------------------
-  // ⭐ Open Step Ratings Modal
-  // -------------------------------
-  const openStepRatings = async (s) => {
-    // Parse steps (for titles)
-    let parsedSteps = [];
+  // ⭐ OPEN MODAL + FETCH STEP RATINGS
+  const openRatingsModal = async (service) => {
     try {
-      parsedSteps = JSON.parse(s.content || "[]");
-      if (!Array.isArray(parsedSteps)) throw new Error();
-    } catch {
-      parsedSteps = [];
-    }
-
-    setSelectedService({
-      ...s,
-      steps: parsedSteps,
-    });
-
-    try {
-      const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${s.service_id}`);
+      const res = await axios.get(
+        `${backendURL}/api/feedback/step-ratings/${service.service_id}`
+      );
       setStepRatings(res.data);
     } catch (err) {
-      console.error("❌ Error loading step ratings:", err);
+      console.error("❌ Failed to load step ratings:", err);
       setStepRatings([]);
     }
 
+    setSelectedService(service);
     setModalOpen(true);
   };
 
   return (
     <div className="role-container">
-      {/* Carousel */}
+      {/* ⭐ CAROUSEL */}
       <div className="carousel-container">
         <div
           className="carousel-track"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
-          {images.map((img, index) => (
-            <img key={index} src={img} alt={`Slide ${index + 1}`} className="carousel-image" />
+          {images.map((img, i) => (
+            <img key={i} src={img} alt={`Slide ${i + 1}`} className="carousel-image" />
           ))}
         </div>
       </div>
 
-      {/* Logo and heading */}
+      {/* LOGO + TITLES */}
       <img src="/nvsu-logo.gif" alt="NVSU Logo" className="logo" />
-      <h2>Nueva Vizcaya State University</h2>
-      <h3>Auxiliary Services Program</h3>
+      <h2>Auxiliary Services Program</h2>
+      <h3>Nueva Vizcaya State University</h3>
       <p>Bayombong, Nueva Vizcaya</p>
 
-      {/* Buttons */}
+      {/* ROLE BUTTONS */}
       <div className="button-group">
-        <button onClick={() => navigate('/login?role=admin')}>Administrator</button>
-        <button onClick={() => navigate('/login?role=user')}>User</button>
+        <button onClick={() => navigate("/login?role=admin")}>Administrator</button>
+        <button onClick={() => navigate("/login?role=user")}>User</button>
       </div>
 
+      {/* TOGGLE RATINGS */}
       <button
         className="ratings-toggle-btn"
         onClick={() => setShowRatings((prev) => !prev)}
@@ -140,7 +129,7 @@ function RoleSelectionPage() {
         {showRatings ? "Hide Service Ratings" : "View Service Ratings"}
       </button>
 
-      {/* Ratings Summary */}
+      {/* RATING GRID */}
       {showRatings && (
         <>
           {isLoading ? (
@@ -151,26 +140,29 @@ function RoleSelectionPage() {
                 <div
                   key={s.service_id}
                   className="role-card"
-                  onClick={() => openStepRatings(s)}
+                  onClick={() => openRatingsModal(s)}
                 >
                   <h3>{s.name}</h3>
-                  <p>⭐ {s.avg} ({s.count})</p>
+                  <p>
+                    ⭐ {s.avg} ({s.count})
+                  </p>
                 </div>
               ))}
             </div>
           ) : (
-            <p>No services found or unable to load ratings.</p>
+            <p>No services found.</p>
           )}
         </>
       )}
 
-      {/* ⭐ Step Ratings Modal */}
+      {/* STEP RATINGS MODAL */}
       <StepRatingsModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         serviceName={selectedService?.name}
+        serviceId={selectedService?.service_id}
         stepRatings={stepRatings}
-        steps={selectedService?.steps}
+        serviceInfo={selectedService}
       />
     </div>
   );
