@@ -1,7 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+
 function AboutPage() {
-   const navigate = useNavigate();
+ 
   return (
     <div
       style={{
@@ -41,30 +41,6 @@ function AboutPage() {
         for everyone.
       </p>
     </div>
-
-
-    {/* Back button */}
-      <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
-        <button
-          className="back-admin-btn"
-          onClick={() => navigate("/admin")}
-          style={{
-            padding: "6px 12px",
-            borderRadius: "30px",
-            backgroundColor: "#1c7c0f",
-            color: "white",
-            cursor: "pointer",
-            fontSize: "16px",
-            fontWeight: "bold",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            position: "absolute",
-            left: 0,
-          }}
-        >
-          <span style={{ fontWeight: "bold", fontSize: "18px" }}>←</span>
-        </button>
   );
 }
 
