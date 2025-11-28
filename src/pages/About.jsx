@@ -18,8 +18,8 @@ function AboutPage() {
       {/* 🔙 Back button */}
       <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
         <button
-          className="back-admin-btn"
-          onClick={() => navigate("/admin")}
+          className="back-user-btn"
+          onClick={() => navigate("/user")}
           style={{
             padding: "6px 12px",
             borderRadius: "30px",
