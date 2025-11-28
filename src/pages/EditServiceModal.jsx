@@ -316,7 +316,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Service Name</label>
             <input name="name" value={form.name} onChange={handleChange} />
 
-            <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description (above steps)</label>
+            <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description 1</label>
             <textarea
               name="description"
               rows="3"
@@ -324,7 +324,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
               onChange={handleChange}
             />
 
-            <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description (below steps)</label>
+            <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description 2</label>
             <textarea
               name="description2"
               rows="3"
@@ -370,7 +370,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
               
                   {/* Step Video Upload */}
                   <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                    🎥 Step Video (optional)
+                    🎥 Step Video
                   </label>
                   <input
                     type="file"
@@ -406,7 +406,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   {/* Upload Form */}
                   <div style={{ marginBottom: "10px" }}>
                     <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                      📎 Upload Form (optional)
+                      📎 Upload Form 
                     </label>
                     <input
                       type="file"
