@@ -152,7 +152,10 @@ function ServiceDetails() {
 
         return (
           <div key={index} className="info-section" style={{ marginBottom: "25px" }}>
-            <h3 style={{ color: "#1C7C0F" }}>{step.title}</h3>
+            {/* ✅ Show step title with custom name */}
+            <h3 style={{ color: "#1C7C0F" }}>
+              {step.customName ? `${step.title} - ${step.customName}` : step.title}
+            </h3>
             
             {/* 🎥 Video for each step - RESPONSIVE */}
             {step.videoFile && (
@@ -210,7 +213,8 @@ function ServiceDetails() {
 
             {currentStep === stepNum && (
               <div className="feedback-section">
-                <h3>Rate {step.title}</h3>
+                {/* ✅ Update feedback title to include custom name */}
+                <h3>Rate {step.customName ? `${step.title} - ${step.customName}` : step.title}</h3>
 
                 <div className="star-rating">
                   {[1, 2, 3, 4, 5].map((star) => (
