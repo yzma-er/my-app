@@ -127,17 +127,24 @@ function ServicesPage() {
       </div>
 
       {/* ----------------------- */}
-      {/* ✅ SEARCH BAR */}
+      {/* ✅ PAGE TITLE & SEARCH */}
       {/* ----------------------- */}
-      <header>
-        <input
-          type="text"
-          placeholder="🔍 Search services..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-bar"
-        />
-      </header>
+      <div className="services-header">
+        <div className="services-title-container">
+          <h1 className="services-title">Services We Offer</h1>
+          <p className="services-subtitle">Discover our comprehensive range of digital solutions</p>
+        </div>
+        
+        <div className="search-section">
+          <input
+            type="text"
+            placeholder="🔍 Search services..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-bar"
+          />
+        </div>
+      </div>
 
       {/* ----------------------- */}
       {/* ✅ SERVICES LIST */}
