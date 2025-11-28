@@ -145,7 +145,7 @@
 /* ========= Background Fix ========= */
 .admin-dashboard {
 
-  background-position: center;
+  background-position: left;
   background-repeat: no-repeat;
   background-size: cover;
 }
