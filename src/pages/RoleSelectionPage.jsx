@@ -8,7 +8,7 @@ import StepRatingsModal from "../components/StepRatingsModal";
 
 function RoleSelectionPage() {
   const navigate = useNavigate();
-  const images = ['/carousel1.jpg', '/carousel2.jpg', '/carousel3.jpg'];
+  const images = ['/carousel1.jpg', '/carousel2.jpg', '/carousel3.jpg', '/carousel4.jpg'];
 
   const [current, setCurrent] = useState(0);
   const [showRatings, setShowRatings] = useState(false);
