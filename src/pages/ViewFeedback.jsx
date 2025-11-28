@@ -87,19 +87,28 @@ function ViewFeedback() {
   });
 
   // Open modal and load step ratings
-  const openStepRatings = async (service) => {
-    setSelectedService(service);
+  // In ViewFeedback.jsx - update the openStepRatings function
+const openStepRatings = async (service) => {
+  setSelectedService(service);
 
-    try {
-      const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
-      setStepRatings(res.data);
-    } catch (err) {
-      console.error("❌ Error loading step ratings:", err);
-      setStepRatings([]);
-    }
+  try {
+    const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
+    console.log("Step ratings response:", res.data); // Debug log
+    
+    // Make sure the response includes custom_name
+    const stepRatingsWithNames = res.data.map(step => ({
+      ...step,
+      custom_name: step.custom_name || null
+    }));
+    
+    setStepRatings(stepRatingsWithNames);
+  } catch (err) {
+    console.error("❌ Error loading step ratings:", err);
+    setStepRatings([]);
+  }
 
-    setModalOpen(true);
-  };
+  setModalOpen(true);
+};
 
   return (
     <div className="feedback-container">
