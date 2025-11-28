@@ -171,6 +171,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
           flexDirection: "column",
           alignItems: "center",
           padding: "30px",
+          position: "relative"
         }}
       >
         <button className="close-btn" onClick={onClose}>
