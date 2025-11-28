@@ -10,6 +10,30 @@ function AboutPage() {
         textAlign: "center",
       }}
     >
+
+
+      {/* Back button */}
+      <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
+        <button
+          className="back-admin-btn"
+          onClick={() => navigate("/admin")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: "30px",
+            backgroundColor: "#1c7c0f",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "bold",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            position: "absolute",
+            left: 0,
+          }}
+        >
+          <span style={{ fontWeight: "bold", fontSize: "18px" }}>←</span>
+        </button>
       <h1 style={{ color: "#104C08", marginBottom: "1.5rem" }}>About </h1>
       
       <p style={{ marginBottom: "1rem", textAlign: "justify", lineHeight: "1.6" }}>
