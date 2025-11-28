@@ -117,11 +117,23 @@
   font-weight: 600;
 }
 
+/* Add to StepRatingsModal.css */
+.step-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .custom-name {
   color: #1C7C0F;
   font-style: italic;
   font-size: 0.9rem;
   font-weight: 500;
+  background: #f0f8f0;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #d4edd4;
 }
 
 .rating-info {
