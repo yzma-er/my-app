@@ -157,3 +157,243 @@
     padding: 6px 0;
   }
 }
+
+
+/* ================================
+   🎯 SERVICES HEADER & TITLE
+================================== */
+.services-header {
+  margin: 20px 0 30px 0;
+}
+
+.services-title-container {
+  background: #104C08; /* Same color as navbar */
+  color: white;
+  padding: 2rem 1rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(16, 76, 8, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.services-title-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.services-title-container:hover::before {
+  left: 100%;
+}
+
+.services-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  letter-spacing: -0.5px;
+}
+
+.services-subtitle {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.9;
+  font-weight: 400;
+  color: #f0f0f0;
+}
+
+.search-section {
+  padding: 0 1rem;
+}
+
+/* ================================
+   📱 RESPONSIVE DESIGN
+================================== */
+@media (max-width: 768px) {
+  .services-title-container {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .services-title {
+    font-size: 2rem;
+  }
+  
+  .services-subtitle {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-title {
+    font-size: 1.75rem;
+  }
+  
+  .services-subtitle {
+    font-size: 0.9rem;
+  }
+}
+
+/* Keep all your existing CSS below */
+.services-container {
+  padding: 1rem;
+  font-family: 'Segoe UI', sans-serif;
+  height: 100%;
+  min-height: 100vh;
+  overflow-y: auto;  /* ✅ allows scrolling */
+  overflow-x: hidden;
+}
+
+.search-bar {
+  width: 98%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #104C08;
+  margin-bottom: 1rem;
+}
+
+.services-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.service-card {
+  background: #f7f7f7;
+  padding: 15px;
+  border-radius: 10px;
+  border: 3px solid #104C08;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.service-card:hover {
+  background: #eaf4ea;
+  transform: translateY(-2px);
+}
+
+.service-card h3 {
+  margin: 0 0 5px;
+}
+
+.service-card p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Centered loader container */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+/* Green spinning circle loader */
+.loader {
+  border: 4px solid #c8e6c9;
+  border-top: 4px solid #2e7d32;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+/* Loader animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ================================
+   🎠 Dynamic Carousel (fixed size)
+================================== */
+.carousel-container {
+  width: 100%;
+  display: flex;
+  margin: 0 auto;  
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.custom-carousel {
+  width: 100%;
+  max-width: 900px; /* ✅ fixed size similar to your screenshot */
+  height: 400px; /* ✅ set a consistent height */
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Images inside the carousel */
+.carousel-slide {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* ✅ ensures the image fits nicely */
+  border-radius: 20px;
+  transition: transform 0.5s ease-in-out;
+}
+
+/* Caption overlay */
+.carousel-caption {
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  padding: 10px 0;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  font-size: 1rem;
+}
+
+/* Optional fade-in effect for each image */
+.carousel-slide {
+  animation: fade 1s ease-in-out;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .custom-carousel {
+    width: 95%;
+    height: 250px;
+  }
+
+  .carousel-caption {
+    font-size: 0.9rem;
+    padding: 6px 0;
+  }
+}
