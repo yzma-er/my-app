@@ -1,4 +1,4 @@
-// src/pages/ViewFeedback.jsx
+// src/pages/ViewFeedback.jsx - UPDATED to show user emails
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -170,7 +170,7 @@ function ViewFeedback() {
       <table className="feedback-table">
         <thead>
           <tr>
-            <th>User</th>
+            <th>User Email</th>
             <th>Service</th>
             <th>Step</th>
             <th>Rating</th>
@@ -184,16 +184,26 @@ function ViewFeedback() {
             filteredFeedback.map((item) => (
               <tr key={item.feedback_id}>
                 <td>
-                  {item.user_email || item.user_id ? 
-                    `User ${item.user_id}` : 
-                    'Anonymous'
-                  }
+                  {item.user_email ? (
+                    <span title={`User ID: ${item.user_id}`}>
+                      {item.user_email}
+                    </span>
+                  ) : (
+                    <span style={{ color: '#999', fontStyle: 'italic' }}>
+                      Anonymous
+                    </span>
+                  )}
                 </td>
                 <td>{item.service_name || "—"}</td>
                 <td>{item.step_number ? `Step ${item.step_number}` : "—"}</td>
                 <td>
-                  {"★".repeat(item.rating)}
-                  {"☆".repeat(5 - item.rating)}
+                  <span style={{ color: '#ffa500' }}>
+                    {"★".repeat(item.rating)}
+                    {"☆".repeat(5 - item.rating)}
+                  </span>
+                  <span style={{ marginLeft: '8px', fontSize: '12px', color: '#666' }}>
+                    ({item.rating}/5)
+                  </span>
                 </td>
                 <td>{item.comment || "No comment"}</td>
                 <td>
