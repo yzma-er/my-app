@@ -174,9 +174,38 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
           position: "relative"
         }}
       >
-        <button className="close-btn" onClick={onClose}>
-          ✖
-        </button>
+         {/* ✅ FIXED: Proper close button for modal */}
+      <button 
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          top: "15px",
+          right: "20px",
+          background: "none",
+          border: "none",
+          fontSize: "24px",
+          cursor: "pointer",
+          color: "#004d00",
+          width: "30px",
+          height: "30px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "50%",
+          transition: "all 0.2s ease"
+        }}
+        onMouseOver={(e) => {
+          e.target.style.background = "#f0f0f0";
+          e.target.style.color = "#b71c1c";
+        }}
+        onMouseOut={(e) => {
+          e.target.style.background = "none";
+          e.target.style.color = "#004d00";
+        }}
+      >
+        ✖
+      </button>
+
 
         <h2>
           Edit Service: <span>{form.name}</span>
