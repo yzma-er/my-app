@@ -166,7 +166,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
         className="modal modal-large"
         style={{
           width: "95%",
-          maxWidth: "1200px",
+          maxWidth: "100px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
