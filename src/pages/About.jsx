@@ -19,7 +19,7 @@ function AboutPage() {
       <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
         <button
           className="back-user-btn"
-          onClick={() => navigate("/user")}
+          onClick={() => navigate("/services")}
           style={{
             padding: "6px 12px",
             borderRadius: "30px",
