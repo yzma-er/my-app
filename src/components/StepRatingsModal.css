@@ -2,50 +2,102 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 9999;
+  align-items: center;
+  z-index: 1000;
 }
 
 .modal-box {
   background: white;
   padding: 25px;
-  width: 380px;
   border-radius: 12px;
-  box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
-  animation: popup 0.25s ease;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
-@keyframes popup {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.modal-box h2 {
+  color: #1C7C0F;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.5rem;
 }
 
 .step-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .step-item {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #ddd;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.step-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.step-header strong {
+  color: #333;
+  font-size: 1rem;
+}
+
+.custom-name {
+  color: #1C7C0F;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.rating-info {
+  color: #666;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .close-btn {
-  background: #ec3f30;
+  background: #1C7C0F;
   color: white;
-  padding: 10px 10px;
-  border-radius: 8px;
   border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
   cursor: pointer;
-  width: 20%;
-  margin-top: 5px;
+  font-size: 1rem;
+  margin-top: 20px;
+  width: 100%;
+  transition: background 0.3s;
+}
+
+.close-btn:hover {
+  background: #155a0a;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .modal-box {
+    width: 95%;
+    padding: 20px;
+  }
   
+  .step-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
   
+  .rating-info {
+    align-self: flex-end;
+  }
 }
