@@ -319,7 +319,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
                     Step {index + 1}
                   </label>
-                  
+                  <br></br>
                   {/* Custom Name Input - EDITABLE */}
                   <label style={{ fontWeight: "bold", color: "#1C7C0F", marginTop: "8px" }}>
                     Step Custom Name (e.g., "Sample Office")
