@@ -87,28 +87,19 @@ function ViewFeedback() {
   });
 
   // Open modal and load step ratings
-  // In ViewFeedback.jsx - update the openStepRatings function
-const openStepRatings = async (service) => {
-  setSelectedService(service);
+  const openStepRatings = async (service) => {
+    setSelectedService(service);
 
-  try {
-    const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
-    console.log("Step ratings response:", res.data); // Debug log
-    
-    // Make sure the response includes custom_name
-    const stepRatingsWithNames = res.data.map(step => ({
-      ...step,
-      custom_name: step.custom_name || null
-    }));
-    
-    setStepRatings(stepRatingsWithNames);
-  } catch (err) {
-    console.error("❌ Error loading step ratings:", err);
-    setStepRatings([]);
-  }
+    try {
+      const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
+      setStepRatings(res.data);
+    } catch (err) {
+      console.error("❌ Error loading step ratings:", err);
+      setStepRatings([]);
+    }
 
-  setModalOpen(true);
-};
+    setModalOpen(true);
+  };
 
   return (
     <div className="feedback-container">
@@ -179,6 +170,7 @@ const openStepRatings = async (service) => {
       <table className="feedback-table">
         <thead>
           <tr>
+            <th>User</th>
             <th>Service</th>
             <th>Step</th>
             <th>Rating</th>
@@ -191,6 +183,12 @@ const openStepRatings = async (service) => {
           {filteredFeedback.length > 0 ? (
             filteredFeedback.map((item) => (
               <tr key={item.feedback_id}>
+                <td>
+                  {item.user_email || item.user_id ? 
+                    `User ${item.user_id}` : 
+                    'Anonymous'
+                  }
+                </td>
                 <td>{item.service_name || "—"}</td>
                 <td>{item.step_number ? `Step ${item.step_number}` : "—"}</td>
                 <td>
@@ -216,7 +214,7 @@ const openStepRatings = async (service) => {
             ))
           ) : (
             <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>
+              <td colSpan="7" style={{ textAlign: "center" }}>
                 No feedback available.
               </td>
             </tr>
