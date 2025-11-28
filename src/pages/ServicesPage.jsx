@@ -131,8 +131,8 @@ function ServicesPage() {
       {/* ----------------------- */}
       <div className="services-header">
         <div className="services-title-container">
-          <h1 className="services-title">Services We Offer</h1>
-          <p className="services-subtitle">Discover our comprehensive range of digital solutions</p>
+          <h1 className="services-title">Services</h1>
+          
         </div>
         
         <div className="search-section">
