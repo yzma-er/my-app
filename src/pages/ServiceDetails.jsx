@@ -20,8 +20,6 @@ function ServiceDetails() {
       : "https://digital-guidance-api.onrender.com";
   }, []);
 
-  const THREE_DAYS_MS = useMemo(() => 3 * 24 * 60 * 60 * 1000, []);
-
   const fetchService = useCallback(async () => {
     try {
       const res = await axios.get(`${backendURL}/api/services/${serviceId}`);
@@ -38,30 +36,41 @@ function ServiceDetails() {
   }, [fetchService]);
 
   const STORAGE_KEY = `progress_${serviceId}`;
+  
+  // ✅ REMOVED: Time-based expiration - progress is saved indefinitely
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const data = JSON.parse(saved);
-      const now = Date.now();
-
-      if (now - data.timestamp < THREE_DAYS_MS) {
-        setCurrentStep(data.currentStep);
-      } else {
-        localStorage.removeItem(STORAGE_KEY);
-        setCurrentStep(1);
-      }
+      setCurrentStep(data.currentStep);
     }
-  }, [STORAGE_KEY, THREE_DAYS_MS]);
+  }, [STORAGE_KEY]);
 
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
         currentStep,
-        timestamp: Date.now(),
+        // ✅ REMOVED: timestamp (no more time-based expiration)
       })
     );
   }, [currentStep, STORAGE_KEY]);
+
+  // ✅ Get user ID from JWT token
+  const getUserId = () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        // Decode JWT token to get user_id
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.user_id;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error getting user ID from token:", error);
+      return null;
+    }
+  };
 
   const handleFeedbackSubmit = async () => {
     if (rating === 0) {
@@ -70,15 +79,24 @@ function ServiceDetails() {
     }
 
     try {
-      await axios.post(`${backendURL}/api/feedback`, {
+      const user_id = getUserId(); // Get the current user's ID from JWT token
+      
+      const res = await axios.post(`${backendURL}/api/feedback`, {
         service_id: service?.service_id,
         service_name: service?.name || null,
         step_number: currentStep,
         rating,
         comment: feedback,
+        user_id: user_id // ✅ ADDED: Include user_id for replaceable ratings
       });
 
-      alert("✅ Feedback submitted successfully!");
+      // ✅ Show appropriate message based on whether rating was updated or created
+      if (res.data.updated) {
+        alert("✅ Rating updated successfully!");
+      } else {
+        alert("✅ Feedback submitted successfully!");
+      }
+      
       setRating(0);
       setFeedback("");
       setCurrentStep((prev) => prev + 1);
@@ -89,10 +107,10 @@ function ServiceDetails() {
   };
 
   const handleResetProgress = () => {
-    if (window.confirm("Are you sure you want to reset your progress?")) {
+    if (window.confirm("Are you sure you want to reset your progress?\n\nThis will clear your progress but will NOT delete your previous ratings.")) {
       localStorage.removeItem(STORAGE_KEY);
       setCurrentStep(1);
-      alert("🔁 Progress has been reset!");
+      alert("🔁 Progress has been reset! You can now go through the steps again.");
     }
   };
 
@@ -237,6 +255,16 @@ function ServiceDetails() {
                 <button className="feedback-btn" onClick={handleFeedbackSubmit}>
                   Submit Feedback
                 </button>
+                
+                {/* ✅ Inform users about replaceable ratings */}
+                <p style={{ 
+                  fontSize: "12px", 
+                  color: "#666", 
+                  marginTop: "10px",
+                  fontStyle: "italic"
+                }}>
+                  💡 You can update your rating later by resetting progress and re-rating this step.
+                </p>
               </div>
             )}
           </div>
@@ -248,6 +276,9 @@ function ServiceDetails() {
           <h3>🎉 You've completed all steps for this service!</h3>
           <p style={{ color: "#1C7C0F" }}>
             You can reset your progress if you wish to start again.
+          </p>
+          <p style={{ fontSize: "14px", color: "#666", marginTop: "10px" }}>
+            🔄 Resetting progress will allow you to go through the steps again and update your ratings.
           </p>
         </div>
       )}
