@@ -156,6 +156,25 @@ p {
 }
 
 
+
+/* Add to Services.css for better step title styling */
+.info-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+/* If you want to style the custom name differently */
+.info-section h3::after {
+  content: "";
+  /* This will show the custom name after a dash */
+}
+
+/* Or keep it as is - the JSX handles the " - " separator */
+
+
 .info-section p,
 .info-section div {
   white-space: pre-line; /* ✅ Keeps line breaks and spacing */
