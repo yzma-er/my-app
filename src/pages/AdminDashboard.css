@@ -137,7 +137,7 @@
   }
 
   .dashboard-overlay {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 1);
     padding: 20px;
   }
 }
@@ -145,7 +145,7 @@
 /* ========= Background Fix ========= */
 .admin-dashboard {
 
-  background-position: left;
+  background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
