@@ -4,10 +4,12 @@ import "./StepRatingsModal.css";
 function StepRatingsModal({ open, onClose, serviceName, stepRatings }) {
   if (!open) return null;
 
+  console.log("StepRatingsModal received:", stepRatings); // Debug log
+
   return (
     <div className="modal-overlay">
       <div className="modal-box">
-        {/* ✅ Aesthetic Close Button */}
+        {/* Aesthetic Close Button */}
         <button 
           className="aesthetic-close-btn"
           onClick={onClose}
@@ -31,10 +33,12 @@ function StepRatingsModal({ open, onClose, serviceName, stepRatings }) {
             {stepRatings.map((step, i) => (
               <li key={i} className="step-item">
                 <div className="step-header">
-                  <strong>Step {step.step_number}</strong>
-                  {step.custom_name && (
-                    <span className="custom-name">— {step.custom_name}</span>
-                  )}
+                  <div className="step-title">
+                    <strong>Step {step.step_number}</strong>
+                    {step.custom_name && (
+                      <span className="custom-name">— {step.custom_name}</span>
+                    )}
+                  </div>
                 </div>
                 <span className="rating-info">
                   ⭐ {step.avg_rating} ({step.count} ratings)
