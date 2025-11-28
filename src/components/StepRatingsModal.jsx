@@ -13,9 +13,14 @@ function StepRatingsModal({ open, onClose, serviceName, stepRatings }) {
           <ul className="step-list">
             {stepRatings.map((step, i) => (
               <li key={i} className="step-item">
-                <strong>Step {step.step_number}</strong>
-                <span>
-                  ⭐ {step.avg_rating} ({step.count})
+                <div className="step-header">
+                  <strong>Step {step.step_number}</strong>
+                  {step.custom_name && (
+                    <span className="custom-name">— {step.custom_name}</span>
+                  )}
+                </div>
+                <span className="rating-info">
+                  ⭐ {step.avg_rating} ({step.count} ratings)
                 </span>
               </li>
             ))}
