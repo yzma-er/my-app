@@ -68,22 +68,22 @@
 }
 
 .close-btn {
-  position: "absolute",
-          top: "15px",
-          right: "20px",
-          background: "none",
-          border: "none",
-          fontSize: "24px",
-          cursor: "pointer",
-          color: "#004d00",
-          width: "30px",
-          height: "30px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: "50%",
-          transition: "all 0.2s ease"
-
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #004d00;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  z-index: 1000;
 }
 
 .close-btn:hover {
