@@ -28,9 +28,10 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             parsedSteps = [{ title: "Step 1", content: data.content || "" }];
           }
 
-          // ✅ Normalize all steps (add formFile and videoFile keys if missing)
+          // ✅ Normalize all steps (add formFile, videoFile, and customName keys if missing)
           parsedSteps = parsedSteps.map((step, i) => ({
             title: step.title || `Step ${i + 1}`,
+            customName: step.customName || "", // Add custom name field
             content: step.content || "",
             formFile: step.formFile || "",
             videoFile: step.videoFile || "",
@@ -56,6 +57,13 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
   const handleStepChange = (index, value) => {
     const updated = [...form.content];
     updated[index].content = value;
+    setForm({ ...form, content: updated });
+  };
+
+  // ✅ Handle custom name changes
+  const handleCustomNameChange = (index, value) => {
+    const updated = [...form.content];
+    updated[index].customName = value;
     setForm({ ...form, content: updated });
   };
 
@@ -112,6 +120,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
         ...form.content,
         { 
           title: `Step ${form.content.length + 1}`, 
+          customName: "", // Initialize custom name as empty
           content: "", 
           formFile: "",
           videoFile: ""
@@ -218,7 +227,10 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                 background: "#f0f8f0",
                 borderRadius: "8px"
               }}>
-                <h4 style={{ color: "#1C7C0F" }}>{step.title}</h4>
+                {/* Show step title with custom name */}
+                <h4 style={{ color: "#1C7C0F" }}>
+                  {step.customName ? `${step.title} - ${step.customName}` : step.title}
+                </h4>
                 
                 {/* Step Video Preview - RESPONSIVE */}
                 {step.videoFile && (
@@ -303,18 +315,20 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                     marginBottom: "15px",
                   }}
                 >
-                  {/* Step Title */}
+                  {/* Step Title - NON-EDITABLE */}
                   <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                    Step Title
+                    Step {index + 1}
+                  </label>
+                  
+                  {/* Custom Name Input - EDITABLE */}
+                  <label style={{ fontWeight: "bold", color: "#1C7C0F", marginTop: "8px" }}>
+                    Step Custom Name (e.g., "Sample Office")
                   </label>
                   <input
                     type="text"
-                    value={step.title}
-                    onChange={(e) => {
-                      const updated = [...form.content];
-                      updated[index].title = e.target.value;
-                      setForm({ ...form, content: updated });
-                    }}
+                    placeholder="Enter custom step name..."
+                    value={step.customName}
+                    onChange={(e) => handleCustomNameChange(index, e.target.value)}
                     style={{
                       width: "100%",
                       padding: "8px",
