@@ -91,25 +91,54 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
   };
 
   const handleFormUpload = async (index, e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
-    const formData = new FormData();
-    formData.append("formFile", file);
+  // Validate file type
+  const allowedTypes = ['.pdf', '.doc', '.docx'];
+  const fileExtension = file.name.toLowerCase().split('.').pop();
+  if (!allowedTypes.includes('.' + fileExtension)) {
+    alert('❌ Only PDF, DOC, and DOCX files are allowed.');
+    return;
+  }
 
-    try {
-      const res = await axios.post(`${backendURL}/api/services/upload/form`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+  // Validate file size (10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    alert('❌ File size must be less than 10MB.');
+    return;
+  }
 
-      const updated = [...form.content];
-      updated[index].formFile = res.data.url;
-      setForm({ ...form, content: updated });
+  const formData = new FormData();
+  formData.append("formFile", file);
 
-      alert("✅ Form uploaded to Cloudinary successfully!");
+  try {
+    console.log("📤 Uploading form to Cloudinary...", file.name);
+    
+    const res = await axios.post(`${backendURL}/api/services/upload/form`, formData, {
+      headers: { 
+        "Content-Type": "multipart/form-data",
+      },
+      timeout: 30000, // 30 second timeout
+    });
+
+    console.log("✅ Form upload response:", res.data);
+
+    const updated = [...form.content];
+    updated[index].formFile = res.data.url;
+    setForm({ ...form, content: updated });
+
+    alert("✅ Form uploaded to Cloudinary successfully!");
   } catch (err) {
     console.error("❌ Cloudinary form upload error:", err);
-    alert("Failed to upload form to Cloudinary.");
+    console.error("❌ Error response:", err.response?.data);
+    
+    if (err.response?.data?.error) {
+      alert(`❌ Upload failed: ${err.response.data.error}`);
+    } else if (err.code === 'ECONNABORTED') {
+      alert('❌ Upload timeout. Please try again.');
+    } else {
+      alert('❌ Failed to upload form to Cloudinary. Check console for details.');
+    }
   }
 };
 
