@@ -94,51 +94,45 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Validate file type
-  const allowedTypes = ['.pdf', '.doc', '.docx'];
-  const fileExtension = file.name.toLowerCase().split('.').pop();
-  if (!allowedTypes.includes('.' + fileExtension)) {
-    alert('❌ Only PDF, DOC, and DOCX files are allowed.');
-    return;
-  }
-
-  // Validate file size (10MB)
-  if (file.size > 10 * 1024 * 1024) {
-    alert('❌ File size must be less than 10MB.');
-    return;
-  }
-
   const formData = new FormData();
   formData.append("formFile", file);
 
   try {
-    console.log("📤 Uploading form to Cloudinary...", file.name);
-    
+    console.log("📤 Uploading form...", file.name);
+
     const res = await axios.post(`${backendURL}/api/services/upload/form`, formData, {
       headers: { 
         "Content-Type": "multipart/form-data",
       },
-      timeout: 30000, // 30 second timeout
+      timeout: 30000,
     });
 
-    console.log("✅ Form upload response:", res.data);
+    console.log("✅ Upload response:", res.data);
+
+    if (res.data.success === false) {
+      throw new Error(res.data.message);
+    }
 
     const updated = [...form.content];
     updated[index].formFile = res.data.url;
     setForm({ ...form, content: updated });
 
-    alert("✅ Form uploaded to Cloudinary successfully!");
+    alert("✅ Form uploaded successfully!");
+
   } catch (err) {
-    console.error("❌ Cloudinary form upload error:", err);
-    console.error("❌ Error response:", err.response?.data);
+    console.error("❌ Upload failed:", err);
+    
+    let errorMessage = "Upload failed";
     
     if (err.response?.data?.error) {
-      alert(`❌ Upload failed: ${err.response.data.error}`);
-    } else if (err.code === 'ECONNABORTED') {
-      alert('❌ Upload timeout. Please try again.');
-    } else {
-      alert('❌ Failed to upload form to Cloudinary. Check console for details.');
+      errorMessage = err.response.data.error;
+    } else if (err.response?.data?.message) {
+      errorMessage = err.response.data.message;
+    } else if (err.message) {
+      errorMessage = err.message;
     }
+    
+    alert(`❌ ${errorMessage}`);
   }
 };
 
