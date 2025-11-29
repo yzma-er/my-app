@@ -91,50 +91,27 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
   };
 
   const handleFormUpload = async (index, e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append("formFile", file);
+    const formData = new FormData();
+    formData.append("formFile", file);
 
-  try {
-    console.log("📤 Uploading form...", file.name);
+    try {
+      const res = await axios.post(`${backendURL}/api/services/upload/form`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    const res = await axios.post(`${backendURL}/api/services/upload/form`, formData, {
-      headers: { 
-        "Content-Type": "multipart/form-data",
-      },
-      timeout: 30000,
-    });
+      const updated = [...form.content];
+      updated[index].formFile = res.data.filename;
+      setForm({ ...form, content: updated });
 
-    console.log("✅ Upload response:", res.data);
-
-    if (res.data.success === false) {
-      throw new Error(res.data.message);
+      alert("✅ Form uploaded successfully!");
+    } catch (err) {
+      console.error("❌ Upload error:", err);
+      alert("Failed to upload form.");
     }
-
-    const updated = [...form.content];
-    updated[index].formFile = res.data.url;
-    setForm({ ...form, content: updated });
-
-    alert("✅ Form uploaded successfully!");
-
-  } catch (err) {
-    console.error("❌ Upload failed:", err);
-    
-    let errorMessage = "Upload failed";
-    
-    if (err.response?.data?.error) {
-      errorMessage = err.response.data.error;
-    } else if (err.response?.data?.message) {
-      errorMessage = err.response.data.message;
-    } else if (err.message) {
-      errorMessage = err.message;
-    }
-    
-    alert(`❌ ${errorMessage}`);
-  }
-};
+  };
 
   const addStep = () => {
     setForm({
@@ -313,7 +290,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   <p>
                     📄{" "}
                     <a
-                      href={step.formFile}
+                      href={`${backendURL}/forms/${step.formFile}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ color: "#1C7C0F", textDecoration: "underline" }}
