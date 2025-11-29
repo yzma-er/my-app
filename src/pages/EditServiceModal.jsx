@@ -103,15 +103,15 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
       });
 
       const updated = [...form.content];
-      updated[index].formFile = res.data.filename;
+      updated[index].formFile = res.data.url;
       setForm({ ...form, content: updated });
 
-      alert("✅ Form uploaded successfully!");
-    } catch (err) {
-      console.error("❌ Upload error:", err);
-      alert("Failed to upload form.");
-    }
-  };
+      alert("✅ Form uploaded to Cloudinary successfully!");
+  } catch (err) {
+    console.error("❌ Cloudinary form upload error:", err);
+    alert("Failed to upload form to Cloudinary.");
+  }
+};
 
   const addStep = () => {
     setForm({
@@ -290,7 +290,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   <p>
                     📄{" "}
                     <a
-                      href={`${backendURL}/forms/${step.formFile}`}
+                      href={step.formFile}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ color: "#1C7C0F", textDecoration: "underline" }}
