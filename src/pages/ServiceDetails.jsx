@@ -211,7 +211,7 @@ function ServiceDetails() {
             {step.formFile && (
               <div style={{ marginTop: "10px" }}>
                 <a
-                  href={step.formFile}
+                  href={`${backendURL}/forms/${step.formFile}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
