@@ -9,6 +9,8 @@ function ManageCarousel() {
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
   const [draggedItem, setDraggedItem] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const navigate = useNavigate();
 
   const backendURL =
@@ -20,7 +22,7 @@ function ManageCarousel() {
   const fetchImages = useCallback(async () => {
     try {
       const res = await axios.get(`${backendURL}/api/carousel`);
-      console.log("Fetched images:", res.data); // Debug log
+      console.log("Fetched images:", res.data);
       // Sort by display_order if available, otherwise keep current order
       const sortedImages = res.data.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
       setImages(sortedImages);
@@ -36,6 +38,8 @@ function ManageCarousel() {
   // Upload image to backend → backend uploads to Cloudinary
   const handleUpload = async () => {
     if (!file) return alert("Please select an image first!");
+
+    setUploading(true);
 
     const formData = new FormData();
     formData.append("image", file);
@@ -54,6 +58,8 @@ function ManageCarousel() {
     } catch (error) {
       console.error("Upload failed:", error);
       alert("❌ Upload failed. Check console.");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -85,6 +91,8 @@ function ManageCarousel() {
     e.preventDefault();
     if (draggedItem === null || draggedItem === targetIndex) return;
 
+    setReordering(true);
+
     // Create new reordered array
     const newImages = [...images];
     const [movedItem] = newImages.splice(draggedItem, 1);
@@ -101,19 +109,28 @@ function ManageCarousel() {
         display_order: index
       }));
 
-      await axios.put(`${backendURL}/api/carousel/reorder`, { images: updateData });
+      console.log('Sending reorder data:', updateData);
+      
+      const response = await axios.put(`${backendURL}/api/carousel/reorder`, { images: updateData });
+      console.log('Reorder response:', response.data);
+      
       alert("✅ Image order updated successfully!");
     } catch (error) {
       console.error("Failed to update order:", error);
-      alert("❌ Failed to save new order. Check console.");
+      console.error("Error response:", error.response?.data);
+      alert(`❌ Failed to save new order: ${error.response?.data?.message || error.message}`);
       // Revert to original order if update fails
       fetchImages();
+    } finally {
+      setReordering(false);
     }
   };
 
   // Move image up in order
   const moveUp = async (index) => {
     if (index === 0) return;
+
+    setReordering(true);
 
     const newImages = [...images];
     [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
@@ -126,16 +143,23 @@ function ManageCarousel() {
         display_order: idx
       }));
 
+      console.log('Moving up - sending data:', updateData);
       await axios.put(`${backendURL}/api/carousel/reorder`, { images: updateData });
     } catch (error) {
       console.error("Failed to update order:", error);
+      console.error("Error response:", error.response?.data);
+      alert(`❌ Failed to update order: ${error.response?.data?.message || error.message}`);
       fetchImages();
+    } finally {
+      setReordering(false);
     }
   };
 
   // Move image down in order
   const moveDown = async (index) => {
     if (index === images.length - 1) return;
+
+    setReordering(true);
 
     const newImages = [...images];
     [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
@@ -148,10 +172,15 @@ function ManageCarousel() {
         display_order: idx
       }));
 
+      console.log('Moving down - sending data:', updateData);
       await axios.put(`${backendURL}/api/carousel/reorder`, { images: updateData });
     } catch (error) {
       console.error("Failed to update order:", error);
+      console.error("Error response:", error.response?.data);
+      alert(`❌ Failed to update order: ${error.response?.data?.message || error.message}`);
       fetchImages();
+    } finally {
+      setReordering(false);
     }
   };
 
@@ -184,14 +213,20 @@ function ManageCarousel() {
 
       <h2>Manage Carousel Images</h2>
 
+      {/* Upload Form */}
       <div className="upload-form">
-        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+        <input 
+          type="file" 
+          onChange={(e) => setFile(e.target.files[0])} 
+          disabled={uploading}
+        />
 
         <input
           type="text"
           placeholder="Title (optional)"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          disabled={uploading}
         />
 
         <input
@@ -199,39 +234,61 @@ function ManageCarousel() {
           placeholder="Caption (optional)"
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
+          disabled={uploading}
         />
 
-        <button onClick={handleUpload}>Upload</button>
+        <button 
+          onClick={handleUpload} 
+          disabled={uploading || !file}
+          className={uploading ? "uploading" : ""}
+        >
+          {uploading ? (
+            <>
+              <div className="loader-small"></div>
+              Uploading...
+            </>
+          ) : (
+            "Upload"
+          )}
+        </button>
       </div>
+
+      {/* Global Reordering Loader */}
+      {reordering && (
+        <div className="global-loader">
+          <div className="loader"></div>
+          <p>Updating image order...</p>
+        </div>
+      )}
 
       <div className="reorder-instructions">
         <p>🎯 <strong>How to reorder:</strong> Drag and drop images to change their display order, or use the up/down buttons.</p>
         <p>Images are displayed from left to right, top to bottom.</p>
       </div>
 
-      <div className="carousel-grid">
+      <div className={`carousel-grid ${reordering ? "reordering" : ""}`}>
         {images.map((img, index) => (
           <div 
             key={img.id} 
             className={`carousel-card ${draggedItem === index ? 'dragging' : ''}`}
-            draggable
-            onDragStart={(e) => handleDragStart(e, index)}
-            onDragOver={(e) => handleDragOver(e, index)}
-            onDrop={(e) => handleDrop(e, index)}
+            draggable={!reordering}
+            onDragStart={(e) => !reordering && handleDragStart(e, index)}
+            onDragOver={(e) => !reordering && handleDragOver(e, index)}
+            onDrop={(e) => !reordering && handleDrop(e, index)}
           >
             <div className="card-header">
               <span className="position-badge">#{index + 1}</span>
               <div className="move-buttons">
                 <button 
                   onClick={() => moveUp(index)}
-                  disabled={index === 0}
+                  disabled={index === 0 || reordering}
                   title="Move up"
                 >
                   ↑
                 </button>
                 <button 
                   onClick={() => moveDown(index)}
-                  disabled={index === images.length - 1}
+                  disabled={index === images.length - 1 || reordering}
                   title="Move down"
                 >
                   ↓
@@ -247,6 +304,7 @@ function ManageCarousel() {
             <button 
               onClick={() => handleDelete(img.id)}
               className="delete-btn"
+              disabled={reordering}
             >
               Delete
             </button>
