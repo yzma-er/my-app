@@ -232,6 +232,87 @@ function ViewFeedback() {
         </tbody>
       </table>
 
+
+      // Add this after your table in the return statement, before the modal:
+
+{/* Mobile Cards - Hidden on desktop */}
+<div className="feedback-mobile-cards">
+  {filteredFeedback.length > 0 ? (
+    filteredFeedback.map((item) => (
+      <div key={item.feedback_id} className="feedback-card">
+        <div className="feedback-card-row">
+          <span className="feedback-card-label">User:</span>
+          <span className="feedback-card-value">
+            {item.user_email || (
+              <span style={{ color: '#999', fontStyle: 'italic' }}>
+                Anonymous
+              </span>
+            )}
+          </span>
+        </div>
+        
+        <div className="feedback-card-row">
+          <span className="feedback-card-label">Service:</span>
+          <span className="feedback-card-value">{item.service_name || "—"}</span>
+        </div>
+        
+        <div className="feedback-card-row">
+          <span className="feedback-card-label">Step:</span>
+          <span className="feedback-card-value">
+            {item.step_number ? `Step ${item.step_number}` : "—"}
+          </span>
+        </div>
+        
+        <div className="feedback-card-row">
+          <span className="feedback-card-label">Rating:</span>
+          <span className="feedback-card-value stars-mobile">
+            {"★".repeat(item.rating)}
+            {"☆".repeat(5 - item.rating)}
+            <span style={{ marginLeft: '5px', fontSize: '12px', color: '#666' }}>
+              ({item.rating}/5)
+            </span>
+          </span>
+        </div>
+        
+        <div className="feedback-card-row">
+          <span className="feedback-card-label">Date:</span>
+          <span className="feedback-card-value">
+            {new Date(item.created_at).toLocaleString("en-US", {
+              dateStyle: "short",
+              timeStyle: "short",
+            })}
+          </span>
+        </div>
+        
+        {item.comment && (
+          <div className="feedback-card-row">
+            <span className="feedback-card-label">Comment:</span>
+            <span className="feedback-card-value comment-mobile">
+              {item.comment}
+            </span>
+          </div>
+        )}
+        
+        <div className="feedback-card-row">
+          <span className="feedback-card-label">Action:</span>
+          <span className="feedback-card-value">
+            <button
+              className="delete-btn"
+              onClick={() => handleDelete(item.feedback_id)}
+            >
+              Delete
+            </button>
+          </span>
+        </div>
+      </div>
+    ))
+  ) : (
+    <div style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+      No feedback available.
+    </div>
+  )}
+</div>
+
       {/* Step Ratings Modal */}
       <StepRatingsModal
         open={modalOpen}
