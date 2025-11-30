@@ -24,35 +24,70 @@ function ManageUsers() {
       : "https://digital-guidance-api.onrender.com";
 
   // ✅ Fetch users
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("❌ No token found. Please log in again.");
+useEffect(() => {
+  const fetchUsers = async () => {
+    const token = localStorage.getItem("token");
+    
+    // Better token validation
+    if (!token) {
+      alert("❌ No token found. Please log in again.");
+      navigate("/login");
+      return;
+    }
+
+    // Check if token is expired or invalid
+    try {
+      // Decode token to check expiration
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const isExpired = payload.exp * 1000 < Date.now();
+      
+      if (isExpired) {
+        alert("❌ Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        navigate("/login");
+        return;
+      }
+    } catch (error) {
+      console.error("Invalid token:", error);
+      alert("❌ Invalid token. Please log in again.");
+      localStorage.removeItem("token");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${backendURL}/api/admin/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 401) {
+        // Unauthorized - token is invalid or user is not admin
+        alert("❌ Access denied. Please ensure you are logged in as admin.");
+        localStorage.removeItem("token");
+        navigate("/login");
         return;
       }
 
-      try {
-        const res = await fetch(`${backendURL}/api/admin/users`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
-        if (!res.ok) throw new Error("Failed to fetch users");
-
-        const data = await res.json();
-        setUsers(data);
-      } catch (err) {
-        console.error("❌ Error fetching users:", err);
-        alert("Failed to load users. Please ensure you are logged in as admin.");
-      } finally {
-        setLoading(false);
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      console.error("❌ Error fetching users:", err);
+      if (err.message.includes("401")) {
+        alert("Access denied. Please ensure you are logged in as admin.");
+      } else {
+        alert("Failed to load users. Please check your connection and try again.");
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchUsers();
-  }, [backendURL]);
+  fetchUsers();
+}, [backendURL, navigate]);
 
   // ✅ Filtered users based on search
   const filteredUsers = users.filter((u) =>
