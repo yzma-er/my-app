@@ -306,19 +306,19 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   }}
                 />
                 {step.formFile && (
-                  <p>
-                    📄{" "}
-                    <a
-                      href={step.formFile} // ✅ FIXED: Use Cloudinary URL directly
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: "#1C7C0F", textDecoration: "underline" }}
-                      download={step.originalFormName || "form"} // ✅ FIXED: Use original filename
-                    >
-                      Download {step.originalFormName || "Form"}
-                    </a>
-                  </p>
-                )}
+                <p>
+                  📄{" "}
+                  <a
+                    href={step.formFile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "#1C7C0F", textDecoration: "underline" }}
+                    download={step.originalFormName || "form"}
+                  >
+                    Download Form {/* ✅ FIXED: Show just "Download Form" */}
+                  </a>
+                </p>
+              )}
               </div>
             ))}
           </div>
