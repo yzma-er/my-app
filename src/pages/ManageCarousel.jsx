@@ -8,6 +8,7 @@ function ManageCarousel() {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
+  const [draggedItem, setDraggedItem] = useState(null);
   const navigate = useNavigate();
 
   const backendURL =
@@ -20,7 +21,9 @@ function ManageCarousel() {
     try {
       const res = await axios.get(`${backendURL}/api/carousel`);
       console.log("Fetched images:", res.data); // Debug log
-      setImages(res.data);
+      // Sort by display_order if available, otherwise keep current order
+      const sortedImages = res.data.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+      setImages(sortedImages);
     } catch (error) {
       console.error("Error fetching images:", error);
     }
@@ -63,6 +66,92 @@ function ManageCarousel() {
       fetchImages();
     } catch (err) {
       console.error("Delete failed:", err);
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (e, index) => {
+    setDraggedItem(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/html", e.currentTarget);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = async (e, targetIndex) => {
+    e.preventDefault();
+    if (draggedItem === null || draggedItem === targetIndex) return;
+
+    // Create new reordered array
+    const newImages = [...images];
+    const [movedItem] = newImages.splice(draggedItem, 1);
+    newImages.splice(targetIndex, 0, movedItem);
+
+    // Update local state immediately for responsive UI
+    setImages(newImages);
+    setDraggedItem(null);
+
+    // Update display_order in database
+    try {
+      const updateData = newImages.map((img, index) => ({
+        id: img.id,
+        display_order: index
+      }));
+
+      await axios.put(`${backendURL}/api/carousel/reorder`, { images: updateData });
+      alert("✅ Image order updated successfully!");
+    } catch (error) {
+      console.error("Failed to update order:", error);
+      alert("❌ Failed to save new order. Check console.");
+      // Revert to original order if update fails
+      fetchImages();
+    }
+  };
+
+  // Move image up in order
+  const moveUp = async (index) => {
+    if (index === 0) return;
+
+    const newImages = [...images];
+    [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+    
+    setImages(newImages);
+
+    try {
+      const updateData = newImages.map((img, idx) => ({
+        id: img.id,
+        display_order: idx
+      }));
+
+      await axios.put(`${backendURL}/api/carousel/reorder`, { images: updateData });
+    } catch (error) {
+      console.error("Failed to update order:", error);
+      fetchImages();
+    }
+  };
+
+  // Move image down in order
+  const moveDown = async (index) => {
+    if (index === images.length - 1) return;
+
+    const newImages = [...images];
+    [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+    
+    setImages(newImages);
+
+    try {
+      const updateData = newImages.map((img, idx) => ({
+        id: img.id,
+        display_order: idx
+      }));
+
+      await axios.put(`${backendURL}/api/carousel/reorder`, { images: updateData });
+    } catch (error) {
+      console.error("Failed to update order:", error);
+      fetchImages();
     }
   };
 
@@ -115,16 +204,52 @@ function ManageCarousel() {
         <button onClick={handleUpload}>Upload</button>
       </div>
 
+      <div className="reorder-instructions">
+        <p>🎯 <strong>How to reorder:</strong> Drag and drop images to change their display order, or use the up/down buttons.</p>
+        <p>Images are displayed from left to right, top to bottom.</p>
+      </div>
+
       <div className="carousel-grid">
-        {images.map((img) => (
-          <div key={img.id} className="carousel-card">
-            {/* ✅ FIXED: Use 'image' instead of 'imageUrl' */}
+        {images.map((img, index) => (
+          <div 
+            key={img.id} 
+            className={`carousel-card ${draggedItem === index ? 'dragging' : ''}`}
+            draggable
+            onDragStart={(e) => handleDragStart(e, index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDrop={(e) => handleDrop(e, index)}
+          >
+            <div className="card-header">
+              <span className="position-badge">#{index + 1}</span>
+              <div className="move-buttons">
+                <button 
+                  onClick={() => moveUp(index)}
+                  disabled={index === 0}
+                  title="Move up"
+                >
+                  ↑
+                </button>
+                <button 
+                  onClick={() => moveDown(index)}
+                  disabled={index === images.length - 1}
+                  title="Move down"
+                >
+                  ↓
+                </button>
+              </div>
+            </div>
+
             <img src={img.image} alt={img.title || 'Carousel image'} />
 
             <p><strong>{img.title || 'No title'}</strong></p>
             <p>{img.caption || 'No caption'}</p>
 
-            <button onClick={() => handleDelete(img.id)}>Delete</button>
+            <button 
+              onClick={() => handleDelete(img.id)}
+              className="delete-btn"
+            >
+              Delete
+            </button>
           </div>
         ))}
       </div>
