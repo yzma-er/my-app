@@ -211,9 +211,10 @@ function ServiceDetails() {
             {step.formFile && (
               <div style={{ marginTop: "10px" }}>
                 <a
-                  href={`${backendURL}/forms/${step.formFile}`}
+                  href={step.formFile} // ✅ FIXED: Use Cloudinary URL directly
                   target="_blank"
                   rel="noopener noreferrer"
+                  download={step.originalFormName || "form"} // ✅ FIXED: Use original filename for download
                   style={{
                     display: "inline-block",
                     background: "#1C7C0F",
@@ -224,7 +225,7 @@ function ServiceDetails() {
                     fontWeight: "bold",
                   }}
                 >
-                  📄 Download Form
+                  📄 Download {step.originalFormName || "Form"} {/* ✅ FIXED: Show actual filename */}
                 </a>
               </div>
             )}
