@@ -91,30 +91,45 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     }
   };
 
-  const handleFormUpload = async (index, e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+ const handleFormUpload = async (index, e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    const formData = new FormData();
-    formData.append("formFile", file);
+  // Check file size (10MB limit)
+  if (file.size > 10 * 1024 * 1024) {
+    alert("File too large. Please select a file smaller than 10MB.");
+    return;
+  }
 
-    try {
-      const res = await axios.post(`${backendURL}/api/services/upload/form`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+  // Check file type
+  const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  if (!allowedTypes.includes(file.type)) {
+    alert("Invalid file type. Please select a PDF, DOC, or DOCX file.");
+    return;
+  }
 
-      const updated = [...form.content];
-      // ✅ FIXED: Store Cloudinary URL and original filename
-      updated[index].formFile = res.data.url; // Cloudinary URL
-      updated[index].originalFormName = res.data.originalName; // Original filename
-      setForm({ ...form, content: updated });
+  const formData = new FormData();
+  formData.append("formFile", file);
 
-      alert("✅ Form uploaded successfully!");
-    } catch (err) {
-      console.error("❌ Upload error:", err);
-      alert("Failed to upload form.");
-    }
-  };
+  try {
+    const res = await axios.post(`${backendURL}/api/services/upload/form`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    console.log("✅ Upload successful:", res.data);
+
+    const updated = [...form.content];
+    updated[index].formFile = res.data.url;
+    updated[index].originalFormName = res.data.originalName || file.name;
+    setForm({ ...form, content: updated });
+
+    alert("✅ Form uploaded successfully!");
+  } catch (err) {
+    console.error("❌ Upload error:", err);
+    const errorMessage = err.response?.data?.message || "Failed to upload form";
+    alert(`Upload failed: ${errorMessage}`);
+  }
+};
 
   const addStep = () => {
     setForm({
