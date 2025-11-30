@@ -34,6 +34,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             customName: step.customName || "", // Add custom name field
             content: step.content || "",
             formFile: step.formFile || "",
+            originalFormName: step.originalFormName || "", // NEW: Store original filename
             videoFile: step.videoFile || "",
           }));
 
@@ -103,7 +104,9 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
       });
 
       const updated = [...form.content];
-      updated[index].formFile = res.data.filename;
+      // ✅ FIXED: Store Cloudinary URL and original filename
+      updated[index].formFile = res.data.url; // Cloudinary URL
+      updated[index].originalFormName = res.data.originalName; // Original filename
       setForm({ ...form, content: updated });
 
       alert("✅ Form uploaded successfully!");
@@ -123,6 +126,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
           customName: "", // Initialize custom name as empty
           content: "", 
           formFile: "",
+          originalFormName: "", // NEW: Initialize original filename
           videoFile: ""
         },
       ],
@@ -290,12 +294,13 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   <p>
                     📄{" "}
                     <a
-                      href={`${backendURL}/forms/${step.formFile}`}
+                      href={step.formFile} // ✅ FIXED: Use Cloudinary URL directly
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ color: "#1C7C0F", textDecoration: "underline" }}
+                      download={step.originalFormName || "form"} // ✅ FIXED: Use original filename
                     >
-                      Download Form
+                      Download {step.originalFormName || "Form"}
                     </a>
                   </p>
                 )}
@@ -415,7 +420,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                     />
                     {step.formFile && (
                       <p style={{ marginTop: "4px", fontSize: "14px" }}>
-                        ✅ Uploaded: {step.formFile}
+                        ✅ Uploaded: {step.originalFormName || step.formFile}
                       </p>
                     )}
                   </div>
