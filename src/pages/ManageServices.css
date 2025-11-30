@@ -5,16 +5,13 @@
   margin: 40px auto;
   font-family: "Poppins", sans-serif;
   color: #1c1c1c;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
 }
 
 .manage-container h1 {
   text-align: center;
-  color: #104C08;
+  color: #2e7d32;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 /* ========== SERVICE LIST ========== */
@@ -35,12 +32,8 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-.service-info {
-  flex: 1;
-}
-
 .service-info strong {
-  color: #0f660a;
+  color: #104C08;
   font-size: 1.1rem;
 }
 
@@ -54,7 +47,6 @@
 .button-group {
   display: flex;
   gap: 10px;
-  flex-shrink: 0; /* Prevents buttons from shrinking */
 }
 
 /* ========== UNIFORM EDIT & DELETE BUTTONS ========== */
@@ -62,22 +54,26 @@
 .delete-btn {
   width: 120px;              /* EXACT SAME WIDTH */
   height: 40px;              /* EXACT SAME HEIGHT */
-  display: flex;             /* Use flex instead of inline-flex */
+  display: inline-flex;      /* Ensures equal size & alignment */
   justify-content: center;
   align-items: center;
+
   box-sizing: border-box;    /* Prevents padding from changing size */
+
   padding: 0;
+  margin: 0;
   border: none;
   border-radius: 20px;
+
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  flex-shrink: 0;            /* Prevents shrinking */
+  flex-shrink: 0;            /* Prevents shrinking in flexbox */
 }
 
 /* Edit Button Color */
 .edit-btn {
-  background-color: #1c7c0f;
+  background-color: #104C08;
   color: white;
 }
 .edit-btn:hover {
@@ -86,11 +82,22 @@
 
 /* Delete Button Color */
 .delete-btn {
-  background-color: #b71c1c;
+  background-color: #FF0000;
   color: white;
 }
 .delete-btn:hover {
   background-color: #8a1010;
+}
+
+/* Add Button */
+.add-btn {
+  background: #104C08;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+}
+.add-btn:hover {
+  background: #16690c;
 }
 
 /* ========== ADD SERVICE ROW ========== */
@@ -107,20 +114,7 @@
   border-radius: 10px;
 }
 
-.add-btn {
-  background: #1c7c0f;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-.add-btn:hover {
-  background: #16690c;
-}
-
-/* ========== MODAL STYLES ========== */
+/* ========== MODAL OVERLAY ========== */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -134,6 +128,7 @@
   z-index: 2000;
 }
 
+/* ========== MODAL CONTAINER ========== */
 .modal-container {
   width: 90%;
   max-width: 1200px;
@@ -155,6 +150,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ========== CLOSE BUTTON ========== */
 .close-btn {
   position: absolute;
   top: 12px;
@@ -172,6 +168,7 @@
   color: #b71c1c;
 }
 
+/* ========== GRID SECTIONS ========== */
 .edit-modal-grid {
   display: flex;
   gap: 30px;
@@ -209,6 +206,7 @@
   gap: 10px;
 }
 
+/* ========== FORM INPUTS ========== */
 .edit-fields input,
 .edit-fields textarea {
   width: 100%;
@@ -230,6 +228,7 @@
   outline: none;
 }
 
+/* ========== SAVE BUTTON ========== */
 .feedback-btn {
   align-self: flex-end;
   background: #104C08;
@@ -239,7 +238,6 @@
   border: none;
   font-weight: 500;
   margin-top: 10px;
-  cursor: pointer;
 }
 
 .feedback-btn:hover {
@@ -247,32 +245,204 @@
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
-@media (max-width: 768px) {
-  .service-item {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
-  }
-  
-  .button-group {
-    justify-content: center;
-    width: 100%;
-  }
-  
-  .edit-btn,
-  .delete-btn {
-    width: 100%; /* Full width on mobile */
-  }
-  
-  .add-service-row {
-    flex-direction: column;
-  }
-  
+@media (max-width: 900px) {
   .edit-modal-grid {
     flex-direction: column;
   }
-  
   .modal-container {
     padding: 20px;
+  }
+}
+/* ========== PAGE CONTAINER ========== */
+.manage-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 40px auto;
+  font-family: "Poppins", sans-serif;
+  color: #1c1c1c;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.manage-container h1 {
+  text-align: center;
+  color: #104C08;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* ========== SERVICE LIST ========== */
+.service-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fff8;
+  border: 1px solid #cde7cb;
+  border-radius: 10px;
+  padding: 15px 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 10px; /* allows wrapping on small screens */
+}
+
+.service-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.service-info {
+  flex: 1;
+  min-width: 150px; /* ensures it doesn't shrink too much */
+}
+
+.service-info strong {
+  color: #0f660a;
+  font-size: 1.1rem;
+}
+
+.service-info p {
+  color: #555;
+  font-size: 0.95rem;
+  margin: 5px 0 0;
+}
+
+/* ========== BUTTON GROUP ========== */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  flex: 0 0 auto; /* prevents buttons from stretching */
+}
+
+/* ========== UNIFORM EDIT & DELETE BUTTONS ========== */
+.edit-btn,
+.delete-btn {
+  flex: 1 1 120px; /* scales but has a minimum width */
+  max-width: 150px; /* optional */
+  height: 40px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* Edit Button Color */
+.edit-btn {
+  background-color: #1c7c0f;
+  color: white;
+}
+.edit-btn:hover {
+  background-color: #155a0a;
+}
+
+/* Delete Button Color */
+.delete-btn {
+  background-color: #b71c1c;
+  color: white;
+}
+.delete-btn:hover {
+  background-color: #8a1010;
+}
+
+/* Add Button */
+.add-btn {
+  background: #1c7c0f;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  align-self: flex-start; /* keeps it on the left */
+}
+.add-btn:hover {
+  background: #16690c;
+}
+
+/* ========== ADD SERVICE ROW ========== */
+.add-service-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-service-row input {
+  flex: 1 1 200px; /* scales but maintains a minimum */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+/* ========== MODAL OVERLAY ========== */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* ========== MODAL CONTAINER ========== */
+.modal-container {
+  width: 90%;
+  max-width: 900px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  padding: 30px;
+  position: relative;
+  overflow-y: auto;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* ...rest remains the same for modals, preview-section, info-section, etc... */
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 900px) {
+  .service-item {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .button-group {
+    justify-content: center;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    flex: 1 1 100%; /* buttons take full width on mobile */
+    max-width: none;
+  }
+
+  .add-service-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-service-row input {
+    flex: 1 1 100%;
+  }
+
+  .modal-container {
+    padding: 20px;
+  }
+
+  .edit-modal-grid {
+    flex-direction: column;
   }
 }
