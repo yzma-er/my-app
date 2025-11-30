@@ -398,11 +398,20 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                     onChange={(e) => handleStepVideoUpload(index, e)}
                     style={{ marginBottom: "10px" }}
                   />
-                  {step.videoFile && (
-                    <p style={{ marginBottom: "10px", fontSize: "14px" }}>
-                      ✅ Current: {step.videoFile}
-                    </p>
-                  )}
+                 
+                {step.videoFile && (
+                  <p style={{ 
+                    marginBottom: "10px", 
+                    fontSize: "14px",
+                    background: "#e8f5e8",
+                    padding: "8px 12px",
+                    borderRadius: "6px",
+                    color: "#1C7C0F",
+                    fontWeight: "bold"
+                  }}>
+                    ✅ Step video uploaded successfully!
+                  </p>
+                )}
               
                   {/* Step Content */}
                   <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
