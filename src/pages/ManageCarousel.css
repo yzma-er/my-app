@@ -100,3 +100,86 @@
 .carousel-card button:hover {
   background-color: #8a1010;
 }
+
+/* ManageCarousel.css */
+.reorder-instructions {
+  background: #f0f8f0;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  border-left: 4px solid #1c7c0f;
+}
+
+.reorder-instructions p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.carousel-card {
+  position: relative;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.carousel-card.dragging {
+  opacity: 0.5;
+  border: 2px dashed #1c7c0f;
+}
+
+.carousel-card:hover {
+  border-color: #1c7c0f;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.position-badge {
+  background: #1c7c0f;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.move-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.move-buttons button {
+  background: #e8f5e8;
+  border: 1px solid #1c7c0f;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.move-buttons button:hover:not(:disabled) {
+  background: #1c7c0f;
+  color: white;
+}
+
+.move-buttons button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+}
