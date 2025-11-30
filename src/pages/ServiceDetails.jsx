@@ -209,26 +209,26 @@ function ServiceDetails() {
             <p style={{ whiteSpace: "pre-line" }}>{step.content}</p>
 
             {step.formFile && (
-              <div style={{ marginTop: "10px" }}>
-                <a
-                  href={step.formFile} // ✅ FIXED: Use Cloudinary URL directly
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download={step.originalFormName || "form"} // ✅ FIXED: Use original filename for download
-                  style={{
-                    display: "inline-block",
-                    background: "#1C7C0F",
-                    color: "white",
-                    padding: "8px 14px",
-                    borderRadius: "25px",
-                    textDecoration: "none",
-                    fontWeight: "bold",
-                  }}
-                >
-                  📄 Download {step.originalFormName || "Form"} {/* ✅ FIXED: Show actual filename */}
-                </a>
-              </div>
-            )}
+            <div style={{ marginTop: "10px" }}>
+              <a
+                href={step.formFile} // Use Cloudinary URL directly
+                target="_blank"
+                rel="noopener noreferrer"
+                download={step.originalFormName || "form"} // Still keep the original filename for download
+                style={{
+                  display: "inline-block",
+                  background: "#1C7C0F",
+                  color: "white",
+                  padding: "8px 14px",
+                  borderRadius: "25px",
+                  textDecoration: "none",
+                  fontWeight: "bold",
+                }}
+              >
+                📄 Download Form {/* ✅ FIXED: Show just "Download Form" */}
+              </a>
+            </div>
+          )}
 
             {currentStep === stepNum && (
               <div className="feedback-section">
