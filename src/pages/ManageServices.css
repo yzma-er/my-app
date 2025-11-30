@@ -60,20 +60,22 @@
 /* ========== UNIFORM EDIT & DELETE BUTTONS ========== */
 .edit-btn,
 .delete-btn {
-  width: 120px;              /* EXACT SAME WIDTH */
-  height: 40px;              /* EXACT SAME HEIGHT */
-  display: flex;             /* Use flex instead of inline-flex */
+  min-width: 120px; /* Use min-width instead of width for flexibility */
+  height: 40px;
+  display: flex;
   justify-content: center;
   align-items: center;
-  box-sizing: border-box;    /* Prevents padding from changing size */
-  padding: 0;
+  box-sizing: border-box;
+  padding: 0 15px; /* Equal horizontal padding */
   border: none;
   border-radius: 20px;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  flex-shrink: 0;            /* Prevents shrinking */
+  flex-shrink: 0;
+  white-space: nowrap; /* Prevent text wrapping */
 }
+
 
 /* Edit Button Color */
 .edit-btn {
@@ -255,9 +257,11 @@
   }
   
   .button-group {
-    justify-content: center;
-    width: 100%;
-  }
+    display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+  align-items: center; /* Ensure vertical alignment */
+}
   
   .edit-btn,
   .delete-btn {
