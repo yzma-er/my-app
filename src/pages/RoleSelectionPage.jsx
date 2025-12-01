@@ -59,6 +59,10 @@ function RoleSelectionPage() {
     return () => clearInterval(interval);
   }, [images.length]);
 
+  // ⭐ GO TO SPECIFIC SLIDE
+  const goToSlide = (index) => {
+    setCurrent(index);
+  };
 
   // ⭐ COMPUTE AVERAGE RATINGS
   const serviceSummary = services.map((s) => {
@@ -73,7 +77,6 @@ function RoleSelectionPage() {
 
     return { ...s, avg, count: serviceFeedback.length };
   });
-
 
   // ⭐ OPEN MODAL + LOAD STEP RATINGS
   const openRatingsModal = async (service) => {
@@ -91,7 +94,7 @@ function RoleSelectionPage() {
   return (
     <div className="role-container">
 
-      {/* ⭐ CAROUSEL */}
+      {/* ⭐ CAROUSEL WITH DOTS */}
       <div className="carousel-container">
         <div
           className="carousel-track"
@@ -99,6 +102,18 @@ function RoleSelectionPage() {
         >
           {images.map((img, index) => (
             <img key={index} src={img} alt={`Slide ${index + 1}`} className="carousel-image" />
+          ))}
+        </div>
+        
+        {/* CAROUSEL DOTS */}
+        <div className="carousel-dots">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              className={`carousel-dot ${current === index ? 'active' : ''}`}
+              onClick={() => goToSlide(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
           ))}
         </div>
       </div>
@@ -136,7 +151,7 @@ function RoleSelectionPage() {
                 <div
                   key={s.service_id}
                   className="role-card"
-                  onClick={() => openRatingsModal(s)}   // ⭐ open modal
+                  onClick={() => openRatingsModal(s)}
                 >
                   <h3>{s.name}</h3>
                   <p>⭐ {s.avg} ({s.count})</p>
