@@ -1,3 +1,4 @@
+
 /* Main container: center everything */
 .role-container {
   display: flex;
@@ -14,8 +15,8 @@
 /* Carousel container: wide but not too tall */
 .carousel-container {
   width: 100%;
-  max-width: 1200px; /* wider for big screens */
-  aspect-ratio: 3 / 1; /* wide and short */
+  max-width: 1200px;
+  aspect-ratio: 3 / 1;
   margin-bottom: 20px;
   overflow: hidden;
   position: relative;
@@ -35,6 +36,42 @@
   height: 100%;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+/* CAROUSEL DOTS */
+.carousel-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background-color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.carousel-dot:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.2);
+}
+
+.carousel-dot.active {
+  background-color: white;
+  border-color: white;
+  transform: scale(1.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
 /* Logo */
@@ -134,6 +171,24 @@
   text-align: center;
 }
 
+/* Ratings toggle button */
+.ratings-toggle-btn {
+  background-color: #104C08;
+  color: white;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 280px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.ratings-toggle-btn:hover {
+  background-color: #1C7C0F;
+  transform: scale(1.05);
+}
+
 /* Responsive adjustments */
 
 /* Tablet */
@@ -141,6 +196,16 @@
   .carousel-container {
     max-width: 95%;
     aspect-ratio: 3 / 1;
+  }
+
+  .carousel-dots {
+    bottom: 15px;
+    gap: 10px;
+  }
+
+  .carousel-dot {
+    width: 10px;
+    height: 10px;
   }
 
   .logo {
@@ -174,6 +239,16 @@
     max-width: 100%;
   }
 
+  .carousel-dots {
+    bottom: 10px;
+    gap: 8px;
+  }
+
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+  }
+
   .logo {
     width: 80px;
   }
@@ -197,24 +272,11 @@
     padding: 15px;
     border-radius: 10px;
     border: 3px solid #104C08;
-    
   }
-}
 
-/* Ratings toggle button */
-.ratings-toggle-btn {
-  background-color: #104C08;
-  color: white;
-  padding: 12px 28px;
-  border: none;
-  border-radius: 30px;
-  font-size: 16px;
-  cursor: pointer;
-  width: 280px;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.ratings-toggle-btn:hover {
-  background-color: #1C7C0F;
-  transform: scale(1.05);
+  .ratings-toggle-btn {
+    width: 90%;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
 }
