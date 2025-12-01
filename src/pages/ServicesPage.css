@@ -1,4 +1,4 @@
-/* ServicesPage.css - Clean Version */
+/* ServicesPage.css - Complete Version with Loader */
 
 /* ================================
    🏠 MAIN CONTAINER
@@ -221,7 +221,7 @@
 }
 
 /* ================================
-   🔄 LOADER
+   🔄 LOADER (GREEN SPINNING CIRCLE)
 ================================== */
 .loader-container {
   display: flex;
@@ -296,6 +296,11 @@
   .service-card h3 {
     font-size: 1.3rem;
   }
+  
+  .loader {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 /* Mobile */
@@ -339,6 +344,11 @@
   .service-card p {
     font-size: 13px;
   }
+  
+  .loader {
+    width: 35px;
+    height: 35px;
+  }
 }
 
 /* Small Phones */
@@ -367,5 +377,10 @@
   
   .service-card h3 {
     font-size: 1.1rem;
+  }
+  
+  .loader {
+    width: 30px;
+    height: 30px;
   }
 }
