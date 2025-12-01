@@ -109,23 +109,7 @@ function ServicesPage() {
               ))}
             </div>
 
-            {/* Navigation arrows */}
-            <button
-              className="carousel-btn prev"
-              onClick={prevSlide}
-              aria-label="Previous slide"
-            >
-              ❮
-            </button>
-
-            <button
-              className="carousel-btn next"
-              onClick={nextSlide}
-              aria-label="Next slide"
-            >
-              ❯
-            </button>
-
+           
             {/* Carousel Dots */}
             <div className="carousel-dots">
               {carouselImages.map((_, index) => (
