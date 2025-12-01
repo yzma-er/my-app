@@ -167,19 +167,16 @@
 
 .search-section {
   padding: 0 1rem;
-  display: flex;
-  justify-content: center;
 }
 
 .search-bar {
-  width: 100%; /* Changed from 98% to 100% */
-  max-width: 900px; /* Added to match carousel width */
+  width: 98%;
   padding: 10px;
   font-size: 16px;
   border-radius: 8px;
   border: 1px solid #104C08;
   margin-bottom: 1rem;
-  box-sizing: b
+}
 
 /* ================================
    📦 SERVICES LIST - CONSISTENT CARD SIZES
@@ -188,8 +185,6 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 15px;
-   max-width: 900px;
-   margin: 0 auto;
 }
 
 .service-card {
@@ -333,8 +328,7 @@
   }
   
   .search-bar {
-    width: 100%; /* Changed from 96% to 100% */
-    max-width: 100%; /* Full width on mobile */
+    width: 96%;
   }
   
   .service-card {
