@@ -1,4 +1,4 @@
-/* ServicesPage.css - Complete Version with Loader */
+/* ServicesPage.css - Complete Fixed Version */
 
 /* ================================
    🏠 MAIN CONTAINER
@@ -131,6 +131,9 @@
   box-shadow: 0 4px 15px rgba(16, 76, 8, 0.2);
   position: relative;
   overflow: hidden;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .services-title-container::before {
@@ -165,26 +168,45 @@
   color: #f0f0f0;
 }
 
+/* ================================
+   🔍 SEARCH BAR - PERFECT ALIGNMENT
+================================== */
 .search-section {
   padding: 0 1rem;
+  display: flex;
+  justify-content: center;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .search-bar {
-  width: 98%;
-  padding: 10px;
+  width: 100%;
+  padding: 12px 15px;
   font-size: 16px;
   border-radius: 8px;
   border: 1px solid #104C08;
   margin-bottom: 1rem;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #1C7C0F;
+  box-shadow: 0 0 0 3px rgba(28, 124, 15, 0.2);
 }
 
 /* ================================
-   📦 SERVICES LIST - CONSISTENT CARD SIZES
+   📦 SERVICES LIST - PERFECTLY ALIGNED
 ================================== */
 .services-list {
   display: grid;
   grid-template-columns: 1fr;
   gap: 15px;
+  padding: 0 1rem;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .service-card {
@@ -198,6 +220,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .service-card:hover {
@@ -288,6 +311,20 @@
     font-size: 1rem;
   }
   
+  .search-section {
+    padding: 0 1.5rem;
+  }
+  
+  .search-bar {
+    padding: 11px 14px;
+    font-size: 15px;
+  }
+  
+  .services-list {
+    padding: 0 1.5rem;
+    gap: 12px;
+  }
+  
   .service-card {
     padding: 18px;
     min-height: 90px;
@@ -327,13 +364,26 @@
     font-size: 0.9rem;
   }
   
+  .search-section {
+    padding: 0 1rem;
+  }
+  
   .search-bar {
-    width: 96%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+  
+  .services-list {
+    padding: 0 1rem;
+    gap: 10px;
   }
   
   .service-card {
     padding: 15px;
     min-height: 85px;
+    border-width: 2px;
+    border-radius: 8px;
   }
   
   .service-card h3 {
@@ -366,13 +416,24 @@
     font-size: 1.5rem;
   }
   
+  .search-section {
+    padding: 0 0.8rem;
+  }
+  
   .search-bar {
-    width: 94%;
+    padding: 9px 11px;
+    font-size: 13px;
+  }
+  
+  .services-list {
+    padding: 0 0.8rem;
+    gap: 8px;
   }
   
   .service-card {
     padding: 12px;
     min-height: 80px;
+    border-radius: 6px;
   }
   
   .service-card h3 {
