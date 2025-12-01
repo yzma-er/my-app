@@ -1,371 +1,292 @@
-/* ServicesPage.css - Clean Version */
-
-/* ================================
-   🏠 MAIN CONTAINER
-================================== */
-.services-container {
-  padding: 1rem;
-  font-family: 'Segoe UI', sans-serif;
-  height: 100%;
-  min-height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* ================================
-   🎠 CAROUSEL WITH DOTS ONLY (NO ARROWS)
-================================== */
-.carousel-container {
-  width: 100%;
+.medical-container {
   display: flex;
-  margin: 0 auto;  
-  justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 40px;
-}
-
-.custom-carousel {
-  width: 100%;
-  max-width: 900px;
-  height: 400px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Carousel Track */
-.carousel-track {
-  display: flex;
-  height: 100%;
-  transition: transform 0.5s ease-in-out;
-}
-
-/* Individual Slide */
-.carousel-slide {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.carousel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 20px;
-}
-
-/* Caption overlay */
-.carousel-caption {
-  position: absolute;
-  bottom: 15px;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.4);
-  color: white;
-  padding: 10px 0;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  font-size: 1rem;
-}
-
-/* Carousel Dots */
-.carousel-dots {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  z-index: 10;
-}
-
-.carousel-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid white;
-  background-color: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  padding: 0;
-  transition: all 0.3s ease;
-}
-
-.carousel-dot:hover {
-  background-color: rgba(255, 255, 255, 0.6);
-  transform: scale(1.2);
-}
-
-.carousel-dot.active {
-  background-color: white;
-  border-color: white;
-  transform: scale(1.3);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-}
-
-.loading-carousel {
-  text-align: center;
-  padding: 40px;
-  color: #666;
-  font-size: 18px;
-}
-
-/* ================================
-   🎯 SERVICES HEADER & TITLE
-================================== */
-.services-header {
-  margin: 20px 0 30px 0;
-}
-
-.services-title-container {
-  background: #104C08;
-  color: white;
-  padding: 1rem 1rem;
-  text-align: left;
-  margin-bottom: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(16, 76, 8, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.services-title-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  transition: left 0.5s ease;
-}
-
-.services-title-container:hover::before {
-  left: 100%;
-}
-
-.services-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  letter-spacing: -0.5px;
-}
-
-.services-subtitle {
-  font-size: 1.1rem;
-  margin: 0;
-  opacity: 0.9;
-  font-weight: 400;
-  color: #f0f0f0;
-}
-
-.search-section {
-  padding: 0 1rem;
-}
-
-.search-bar {
-  width: 98%;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #104C08;
-  margin-bottom: 1rem;
-}
-
-/* ================================
-   📦 SERVICES LIST - CONSISTENT CARD SIZES
-================================== */
-.services-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
-}
-
-.service-card {
-  background: #f7f7f7;
   padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* =========================
+   Video Section
+========================= */
+.video-container {
+  width: 100%;         /* ✅ full width inside container */
+  margin: 0 auto 20px;
   border-radius: 10px;
-  border: 3px solid #104C08;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  overflow: hidden; /* crop overflow when rounding */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.service-card:hover {
+.video-container video {
+  width: 100%;
+  aspect-ratio: 16 / 9;   /* ✅ keeps proportional height */
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+
+/* =========================
+   Info Section
+========================= */
+.info-section {
+  text-align: left;
+  margin: 20px 0;
+  padding: 10px;
+  width: 100%;   /* ✅ aligns with video/feedback */
+}
+
+.info-section h2 {
+  font-size: 25px;
+  margin-bottom: 10px;
+}
+
+p {
+   font-size: 1.05rem;
+  line-height: 1.6;
+  color: #000;
+}
+
+/* =========================
+   Feedback Section
+========================= */
+.feedback-section {
+  width: 100%;          /* ✅ same width as video */
+  margin: 20px auto;
+  padding: 20px;
   background: #eaf4ea;
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(16, 76, 8, 0.15);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px #1C7C0F(0, 0, 0, 0.2);
+  box-sizing: border-box;  /* ✅ ensures padding doesn’t break width */
 }
 
-.service-card h3 {
-  margin: 0 0 10px 0;
-  color: #104C08;
-  font-size: 1.4rem;
-  font-weight: 600;
-}
-
-.service-card p {
-  font-size: 14px;
-  color: #555;
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* ================================
-   🔄 LOADER
-================================== */
-.loader-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60vh;
+.feedback-section h3 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
   text-align: center;
-  color: #2e7d32;
-  font-weight: 500;
 }
 
-.loader {
-  border: 4px solid #c8e6c9;
-  border-top: 4px solid #2e7d32;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
+/* Star Rating */
+.star-rating {
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  text-align: center;
+}
+
+.star {
+  color: #ccc;
+  margin: 0 3px;
+}
+
+.star.active {
+  color: gold;
+}
+
+/* Textarea */
+.feedback-section textarea {
+  width: 100%;                 /* ✅ fills container */
+  min-height: 120px;
+  border: 1px solid #1C7C0F;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 1rem;
+  resize: vertical;
+  display: block;
+  margin: 15px 0;              /* ✅ spacing inside container */
+  box-sizing: border-box;      /* ✅ no overflow from padding */
+}
+
+/* Button */
+.feedback-btn {
+  background-color: #1C7C0F;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin: 15px auto 0;
+  display: block;
+  width: fit-content;
+}
+
+.feedback-btn:hover {
+  background-color: #104C08;
+  transform: scale(1.05);
+}
+
+.feedback-btn:active {
+  background-color: #367a39;
+  transform: scale(0.98);
+}
+
+.see-more-btn {
+  background-color: #1C7C0F;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 15px;
+  display: inline-block; /* 👈 keeps it aligned to the left */
+}
+
+.see-more-btn:hover {
+  background-color: #104C08;
+  transform: scale(1.05);
+}
+.download-link {
+  color: #1C7C0F;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.download-link:hover {
+  color: #145a0b;
+}
+
+
+
+/* Add to Services.css for better step title styling */
+.info-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   margin-bottom: 15px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* If you want to style the custom name differently */
+.info-section h3::after {
+  content: "";
+  /* This will show the custom name after a dash */
 }
 
-/* ================================
-   📱 RESPONSIVE DESIGN
-================================== */
+/* Or keep it as is - the JSX handles the " - " separator */
 
-/* Tablet */
-@media (max-width: 768px) {
-  .custom-carousel {
-    width: 95%;
-    height: 250px;
-  }
 
-  .carousel-caption {
-    font-size: 0.9rem;
-    padding: 6px 0;
-  }
-
-  .carousel-dots {
-    bottom: 15px;
-    gap: 10px;
-  }
-
-  .carousel-dot {
-    width: 10px;
-    height: 10px;
-  }
-
-  .services-title-container {
-    padding: 1.5rem 1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .services-title {
-    font-size: 2rem;
-  }
-  
-  .services-subtitle {
-    font-size: 1rem;
-  }
-  
-  .service-card {
-    padding: 18px;
-    min-height: 90px;
-  }
-  
-  .service-card h3 {
-    font-size: 1.3rem;
-  }
+.info-section p,
+.info-section div {
+  white-space: pre-line; /* ✅ Keeps line breaks and spacing */
 }
 
-/* Mobile */
-@media (max-width: 480px) {
-  .custom-carousel {
-    height: 200px;
-  }
-
-  .carousel-dots {
-    bottom: 10px;
-    gap: 8px;
-  }
-
-  .carousel-dot {
-    width: 8px;
-    height: 8px;
-  }
-
-  .services-title {
-    font-size: 1.75rem;
-  }
-  
-  .services-subtitle {
-    font-size: 0.9rem;
-  }
-  
-  .search-bar {
-    width: 96%;
-  }
-  
-  .service-card {
-    padding: 15px;
-    min-height: 85px;
-  }
-  
-  .service-card h3 {
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-  }
-  
-  .service-card p {
-    font-size: 13px;
-  }
+/* Ensure container adjusts for small screens */
+.medical-container {
+  max-width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
-/* Small Phones */
-@media (max-width: 360px) {
-  .custom-carousel {
-    height: 180px;
-  }
-  
-  .carousel-caption {
-    font-size: 0.8rem;
-    padding: 4px 0;
-  }
-  
-  .services-title {
-    font-size: 1.5rem;
-  }
-  
-  .search-bar {
-    width: 94%;
-  }
-  
-  .service-card {
+/* Make each step section flexible and readable */
+.info-section {
+  background: #f8fff8;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  word-wrap: break-word;      /* ✅ Break long words */
+  overflow-wrap: break-word;  /* ✅ Support long text wrapping */
+}
+
+/* Step text should wrap and not overflow */
+.info-section p {
+  white-space: pre-line;
+  text-align: justify;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  margin: 10px 0;
+}
+
+/* Make videos responsive */
+.video-container video {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Feedback section responsive */
+.feedback-section {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Make stars and text areas fit well */
+.star-rating {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap; /* ✅ Wrap stars if needed */
+  font-size: 28px;
+}
+
+.feedback-section textarea {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* Feedback button full-width on mobile */
+.feedback-btn {
+  background: #1C7C0F;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  width: fit-content;
+  align-self: center;
+}
+
+/* ✅ Mobile responsiveness */
+@media (max-width: 600px) {
+  .info-section {
     padding: 12px;
-    min-height: 80px;
   }
-  
-  .service-card h3 {
-    font-size: 1.1rem;
+
+  .info-section p {
+    font-size: 15px;
+    text-align: left;
   }
+
+  .feedback-btn {
+    width: 100%;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+
+  .star-rating {
+    font-size: 24px;
+  }
+}
+
+
+.service-description2 {
+  text-align: left !important;
+  display: block;
+  margin: 15px 0;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-line;
+  font-size: 18px;
+  width: 100%;
 }
