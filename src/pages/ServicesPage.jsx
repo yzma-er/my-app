@@ -20,9 +20,7 @@ function ServicesPage() {
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
 
-  // -------------------------------
   // ✅ Fetch Services
-  // -------------------------------
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -37,9 +35,7 @@ function ServicesPage() {
     fetchServices();
   }, [backendURL]);
 
-  // -------------------------------
   // ✅ Fetch Carousel Images (Cloudinary URLs already stored in DB)
-  // -------------------------------
   useEffect(() => {
     const fetchCarousel = async () => {
       try {
@@ -52,9 +48,7 @@ function ServicesPage() {
     fetchCarousel();
   }, []);
 
-  // -------------------------------
   // ✅ Auto-slide every 4 seconds
-  // -------------------------------
   useEffect(() => {
     if (carouselImages.length === 0) return;
 
@@ -65,9 +59,24 @@ function ServicesPage() {
     return () => clearInterval(interval);
   }, [carouselImages]);
 
-  // -------------------------------
+  // ✅ Go to specific slide
+  const goToSlide = (index) => {
+    setCurrentIndex(index);
+  };
+
+  // ✅ Next slide
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % carouselImages.length);
+  };
+
+  // ✅ Previous slide
+  const prevSlide = () => {
+    setCurrentIndex((prev) => 
+      prev === 0 ? carouselImages.length - 1 : prev - 1
+    );
+  };
+
   // Filter services by search
-  // -------------------------------
   const filteredServices = services.filter((service) =>
     service.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -76,63 +85,68 @@ function ServicesPage() {
     <div className="services-container">
       <NavBar />
 
-      {/* ----------------------- */}
       {/* ✅ CAROUSEL */}
-      {/* ----------------------- */}
       <div className="carousel-container">
         {carouselImages.length > 0 ? (
           <div className="custom-carousel">
-            <div className="carousel-slide fade">
-              <img
-                src={carouselImages[currentIndex].image} // Cloudinary URL
-                alt={carouselImages[currentIndex].title || "Carousel Image"}
-                className="carousel-image"
-              />
-              <div className="carousel-caption">
-                {carouselImages[currentIndex].title && (
-                  <h3>{carouselImages[currentIndex].title}</h3>
-                )}
-                {carouselImages[currentIndex].caption && (
-                  <p>{carouselImages[currentIndex].caption}</p>
-                )}
-              </div>
+            {/* Carousel Track */}
+            <div
+              className="carousel-track"
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+            >
+              {carouselImages.map((img, index) => (
+                <div key={index} className="carousel-slide">
+                  <img
+                    src={img.image}
+                    alt={img.title || "Carousel Image"}
+                    className="carousel-image"
+                  />
+                  <div className="carousel-caption">
+                    {img.title && <h3>{img.title}</h3>}
+                    {img.caption && <p>{img.caption}</p>}
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Navigation arrows */}
             <button
               className="carousel-btn prev"
-              onClick={() =>
-                setCurrentIndex(
-                  (prevIndex) =>
-                    (prevIndex - 1 + carouselImages.length) %
-                    carouselImages.length
-                )
-              }
+              onClick={prevSlide}
+              aria-label="Previous slide"
             >
               ❮
             </button>
 
             <button
               className="carousel-btn next"
-              onClick={() =>
-                setCurrentIndex((prevIndex) => (prevIndex + 1) % carouselImages.length)
-              }
+              onClick={nextSlide}
+              aria-label="Next slide"
             >
               ❯
             </button>
+
+            {/* Carousel Dots */}
+            <div className="carousel-dots">
+              {carouselImages.map((_, index) => (
+                <button
+                  key={index}
+                  className={`carousel-dot ${currentIndex === index ? 'active' : ''}`}
+                  onClick={() => goToSlide(index)}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         ) : (
           <p className="loading-carousel">🕓 Loading carousel...</p>
         )}
       </div>
 
-      {/* ----------------------- */}
       {/* ✅ PAGE TITLE & SEARCH */}
-      {/* ----------------------- */}
       <div className="services-header">
         <div className="services-title-container">
           <h1 className="services-title">Services</h1>
-          
         </div>
         
         <div className="search-section">
@@ -146,9 +160,7 @@ function ServicesPage() {
         </div>
       </div>
 
-      {/* ----------------------- */}
       {/* ✅ SERVICES LIST */}
-      {/* ----------------------- */}
       {loading ? (
         <div className="loader-container">
           <div className="loader"></div>
