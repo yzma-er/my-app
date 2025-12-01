@@ -20,20 +20,8 @@
   display: flex;
   margin: 0 auto;  
   justify-content: center;
-  margin-bottom: 30px; /* Reduced space below carousel */
-}
-
-/* ✅ FIXED: Reduced space between carousel and title on mobile */
-@media (max-width: 768px) {
-  .carousel-container {
-    margin-bottom: 20px; /* Less space on tablets */
-  }
-}
-
-@media (max-width: 480px) {
-  .carousel-container {
-    margin-bottom: 15px; /* Even less space on phones */
-  }
+  margin-top: 20px;
+  margin-bottom: 40px;
 }
 
 .custom-carousel {
@@ -130,7 +118,7 @@
    🎯 SERVICES HEADER & TITLE
 ================================== */
 .services-header {
-  margin: 0 0 30px 0; /* Reduced top margin */
+  margin: 20px 0 30px 0;
 }
 
 .services-title-container {
@@ -188,20 +176,6 @@
   border-radius: 8px;
   border: 1px solid #104C08;
   margin-bottom: 1rem;
-}
-
-/* ✅ FIXED: Search bar alignment with carousel */
-@media (max-width: 768px) {
-  .search-section {
-    padding: 0 0.75rem; /* Adjusted to match carousel container */
-  }
-  
-  .search-bar {
-    width: 100%; /* Full width within its container */
-    max-width: 900px; /* Same as carousel max-width */
-    margin: 0 auto 1rem auto; /* Center align like carousel */
-    display: block;
-  }
 }
 
 /* ================================
@@ -333,7 +307,6 @@
 @media (max-width: 480px) {
   .custom-carousel {
     height: 200px;
-    width: 95%; /* Ensure consistent width with search bar */
   }
 
   .carousel-dots {
@@ -355,10 +328,7 @@
   }
   
   .search-bar {
-    width: 100%; /* Full width to match carousel */
-    max-width: 900px; /* Match carousel max-width */
-    margin: 0 auto 1rem auto; /* Center align */
-    display: block;
+    width: 96%;
   }
   
   .service-card {
@@ -379,18 +349,12 @@
     width: 35px;
     height: 35px;
   }
-  
-  /* ✅ FIXED: Reduced space between carousel and title */
-  .services-header {
-    margin: 0 0 20px 0;
-  }
 }
 
 /* Small Phones */
 @media (max-width: 360px) {
   .custom-carousel {
     height: 180px;
-    width: 95%; /* Consistent width */
   }
   
   .carousel-caption {
@@ -403,10 +367,7 @@
   }
   
   .search-bar {
-    width: 100%; /* Full width */
-    max-width: 900px; /* Match carousel */
-    margin: 0 auto 1rem auto; /* Center align */
-    display: block;
+    width: 94%;
   }
   
   .service-card {
@@ -421,10 +382,5 @@
   .loader {
     width: 30px;
     height: 30px;
-  }
-  
-  /* ✅ FIXED: Even less space between carousel and title */
-  .services-header {
-    margin: 0 0 15px 0;
   }
 }
