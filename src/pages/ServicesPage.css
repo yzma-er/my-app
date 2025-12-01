@@ -20,7 +20,7 @@
   display: flex;
   margin: 0 auto;  
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 10px; /* CHANGED: Reduced from 20px to make space closer */
   margin-bottom: 40px;
 }
 
@@ -118,7 +118,8 @@
    🎯 SERVICES HEADER & TITLE
 ================================== */
 .services-header {
-  margin: 20px 0 30px 0;
+  margin: 0 auto 30px auto; /* CHANGED: Removed top margin and centered */
+  max-width: 900px; /* ADDED: To match carousel width */
 }
 
 .services-title-container {
@@ -126,7 +127,7 @@
   color: white;
   padding: 1rem 1rem;
   text-align: left;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem; /* CHANGED: Reduced from 2rem to bring search bar closer */
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(16, 76, 8, 0.2);
   position: relative;
@@ -166,16 +167,18 @@
 }
 
 .search-section {
-  padding: 0 1rem;
+  padding: 0; /* CHANGED: Removed horizontal padding */
+  max-width: 900px; /* ADDED: To match carousel width */
 }
 
 .search-bar {
-  width: 98%;
+  width: 100%; /* CHANGED: From 98% to 100% for perfect alignment */
   padding: 10px;
   font-size: 16px;
   border-radius: 8px;
   border: 1px solid #104C08;
   margin-bottom: 1rem;
+  box-sizing: border-box; /* ADDED: Ensures padding doesn't affect width */
 }
 
 /* ================================
@@ -328,7 +331,7 @@
   }
   
   .search-bar {
-    width: 96%;
+    width: 100%;
   }
   
   .service-card {
@@ -367,7 +370,7 @@
   }
   
   .search-bar {
-    width: 94%;
+    width: 100%;
   }
   
   .service-card {
