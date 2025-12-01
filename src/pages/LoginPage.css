@@ -7,7 +7,7 @@ html, body, #root {
   height: 100%;
   background-color: #FFF8EF;
   font-family: 'Segoe UI', sans-serif;
-  overflow: hidden; /* 🔹 removes all scrollbars */
+  overflow: hidden;
 }
 
 /* --- Wrapper to center the login form --- */
@@ -15,7 +15,7 @@ html, body, #root {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* fixed height instead of min-height */
+  height: 100vh;
   width: 100%;
   background-color: #FFF8EF;
   box-sizing: border-box;
@@ -26,7 +26,7 @@ html, body, #root {
   width: 100%;
   max-width: 450px;
   background-color: #F4FFE3;
-  border-radius: 60px 20px 80px 30px; /* 🔹 asymmetric corners for organic shape */
+  border-radius: 60px 20px 80px 30px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   padding: 2rem;
   transition: transform 0.3s ease;
@@ -71,10 +71,17 @@ html, body, #root {
   font-size: 1rem;
   outline: none;
   box-sizing: border-box;
+  transition: all 0.3s ease;
 }
 
 .login-form input:focus {
   border-color: #104C08;
+}
+
+.login-form input:disabled {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+  cursor: not-allowed;
 }
 
 /* --- Password with eye icon --- */
@@ -109,6 +116,11 @@ html, body, #root {
   color: #104C08;
 }
 
+.toggle-icon.disabled-icon {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
 /* --- Button styling --- */
 .login-form button {
   width: 100%;
@@ -121,11 +133,59 @@ html, body, #root {
   font-size: 1rem;
   cursor: pointer;
   margin-top: 1.5rem;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
 }
 
-.login-form button:hover {
+.login-form button:hover:not(:disabled) {
   background-color: #1C7C0F;
+}
+
+.login-form button:disabled {
+  background-color: #8bc34a;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.login-form button.loading {
+  background: linear-gradient(90deg, #104C08, #1C7C0F, #104C08);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* --- Loader --- */
+.loader {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 2px solid white;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* --- Success Animation --- */
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.login-success {
+  animation: successPulse 0.5s ease;
 }
 
 /* --- Link section --- */
@@ -142,7 +202,7 @@ html, body, #root {
 /* --- Responsive Design --- */
 @media (max-width: 768px) {
   html, body {
-    overflow: hidden; /* keep no scroll on smaller screens too */
+    overflow: hidden;
   }
 
   .login-container {
@@ -161,6 +221,11 @@ html, body, #root {
   .login-form input,
   .login-form button {
     font-size: 0.95rem;
+  }
+  
+  .loader {
+    width: 18px;
+    height: 18px;
   }
 }
 
@@ -181,5 +246,10 @@ html, body, #root {
 
   .toggle-icon {
     font-size: 1rem;
+  }
+  
+  .loader {
+    width: 16px;
+    height: 16px;
   }
 }
