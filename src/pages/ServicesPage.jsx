@@ -64,17 +64,7 @@ function ServicesPage() {
     setCurrentIndex(index);
   };
 
-  // ✅ Next slide
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % carouselImages.length);
-  };
-
-  // ✅ Previous slide
-  const prevSlide = () => {
-    setCurrentIndex((prev) => 
-      prev === 0 ? carouselImages.length - 1 : prev - 1
-    );
-  };
+  
 
   // Filter services by search
   const filteredServices = services.filter((service) =>
