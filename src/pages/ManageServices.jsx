@@ -38,7 +38,11 @@ function ManageServices() {
 
     if (res.ok) {
       alert("✅ Service added successfully!");
-      window.location.reload();
+      setNewService(""); // Clear the input
+      // Refresh services
+      const updatedRes = await fetch(`${backendURL}/api/services`);
+      const updatedData = await updatedRes.json();
+      setServices(updatedData);
     } else {
       alert("❌ Failed to add service.");
     }
@@ -47,8 +51,14 @@ function ManageServices() {
   // ✅ Delete service
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this service?")) return;
-    await fetch(`${backendURL}/api/services/${id}`, { method: "DELETE" });
-    setServices(services.filter((s) => s.service_id !== id));
+    const res = await fetch(`${backendURL}/api/services/${id}`, { 
+      method: "DELETE" 
+    });
+    if (res.ok) {
+      setServices(services.filter((s) => s.service_id !== id));
+    } else {
+      alert("Failed to delete service.");
+    }
   };
 
   // ✅ Refresh list after saving edits
@@ -59,73 +69,78 @@ function ManageServices() {
     setServices(data);
   };
 
+  // ✅ Handle Enter key for adding service
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleAddService();
+    }
+  };
+
   return (
     <div className="manage-container">
       
-      {/* Back button */}
-      <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
+      {/* Back button with class only - removed inline styles */}
+      <div className="back-button-container">
         <button
           className="back-admin-btn"
           onClick={() => navigate("/admin")}
-          style={{
-            padding: "6px 12px",
-            borderRadius: "30px",
-            backgroundColor: "#1c7c0f",
-            color: "white",
-            cursor: "pointer",
-            fontSize: "16px",
-            fontWeight: "bold",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            position: "absolute",
-            left: 0,
-          }}
         >
-          <span style={{ fontWeight: "bold", fontSize: "18px" }}>←</span>
+          <span className="back-arrow">←</span> Back to Admin
         </button>
       </div>
 
       <h1>Manage Services</h1>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="loading-container">
+          <p>Loading services...</p>
+        </div>
+      ) : services.length === 0 ? (
+        <div className="no-services">
+          <p>No services found. Add your first service below!</p>
+        </div>
       ) : (
-        services.map((service) => (
-          <div key={service.service_id} className="service-item">
-            <div className="service-info">
-              <strong>{service.name}</strong>
-              <p>{service.description}</p>
+        <div className="services-list">
+          {services.map((service) => (
+            <div key={service.service_id} className="service-item">
+              <div className="service-info">
+                <strong>{service.name}</strong>
+                <p>{service.description || "No description available"}</p>
+              </div>
+              <div className="button-group">
+                <button
+                  className="edit-btn"
+                  onClick={() => setEditingServiceId(service.service_id)}
+                >
+                  ✏️ Edit
+                </button>
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDelete(service.service_id)}
+                >
+                  🗑️ Delete
+                </button>
+              </div>
             </div>
-            <div className="button-group">
-              <button
-                className="edit-btn"
-                onClick={() => setEditingServiceId(service.service_id)}
-              >
-                ✏️ Edit
-              </button>
-              <button
-                className="delete-btn"
-                onClick={() => handleDelete(service.service_id)}
-              >
-                🗑️ Delete
-              </button>
-            </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
 
       {/* Add new service */}
-      <div className="service-item add-service-row">
-        <input
-          type="text"
-          placeholder="Enter new service"
-          value={newService}
-          onChange={(e) => setNewService(e.target.value)}
-        />
-        <button className="add-btn" onClick={handleAddService}>
-          + Add
-        </button>
+      <div className="add-service-container">
+        <div className="add-service-row">
+          <input
+            type="text"
+            placeholder="Enter new service name"
+            value={newService}
+            onChange={(e) => setNewService(e.target.value)}
+            onKeyPress={handleKeyPress}
+          />
+          <button className="add-btn" onClick={handleAddService}>
+            + Add Service
+          </button>
+        </div>
+        <p className="add-service-hint">Press Enter or click "Add Service" to save</p>
       </div>
 
       {/* ✅ Edit Modal appears here */}
