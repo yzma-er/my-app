@@ -145,17 +145,13 @@ function ServiceDetails() {
       <h2 style={{ color: "#1C7C0F", marginBottom: "10px", width: "100%", textAlign: "center" }}>{service.name}</h2>
 
       {service.description && (
-        <p
-          className="service-description"
-          style={{
-            marginBottom: "20px",
-            whiteSpace: "pre-line",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          {service.description}
-        </p>
+        <p 
+        className="service-description" 
+        style={{ ... }}
+        dangerouslySetInnerHTML={{ 
+          __html: service.description ? service.description.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : '' 
+        }}
+      />
       )}
 
       {/* NEW: Service Photo Display */}
@@ -191,9 +187,12 @@ function ServiceDetails() {
       )}
 
       {service.description2 && (
-        <p className="service-description2" style={{ width: "100%" }}>
-          {service.description2}
-        </p>
+        <p 
+        className="service-description2"
+        dangerouslySetInnerHTML={{ 
+          __html: service.description2 ? service.description2.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : '' 
+        }}
+      />
       )}
 
       {steps.map((step, index) => {
@@ -237,7 +236,12 @@ function ServiceDetails() {
               </div>
             )}
 
-            <p style={{ whiteSpace: "pre-line" }}>{step.content}</p>
+           <p 
+            style={{ whiteSpace: "pre-line" }}
+            dangerouslySetInnerHTML={{ 
+              __html: step.content ? step.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : '' 
+            }}
+          />
 
             {step.formFile && (
               <div style={{ marginTop: "10px" }}>
