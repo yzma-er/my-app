@@ -37,7 +37,6 @@ function ServiceDetails() {
 
   const STORAGE_KEY = `progress_${serviceId}`;
   
-  // ✅ REMOVED: Time-based expiration - progress is saved indefinitely
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -51,17 +50,14 @@ function ServiceDetails() {
       STORAGE_KEY,
       JSON.stringify({
         currentStep,
-        // ✅ REMOVED: timestamp (no more time-based expiration)
       })
     );
   }, [currentStep, STORAGE_KEY]);
 
-  // ✅ Get user ID from JWT token
   const getUserId = () => {
     try {
       const token = localStorage.getItem("token");
       if (token) {
-        // Decode JWT token to get user_id
         const payload = JSON.parse(atob(token.split('.')[1]));
         return payload.user_id;
       }
@@ -79,7 +75,7 @@ function ServiceDetails() {
     }
 
     try {
-      const user_id = getUserId(); // Get the current user's ID from JWT token
+      const user_id = getUserId();
       
       const res = await axios.post(`${backendURL}/api/feedback`, {
         service_id: service?.service_id,
@@ -87,10 +83,9 @@ function ServiceDetails() {
         step_number: currentStep,
         rating,
         comment: feedback,
-        user_id: user_id // ✅ ADDED: Include user_id for replaceable ratings
+        user_id: user_id
       });
 
-      // ✅ Show appropriate message based on whether rating was updated or created
       if (res.data.updated) {
         alert("✅ Rating updated successfully!");
       } else {
@@ -141,12 +136,13 @@ function ServiceDetails() {
           display: "inline-flex",
           alignItems: "center",
           gap: "5px",
+          alignSelf: "flex-start",
         }}
       >
         ← Back to Services
       </button>
 
-      <h2 style={{ color: "#1C7C0F", marginBottom: "10px" }}>{service.name}</h2>
+      <h2 style={{ color: "#1C7C0F", marginBottom: "10px", width: "100%" }}>{service.name}</h2>
 
       {service.description && (
         <p
@@ -155,13 +151,57 @@ function ServiceDetails() {
             marginBottom: "20px",
             whiteSpace: "pre-line",
             textAlign: "justify",
+            width: "100%",
           }}
         >
           {service.description}
         </p>
       )}
 
-      {service.description2 && <p className="service-description2">{service.description2}</p>}
+      {/* NEW: Service Photo Display */}
+      {service.photo && (
+        <div style={{ 
+          width: "100%", 
+          margin: "20px 0",
+          textAlign: "center"
+        }}>
+          <div style={{
+            maxWidth: "800px",
+            margin: "0 auto",
+            border: "1px solid #bde3b2",
+            borderRadius: "12px",
+            padding: "15px",
+            background: "#f8fff8",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+          }}>
+            <img 
+              src={service.photo} 
+              alt={service.name} 
+              style={{
+                width: "100%",
+                height: "auto",
+                maxHeight: "400px",
+                borderRadius: "8px",
+                objectFit: "contain"
+              }}
+            />
+            <p style={{ 
+              marginTop: "10px", 
+              fontSize: "14px", 
+              color: "#666",
+              fontStyle: "italic"
+            }}>
+              {service.name} Photo
+            </p>
+          </div>
+        </div>
+      )}
+
+      {service.description2 && (
+        <p className="service-description2" style={{ width: "100%" }}>
+          {service.description2}
+        </p>
+      )}
 
       {steps.map((step, index) => {
         const stepNum = index + 1;
@@ -169,13 +209,11 @@ function ServiceDetails() {
         if (!isUnlocked) return null;
 
         return (
-          <div key={index} className="info-section" style={{ marginBottom: "25px" }}>
-            {/* ✅ Show step title with custom name */}
+          <div key={index} className="info-section" style={{ marginBottom: "25px", width: "100%" }}>
             <h3 style={{ color: "#1C7C0F" }}>
               {step.customName ? `${step.title} - ${step.customName}` : step.title}
             </h3>
             
-            {/* 🎥 Video for each step - RESPONSIVE */}
             {step.videoFile && (
               <div style={{ 
                 marginTop: "12px", 
@@ -209,30 +247,29 @@ function ServiceDetails() {
             <p style={{ whiteSpace: "pre-line" }}>{step.content}</p>
 
             {step.formFile && (
-            <div style={{ marginTop: "10px" }}>
-              <a
-                href={step.formFile} // Use Cloudinary URL directly
-                target="_blank"
-                rel="noopener noreferrer"
-                download={step.originalFormName || "form"} // Still keep the original filename for download
-                style={{
-                  display: "inline-block",
-                  background: "#1C7C0F",
-                  color: "white",
-                  padding: "8px 14px",
-                  borderRadius: "25px",
-                  textDecoration: "none",
-                  fontWeight: "bold",
-                }}
-              >
-                📄 Download Form {/* ✅ FIXED: Show just "Download Form" */}
-              </a>
-            </div>
-          )}
+              <div style={{ marginTop: "10px" }}>
+                <a
+                  href={step.formFile}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download={step.originalFormName || "form"}
+                  style={{
+                    display: "inline-block",
+                    background: "#1C7C0F",
+                    color: "white",
+                    padding: "8px 14px",
+                    borderRadius: "25px",
+                    textDecoration: "none",
+                    fontWeight: "bold",
+                  }}
+                >
+                  📄 Download Form
+                </a>
+              </div>
+            )}
 
             {currentStep === stepNum && (
               <div className="feedback-section">
-                {/* ✅ Update feedback title to include custom name */}
                 <h3>Rate {step.customName ? `${step.title} - ${step.customName}` : step.title}</h3>
 
                 <div className="star-rating">
@@ -257,7 +294,6 @@ function ServiceDetails() {
                   Submit Feedback
                 </button>
                 
-                {/* ✅ Inform users about replaceable ratings */}
                 <p style={{ 
                   fontSize: "12px", 
                   color: "#666", 
@@ -273,7 +309,7 @@ function ServiceDetails() {
       })}
 
       {currentStep > steps.length && (
-        <div className="info-section" style={{ textAlign: "center", marginTop: "20px" }}>
+        <div className="info-section" style={{ textAlign: "center", marginTop: "20px", width: "100%" }}>
           <h3>🎉 You've completed all steps for this service!</h3>
           <p style={{ color: "#1C7C0F" }}>
             You can reset your progress if you wish to start again.
@@ -284,7 +320,7 @@ function ServiceDetails() {
         </div>
       )}
 
-      <div style={{ textAlign: "center", marginTop: "30px" }}>
+      <div style={{ textAlign: "center", marginTop: "30px", width: "100%" }}>
         <button
           onClick={handleResetProgress}
           style={{
