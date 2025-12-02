@@ -109,6 +109,24 @@ function ServiceDetails() {
     }
   };
 
+  // ✅ Helper function to parse bold text (**text** to <strong>text</strong>)
+  const parseBoldText = (text) => {
+    if (!text) return text;
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  };
+
+  // ✅ Helper function to render HTML safely with bold support
+  const renderWithBold = (text, className = "", style = {}) => {
+    const html = parseBoldText(text);
+    return (
+      <div 
+        className={className}
+        style={style}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!service) return <p>❌ Service not found.</p>;
 
@@ -144,17 +162,19 @@ function ServiceDetails() {
 
       <h2 style={{ color: "#1C7C0F", marginBottom: "10px", width: "100%", textAlign: "center" }}>{service.name}</h2>
 
-      {service.description && (
-        <p 
-        className="service-description" 
-        style={{ ... }}
-        dangerouslySetInnerHTML={{ 
-          __html: service.description ? service.description.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : '' 
-        }}
-      />
+      {/* ✅ Description 1 with bold support */}
+      {service.description && renderWithBold(
+        service.description,
+        "service-description",
+        {
+          marginBottom: "20px",
+          whiteSpace: "pre-line",
+          textAlign: "center",
+          width: "100%",
+        }
       )}
 
-      {/* NEW: Service Photo Display */}
+      {/* Service Photo Display */}
       {service.photo && (
         <div style={{ 
           width: "100%", 
@@ -181,18 +201,15 @@ function ServiceDetails() {
                 objectFit: "contain"
               }}
             />
-            
           </div>
         </div>
       )}
 
-      {service.description2 && (
-        <p 
-        className="service-description2"
-        dangerouslySetInnerHTML={{ 
-          __html: service.description2 ? service.description2.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : '' 
-        }}
-      />
+      {/* ✅ Description 2 with bold support */}
+      {service.description2 && renderWithBold(
+        service.description2,
+        "service-description2",
+        { width: "100%" }
       )}
 
       {steps.map((step, index) => {
@@ -236,12 +253,12 @@ function ServiceDetails() {
               </div>
             )}
 
-           <p 
-            style={{ whiteSpace: "pre-line" }}
-            dangerouslySetInnerHTML={{ 
-              __html: step.content ? step.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : '' 
-            }}
-          />
+            {/* ✅ Step content with bold support */}
+            {renderWithBold(
+              step.content,
+              "",
+              { whiteSpace: "pre-line" }
+            )}
 
             {step.formFile && (
               <div style={{ marginTop: "10px" }}>
