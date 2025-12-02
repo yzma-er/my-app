@@ -142,7 +142,7 @@ function ServiceDetails() {
         ← Back to Services
       </button>
 
-      <h2 style={{ color: "#1C7C0F", marginBottom: "10px", width: "100%" }}>{service.name}</h2>
+      <h2 style={{ color: "#1C7C0F", marginBottom: "10px", width: "100%", textAlign: "center" }}>{service.name}</h2>
 
       {service.description && (
         <p
