@@ -150,7 +150,7 @@ function ServiceDetails() {
           style={{
             marginBottom: "20px",
             whiteSpace: "pre-line",
-            textAlign: "justify",
+            textAlign: "center",
             width: "100%",
           }}
         >
