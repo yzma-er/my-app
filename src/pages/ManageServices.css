@@ -5,444 +5,265 @@
   margin: 40px auto;
   font-family: "Poppins", sans-serif;
   color: #1c1c1c;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
+/* ========== BACK BUTTON ========== */
+.back-button-container {
+  margin-bottom: 10px;
+}
+
+.back-admin-btn {
+  padding: 10px 20px;
+  border-radius: 30px;
+  background-color: #1c7c0f;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.back-admin-btn:hover {
+  background-color: #16690c;
+  transform: translateX(-3px);
+}
+
+.back-arrow {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+/* ========== HEADING ========== */
 .manage-container h1 {
   text-align: center;
-  color: #2e7d32;
-  font-weight: 600;
-  margin-bottom: 30px;
-}
-
-/* ========== SERVICE LIST ========== */
-.service-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f9fff8;
-  border: 1px solid #cde7cb;
-  border-radius: 10px;
-  padding: 15px 20px;
-  margin-bottom: 15px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.service-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-.service-info strong {
   color: #104C08;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 2rem;
+}
+
+/* ========== LOADING & EMPTY STATES ========== */
+.loading-container,
+.no-services {
+  text-align: center;
+  padding: 40px;
+  background: #f9fff8;
+  border-radius: 10px;
+  border: 1px dashed #cde7cb;
+}
+
+.loading-container p,
+.no-services p {
+  color: #666;
   font-size: 1.1rem;
 }
 
-.service-info p {
-  color: #555;
-  font-size: 0.95rem;
-  margin: 5px 0 0;
-}
-
-/* ========== BUTTON GROUP ========== */
-.button-group {
-  display: flex;
-  gap: 10px;
-}
-
-/* ========== UNIFORM EDIT & DELETE BUTTONS ========== */
-.edit-btn,
-.delete-btn {
-  width: 120px;              /* EXACT SAME WIDTH */
-  height: 40px;              /* EXACT SAME HEIGHT */
-  display: inline-flex;      /* Ensures equal size & alignment */
-  justify-content: center;
-  align-items: center;
-
-  box-sizing: border-box;    /* Prevents padding from changing size */
-
-  padding: 0;
-  margin: 0;
-  border: none;
-  border-radius: 20px;
-
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  flex-shrink: 0;            /* Prevents shrinking in flexbox */
-}
-
-/* Edit Button Color */
-.edit-btn {
-  background-color: #104C08;
-  color: white;
-}
-.edit-btn:hover {
-  background-color: #155a0a;
-}
-
-/* Delete Button Color */
-.delete-btn {
-  background-color: #FF0000;
-  color: white;
-}
-.delete-btn:hover {
-  background-color: #8a1010;
-}
-
-/* Add Button */
-.add-btn {
-  background: #104C08;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 20px;
-}
-.add-btn:hover {
-  background: #16690c;
-}
-
-/* ========== ADD SERVICE ROW ========== */
-.add-service-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.add-service-row input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-}
-
-/* ========== MODAL OVERLAY ========== */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-/* ========== MODAL CONTAINER ========== */
-.modal-container {
-  width: 90%;
-  max-width: 1200px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-  padding: 30px;
-  position: relative;
-  overflow-y: auto;
-  max-height: 90vh;
+/* ========== SERVICES LIST ========== */
+.services-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  animation: fadeIn 0.3s ease-in-out;
+  gap: 15px;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ========== CLOSE BUTTON ========== */
-.close-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  font-size: 22px;
-  background: none;
-  color: #333;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.close-btn:hover {
-  transform: rotate(90deg);
-  color: #b71c1c;
-}
-
-/* ========== GRID SECTIONS ========== */
-.edit-modal-grid {
-  display: flex;
-  gap: 30px;
-  flex-wrap: wrap;
-}
-
-.preview-section {
-  flex: 1.2;
-  background: #f7fff6;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
-.video-container video {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 15px;
-}
-
-.info-section {
-  line-height: 1.5;
-}
-
-.info-section h3 {
-  color: #104C08;
-  font-weight: 600;
-  margin-top: 10px;
-}
-
-.edit-fields {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* ========== FORM INPUTS ========== */
-.edit-fields input,
-.edit-fields textarea {
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 10px;
-  resize: vertical;
-  font-size: 1rem;
-}
-
-.edit-fields textarea {
-  min-height: 150px;
-  transition: all 0.2s ease;
-}
-
-.edit-fields textarea:focus {
-  min-height: 200px;
-  border-color: #1c7c0f;
-  outline: none;
-}
-
-/* ========== SAVE BUTTON ========== */
-.feedback-btn {
-  align-self: flex-end;
-  background: #104C08;
-  color: white;
-  border-radius: 25px;
-  padding: 10px 22px;
-  border: none;
-  font-weight: 500;
-  margin-top: 10px;
-}
-
-.feedback-btn:hover {
-  background: #16690c;
-}
-
-/* ========== RESPONSIVE DESIGN ========== */
-@media (max-width: 900px) {
-  .edit-modal-grid {
-    flex-direction: column;
-  }
-  .modal-container {
-    padding: 20px;
-  }
-}
-/* ========== PAGE CONTAINER ========== */
-.manage-container {
-  width: 90%;
-  max-width: 1200px;
-  margin: 40px auto;
-  font-family: "Poppins", sans-serif;
-  color: #1c1c1c;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.manage-container h1 {
-  text-align: center;
-  color: #104C08;
-  font-weight: 600;
-  margin-bottom: 20px;
-}
-
-/* ========== SERVICE LIST ========== */
 .service-item {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   background: #f9fff8;
   border: 1px solid #cde7cb;
   border-radius: 10px;
-  padding: 15px 20px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  gap: 10px; /* allows wrapping on small screens */
+  padding: 20px;
+  transition: all 0.3s ease;
 }
 
 .service-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-color: #1c7c0f;
 }
 
 .service-info {
   flex: 1;
-  min-width: 150px; /* ensures it doesn't shrink too much */
+  min-width: 0; /* Prevents overflow issues */
 }
 
 .service-info strong {
-  color: #0f660a;
-  font-size: 1.1rem;
+  color: #104C08;
+  font-size: 1.2rem;
+  display: block;
+  margin-bottom: 5px;
 }
 
 .service-info p {
   color: #555;
   font-size: 0.95rem;
-  margin: 5px 0 0;
+  margin: 0;
+  line-height: 1.4;
 }
 
 /* ========== BUTTON GROUP ========== */
 .button-group {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-end;
-  flex: 0 0 auto; /* prevents buttons from stretching */
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: 20px;
 }
 
 /* ========== UNIFORM EDIT & DELETE BUTTONS ========== */
 .edit-btn,
 .delete-btn {
-  flex: 1 1 120px; /* scales but has a minimum width */
-  max-width: 150px; /* optional */
+  min-width: 100px;
   height: 40px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  padding: 0 20px;
   border: none;
   border-radius: 20px;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  padding: 0 10px;
-  box-sizing: border-box;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-/* Edit Button Color */
+/* Edit Button */
 .edit-btn {
   background-color: #1c7c0f;
   color: white;
 }
+
 .edit-btn:hover {
   background-color: #155a0a;
+  transform: translateY(-2px);
 }
 
-/* Delete Button Color */
+/* Delete Button */
 .delete-btn {
-  background-color: #b71c1c;
+  background-color: #dc3545;
   color: white;
 }
+
 .delete-btn:hover {
-  background-color: #8a1010;
+  background-color: #c82333;
+  transform: translateY(-2px);
 }
 
-/* Add Button */
-.add-btn {
-  background: #1c7c0f;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 20px;
-  align-self: flex-start; /* keeps it on the left */
-}
-.add-btn:hover {
-  background: #16690c;
+/* ========== ADD SERVICE SECTION ========== */
+.add-service-container {
+  background: #f0f9ff;
+  border-radius: 10px;
+  padding: 25px;
+  border: 1px solid #cde7cb;
+  margin-top: 20px;
 }
 
-/* ========== ADD SERVICE ROW ========== */
 .add-service-row {
   display: flex;
-  flex-wrap: wrap;
+  gap: 15px;
   align-items: center;
-  gap: 10px;
 }
 
 .add-service-row input {
-  flex: 1 1 200px; /* scales but maintains a minimum */
-  padding: 10px;
-  border: 1px solid #ccc;
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
   border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
 
-/* ========== MODAL OVERLAY ========== */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
+.add-service-row input:focus {
+  outline: none;
+  border-color: #1c7c0f;
+  box-shadow: 0 0 0 3px rgba(28, 124, 15, 0.1);
 }
 
-/* ========== MODAL CONTAINER ========== */
-.modal-container {
-  width: 90%;
-  max-width: 900px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-  padding: 30px;
-  position: relative;
-  overflow-y: auto;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  animation: fadeIn 0.3s ease-in-out;
+.add-btn {
+  background: #1c7c0f;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 20px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
-/* ...rest remains the same for modals, preview-section, info-section, etc... */
+.add-btn:hover {
+  background: #16690c;
+  transform: translateY(-2px);
+}
+
+.add-service-hint {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  margin-left: 5px;
+}
 
 /* ========== RESPONSIVE DESIGN ========== */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
+  .manage-container {
+    width: 95%;
+    margin: 20px auto;
+  }
+  
   .service-item {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    gap: 15px;
+    padding: 15px;
   }
-
+  
   .button-group {
-    justify-content: center;
+    margin-left: 0;
+    width: 100%;
+    justify-content: stretch;
   }
-
+  
   .edit-btn,
   .delete-btn {
-    flex: 1 1 100%; /* buttons take full width on mobile */
-    max-width: none;
+    flex: 1;
+    min-width: auto;
   }
-
+  
   .add-service-row {
     flex-direction: column;
     align-items: stretch;
   }
-
-  .add-service-row input {
-    flex: 1 1 100%;
+  
+  .add-service-row input,
+  .add-btn {
+    width: 100%;
   }
-
-  .modal-container {
-    padding: 20px;
+  
+  .back-admin-btn {
+    width: 100%;
+    justify-content: center;
   }
+}
 
-  .edit-modal-grid {
+@media (max-width: 480px) {
+  .manage-container h1 {
+    font-size: 1.5rem;
+  }
+  
+  .button-group {
     flex-direction: column;
+  }
+  
+  .edit-btn,
+  .delete-btn {
+    width: 100%;
   }
 }
