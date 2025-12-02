@@ -185,14 +185,7 @@ function ServiceDetails() {
                 objectFit: "contain"
               }}
             />
-            <p style={{ 
-              marginTop: "10px", 
-              fontSize: "14px", 
-              color: "#666",
-              fontStyle: "italic"
-            }}>
-              {service.name} Photo
-            </p>
+            
           </div>
         </div>
       )}
