@@ -8,9 +8,11 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
   const [form, setForm] = useState({
     name: "",
     description: "",
+    photo: "", // NEW: Added photo field
     description2: "",
     content: [],
   });
+  const [uploadingPhoto, setUploadingPhoto] = useState(false); // NEW: Loading state for photo upload
   const backendURL = "https://digital-guidance-api.onrender.com";
 
   // ✅ Fetch service details
@@ -28,13 +30,13 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             parsedSteps = [{ title: "Step 1", content: data.content || "" }];
           }
 
-          // ✅ Normalize all steps (add formFile, videoFile, and customName keys if missing)
+          // ✅ Normalize all steps
           parsedSteps = parsedSteps.map((step, i) => ({
             title: step.title || `Step ${i + 1}`,
-            customName: step.customName || "", // Add custom name field
+            customName: step.customName || "",
             content: step.content || "",
             formFile: step.formFile || "",
-            originalFormName: step.originalFormName || "", // NEW: Store original filename
+            originalFormName: step.originalFormName || "",
             videoFile: step.videoFile || "",
           }));
 
@@ -42,6 +44,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
           setForm({
             name: data.name || "",
             description: data.description || "",
+            photo: data.photo || "", // NEW: Initialize photo from database
             description2: data.description2 || "",
             content: parsedSteps,
           });
@@ -68,6 +71,51 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     setForm({ ...form, content: updated });
   };
 
+  // ✅ NEW: Handle photo upload
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check file size (5MB limit for images)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image too large. Please select an image smaller than 5MB.");
+      return;
+    }
+
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Invalid file type. Please select a JPG, PNG, GIF, or WebP image.");
+      return;
+    }
+
+    setUploadingPhoto(true);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await axios.post(`${backendURL}/api/services/upload/photo`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setForm({ ...form, photo: res.data.url });
+      alert("✅ Photo uploaded successfully!");
+    } catch (err) {
+      console.error("❌ Photo upload error:", err);
+      const errorMessage = err.response?.data?.message || "Failed to upload photo";
+      alert(`Photo upload failed: ${errorMessage}`);
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  // ✅ NEW: Remove photo
+  const handleRemovePhoto = () => {
+    if (window.confirm("Are you sure you want to remove this photo?")) {
+      setForm({ ...form, photo: "" });
+    }
+  };
+
   const handleStepVideoUpload = async (index, e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -81,7 +129,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
       });
 
       const updated = [...form.content];
-      updated[index].videoFile = res.data.url; // Store Cloudinary URL
+      updated[index].videoFile = res.data.url;
       setForm({ ...form, content: updated });
 
       alert("✅ Step video uploaded successfully!");
@@ -91,45 +139,43 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     }
   };
 
- const handleFormUpload = async (index, e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleFormUpload = async (index, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  // Check file size (10MB limit)
-  if (file.size > 10 * 1024 * 1024) {
-    alert("File too large. Please select a file smaller than 10MB.");
-    return;
-  }
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File too large. Please select a file smaller than 10MB.");
+      return;
+    }
 
-  // Check file type
-  const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-  if (!allowedTypes.includes(file.type)) {
-    alert("Invalid file type. Please select a PDF, DOC, or DOCX file.");
-    return;
-  }
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Invalid file type. Please select a PDF, DOC, or DOCX file.");
+      return;
+    }
 
-  const formData = new FormData();
-  formData.append("formFile", file);
+    const formData = new FormData();
+    formData.append("formFile", file);
 
-  try {
-    const res = await axios.post(`${backendURL}/api/services/upload/form`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    try {
+      const res = await axios.post(`${backendURL}/api/services/upload/form`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    console.log("✅ Upload successful:", res.data);
+      console.log("✅ Upload successful:", res.data);
 
-    const updated = [...form.content];
-    updated[index].formFile = res.data.url;
-    updated[index].originalFormName = res.data.originalName || file.name;
-    setForm({ ...form, content: updated });
+      const updated = [...form.content];
+      updated[index].formFile = res.data.url;
+      updated[index].originalFormName = res.data.originalName || file.name;
+      setForm({ ...form, content: updated });
 
-    alert("✅ Form uploaded successfully!");
-  } catch (err) {
-    console.error("❌ Upload error:", err);
-    const errorMessage = err.response?.data?.message || "Failed to upload form";
-    alert(`Upload failed: ${errorMessage}`);
-  }
-};
+      alert("✅ Form uploaded successfully!");
+    } catch (err) {
+      console.error("❌ Upload error:", err);
+      const errorMessage = err.response?.data?.message || "Failed to upload form";
+      alert(`Upload failed: ${errorMessage}`);
+    }
+  };
 
   const addStep = () => {
     setForm({
@@ -138,10 +184,10 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
         ...form.content,
         { 
           title: `Step ${form.content.length + 1}`, 
-          customName: "", // Initialize custom name as empty
+          customName: "",
           content: "", 
           formFile: "",
-          originalFormName: "", // NEW: Initialize original filename
+          originalFormName: "",
           videoFile: ""
         },
       ],
@@ -153,13 +199,13 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     setForm({ ...form, content: updated });
   };
 
-  // ✅ FIXED: Save all changes - Send as JSON, not FormData
+  // ✅ Updated: Save all changes including photo
   const handleSave = async () => {
     try {
-      // Send as JSON data instead of FormData
       const updateData = {
         name: form.name,
         description: form.description,
+        photo: form.photo, // NEW: Include photo
         description2: form.description2,
         content: JSON.stringify(form.content)
       };
@@ -193,38 +239,36 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
           position: "relative"
         }}
       >
-         {/* ✅ FIXED: Proper close button for modal */}
-      <button 
-        onClick={onClose}
-        style={{
-          position: "absolute",
-          top: "15px",
-          right: "20px",
-          background: "none",
-          border: "none",
-          fontSize: "24px",
-          cursor: "pointer",
-          color: "#004d00",
-          width: "30px",
-          height: "30px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: "50%",
-          transition: "all 0.2s ease"
-        }}
-        onMouseOver={(e) => {
-          e.target.style.background = "#f0f0f0";
-          e.target.style.color = "#b71c1c";
-        }}
-        onMouseOut={(e) => {
-          e.target.style.background = "none";
-          e.target.style.color = "#004d00";
-        }}
-      >
-        ✖
-      </button>
-
+        <button 
+          onClick={onClose}
+          style={{
+            position: "absolute",
+            top: "15px",
+            right: "20px",
+            background: "none",
+            border: "none",
+            fontSize: "24px",
+            cursor: "pointer",
+            color: "#004d00",
+            width: "30px",
+            height: "30px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "50%",
+            transition: "all 0.2s ease"
+          }}
+          onMouseOver={(e) => {
+            e.target.style.background = "#f0f0f0";
+            e.target.style.color = "#b71c1c";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.background = "none";
+            e.target.style.color = "#004d00";
+          }}
+        >
+          ✖
+        </button>
 
         <h2>
           Edit Service: <span>{form.name}</span>
@@ -256,6 +300,37 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             <h2 style={{ color: "#1C7C0F" }}>{form.name}</h2>
             <p>{form.description}</p>
 
+            {/* NEW: Photo Preview */}
+            {form.photo && (
+              <div style={{ 
+                margin: "15px 0", 
+                textAlign: "center",
+                border: "1px solid #bde3b2",
+                borderRadius: "10px",
+                padding: "10px",
+                background: "#f0f8f0"
+              }}>
+                <img 
+                  src={form.photo} 
+                  alt="Service" 
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "300px",
+                    borderRadius: "8px",
+                    objectFit: "contain"
+                  }}
+                />
+                <p style={{ 
+                  marginTop: "8px", 
+                  fontSize: "14px", 
+                  color: "#666",
+                  fontStyle: "italic"
+                }}>
+                  Service Photo
+                </p>
+              </div>
+            )}
+
             {form.description2 && (
               <p
                 style={{
@@ -276,12 +351,10 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                 background: "#f0f8f0",
                 borderRadius: "8px"
               }}>
-                {/* Show step title with custom name */}
                 <h4 style={{ color: "#1C7C0F" }}>
                   {step.customName ? `${step.title} - ${step.customName}` : step.title}
                 </h4>
                 
-                {/* Step Video Preview - RESPONSIVE */}
                 {step.videoFile && (
                   <div style={{ margin: "10px 0", width: "100%" }}>
                     <video
@@ -306,19 +379,19 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   }}
                 />
                 {step.formFile && (
-                <p>
-                  📄{" "}
-                  <a
-                    href={step.formFile}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: "#1C7C0F", textDecoration: "underline" }}
-                    download={step.originalFormName || "form"}
-                  >
-                    Download Form {/* ✅ FIXED: Show just "Download Form" */}
-                  </a>
-                </p>
-              )}
+                  <p>
+                    📄{" "}
+                    <a
+                      href={step.formFile}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#1C7C0F", textDecoration: "underline" }}
+                      download={step.originalFormName || "form"}
+                    >
+                      Download Form
+                    </a>
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -344,127 +417,242 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
               onChange={handleChange}
             />
 
+            {/* NEW: Photo Upload Section */}
+            <div style={{ 
+              background: "#f4fff4", 
+              padding: "15px", 
+              borderRadius: "10px",
+              border: "1px solid #bde3b2"
+            }}>
+              <label style={{ fontWeight: "bold", color: "#1C7C0F", marginBottom: "10px", display: "block" }}>
+                📷 Service Photo (Between Description 1 and 2)
+              </label>
+              
+              {form.photo ? (
+                <div style={{ 
+                  marginBottom: "15px",
+                  textAlign: "center"
+                }}>
+                  <img 
+                    src={form.photo} 
+                    alt="Preview" 
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "200px",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      border: "1px solid #ddd"
+                    }}
+                  />
+                  <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                    <button
+                      onClick={() => document.getElementById('photo-upload').click()}
+                      style={{
+                        background: "#1C7C0F",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "20px",
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        fontSize: "14px"
+                      }}
+                    >
+                      Change Photo
+                    </button>
+                    <button
+                      onClick={handleRemovePhoto}
+                      style={{
+                        background: "#b71c1c",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "20px",
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        fontSize: "14px"
+                      }}
+                    >
+                      Remove Photo
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ 
+                  border: "2px dashed #bde3b2",
+                  borderRadius: "10px",
+                  padding: "20px",
+                  textAlign: "center",
+                  background: "#f9fff9",
+                  marginBottom: "15px"
+                }}>
+                  <p style={{ color: "#666", marginBottom: "15px" }}>
+                    No photo uploaded. Add a photo that will appear between Description 1 and Description 2.
+                  </p>
+                  <button
+                    onClick={() => document.getElementById('photo-upload').click()}
+                    disabled={uploadingPhoto}
+                    style={{
+                      background: uploadingPhoto ? "#ccc" : "#1C7C0F",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "20px",
+                      padding: "8px 16px",
+                      cursor: uploadingPhoto ? "not-allowed" : "pointer",
+                      fontSize: "14px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px"
+                    }}
+                  >
+                    {uploadingPhoto ? (
+                      <>
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>📷</span>
+                        <span>Upload Photo</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+              
+              <input
+                id="photo-upload"
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                style={{ display: "none" }}
+              />
+              
+              <div style={{ 
+                fontSize: "12px", 
+                color: "#666", 
+                marginTop: "10px",
+                padding: "8px",
+                background: "#f0f8f0",
+                borderRadius: "6px"
+              }}>
+                <strong>Note:</strong> Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB.
+                The photo will appear between Description 1 and Description 2 on the service page.
+              </div>
+            </div>
+
             <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description 2</label>
             <textarea
               name="description2"
               rows="3"
               value={form.description2}
               onChange={handleChange}
-              placeholder="Enter extra details that appear below the steps..."
+              placeholder="Enter extra details that appear below the photo..."
             />
 
             <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Steps</label>
             {form.content.map((step, index) => (
-                <div
-                  key={index}
+              <div
+                key={index}
+                style={{
+                  background: "#f4fff4",
+                  padding: "15px",
+                  borderRadius: "10px",
+                  border: "1px solid #bde3b2",
+                  marginBottom: "15px",
+                }}
+              >
+                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                  Step {index + 1}
+                </label>
+                <br></br>
+                <label style={{ fontWeight: "bold", color: "#1C7C0F", marginTop: "8px" }}>
+                  Step Custom Name (e.g., "Sample Office")
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter custom step name..."
+                  value={step.customName}
+                  onChange={(e) => handleCustomNameChange(index, e.target.value)}
                   style={{
-                    background: "#f4fff4",
-                    padding: "15px",
-                    borderRadius: "10px",
-                    border: "1px solid #bde3b2",
-                    marginBottom: "15px",
+                    width: "100%",
+                    padding: "8px",
+                    marginBottom: "10px",
+                    borderRadius: "6px",
+                    border: "1px solid #bde3b2"
                   }}
-                >
-                  {/* Step Title - NON-EDITABLE */}
+                />
+            
+                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                  🎥 Step Video
+                </label>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => handleStepVideoUpload(index, e)}
+                  style={{ marginBottom: "10px" }}
+                />
+               
+              {step.videoFile && (
+                <p style={{ 
+                  marginBottom: "10px", 
+                  fontSize: "14px",
+                  background: "#e8f5e8",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  color: "#1C7C0F",
+                  fontWeight: "bold"
+                }}>
+                  ✅ Step video uploaded successfully!
+                </p>
+              )}
+            
+                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                  Step Content
+                </label>
+                <textarea
+                  rows="6"
+                  value={step.content}
+                  onChange={(e) => handleStepChange(index, e.target.value)}
+                  placeholder={`Enter content for ${step.title}`}
+                  style={{
+                    width: "100%",
+                    resize: "vertical",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    border: "1px solid #bde3b2",
+                    marginBottom: "10px"
+                  }}
+                />
+            
+                <div style={{ marginBottom: "10px" }}>
                   <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                    Step {index + 1}
-                  </label>
-                  <br></br>
-                  {/* Custom Name Input - EDITABLE */}
-                  <label style={{ fontWeight: "bold", color: "#1C7C0F", marginTop: "8px" }}>
-                    Step Custom Name (e.g., "Sample Office")
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter custom step name..."
-                    value={step.customName}
-                    onChange={(e) => handleCustomNameChange(index, e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "8px",
-                      marginBottom: "10px",
-                      borderRadius: "6px",
-                      border: "1px solid #bde3b2"
-                    }}
-                  />
-              
-                  {/* Step Video Upload */}
-                  <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                    🎥 Step Video
+                    📎 Upload Form 
                   </label>
                   <input
                     type="file"
-                    accept="video/*"
-                    onChange={(e) => handleStepVideoUpload(index, e)}
-                    style={{ marginBottom: "10px" }}
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => handleFormUpload(index, e)}
                   />
-                 
-                {step.videoFile && (
-                  <p style={{ 
-                    marginBottom: "10px", 
-                    fontSize: "14px",
-                    background: "#e8f5e8",
-                    padding: "8px 12px",
-                    borderRadius: "6px",
-                    color: "#1C7C0F",
-                    fontWeight: "bold"
-                  }}>
-                    ✅ Step video uploaded successfully!
-                  </p>
-                )}
-              
-                  {/* Step Content */}
-                  <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                    Step Content
-                  </label>
-                  <textarea
-                    rows="6"
-                    value={step.content}
-                    onChange={(e) => handleStepChange(index, e.target.value)}
-                    placeholder={`Enter content for ${step.title}`}
-                    style={{
-                      width: "100%",
-                      resize: "vertical",
-                      padding: "8px",
-                      borderRadius: "6px",
-                      border: "1px solid #bde3b2",
-                      marginBottom: "10px"
-                    }}
-                  />
-              
-                  {/* Upload Form */}
-                  <div style={{ marginBottom: "10px" }}>
-                    <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                      📎 Upload Form 
-                    </label>
-                    <input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      onChange={(e) => handleFormUpload(index, e)}
-                    />
-                    {step.formFile && (
-                      <p style={{ marginTop: "4px", fontSize: "14px" }}>
-                        ✅ Uploaded: {step.originalFormName || step.formFile}
-                      </p>
-                    )}
-                  </div>
-              
-                  {/* Remove Step Button */}
-                  <button
-                    style={{
-                      background: "#b71c1c",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "20px",
-                      padding: "6px 12px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => removeStep(index)}
-                  >
-                    🗑️ Remove Step
-                  </button>
+                  {step.formFile && (
+                    <p style={{ marginTop: "4px", fontSize: "14px" }}>
+                      ✅ Uploaded: {step.originalFormName || step.formFile}
+                    </p>
+                  )}
                 </div>
-              ))}
+            
+                <button
+                  style={{
+                    background: "#b71c1c",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "20px",
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => removeStep(index)}
+                >
+                  🗑️ Remove Step
+                </button>
+              </div>
+            ))}
 
             <button
               style={{
