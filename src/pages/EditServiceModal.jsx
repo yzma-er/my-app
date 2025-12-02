@@ -1,5 +1,5 @@
 //EditServiceModal.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./Services.css";
 
@@ -8,12 +8,17 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
   const [form, setForm] = useState({
     name: "",
     description: "",
-    photo: "", // NEW: Added photo field
+    photo: "",
     description2: "",
     content: [],
   });
-  const [uploadingPhoto, setUploadingPhoto] = useState(false); // NEW: Loading state for photo upload
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const backendURL = "https://digital-guidance-api.onrender.com";
+
+  // Refs for textareas to handle bold formatting
+  const descriptionRef = useRef(null);
+  const description2Ref = useRef(null);
+  const stepContentRefs = useRef([]);
 
   // ✅ Fetch service details
   useEffect(() => {
@@ -30,7 +35,6 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             parsedSteps = [{ title: "Step 1", content: data.content || "" }];
           }
 
-          // ✅ Normalize all steps
           parsedSteps = parsedSteps.map((step, i) => ({
             title: step.title || `Step ${i + 1}`,
             customName: step.customName || "",
@@ -44,7 +48,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
           setForm({
             name: data.name || "",
             description: data.description || "",
-            photo: data.photo || "", // NEW: Initialize photo from database
+            photo: data.photo || "",
             description2: data.description2 || "",
             content: parsedSteps,
           });
@@ -64,6 +68,64 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     setForm({ ...form, content: updated });
   };
 
+  // ✅ NEW: Format text as bold
+  const formatBold = (fieldName, index = null) => {
+    const textarea = getTextareaRef(fieldName, index);
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    if (selectedText) {
+      const newText = `**${selectedText}**`;
+      const newValue = textarea.value.substring(0, start) + 
+                      newText + 
+                      textarea.value.substring(end);
+      
+      if (fieldName === 'description') {
+        setForm({ ...form, description: newValue });
+      } else if (fieldName === 'description2') {
+        setForm({ ...form, description2: newValue });
+      } else if (fieldName === 'stepContent') {
+        const updated = [...form.content];
+        updated[index].content = newValue;
+        setForm({ ...form, content: updated });
+      }
+      
+      // Restore cursor position
+      setTimeout(() => {
+        const newCursorPos = start + newText.length;
+        if (fieldName === 'description' && descriptionRef.current) {
+          descriptionRef.current.setSelectionRange(newCursorPos, newCursorPos);
+          descriptionRef.current.focus();
+        } else if (fieldName === 'description2' && description2Ref.current) {
+          description2Ref.current.setSelectionRange(newCursorPos, newCursorPos);
+          description2Ref.current.focus();
+        } else if (fieldName === 'stepContent' && stepContentRefs.current[index]) {
+          stepContentRefs.current[index].setSelectionRange(newCursorPos, newCursorPos);
+          stepContentRefs.current[index].focus();
+        }
+      }, 0);
+    }
+  };
+
+  // ✅ Helper to get textarea ref
+  const getTextareaRef = (fieldName, index) => {
+    if (fieldName === 'description') return descriptionRef.current;
+    if (fieldName === 'description2') return description2Ref.current;
+    if (fieldName === 'stepContent') return stepContentRefs.current[index];
+    return null;
+  };
+
+  // ✅ NEW: Parse bold text for preview (using **text** syntax)
+  const parseBoldText = (text) => {
+    if (!text) return text;
+    
+    // Replace **text** with <strong>text</strong>
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  };
+
   // ✅ Handle custom name changes
   const handleCustomNameChange = (index, value) => {
     const updated = [...form.content];
@@ -71,18 +133,16 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     setForm({ ...form, content: updated });
   };
 
-  // ✅ NEW: Handle photo upload
+  // ✅ Handle photo upload
   const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Check file size (5MB limit for images)
     if (file.size > 5 * 1024 * 1024) {
       alert("Image too large. Please select an image smaller than 5MB.");
       return;
     }
 
-    // Check file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
     if (!allowedTypes.includes(file.type)) {
       alert("Invalid file type. Please select a JPG, PNG, GIF, or WebP image.");
@@ -109,7 +169,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     }
   };
 
-  // ✅ NEW: Remove photo
+  // ✅ Remove photo
   const handleRemovePhoto = () => {
     if (window.confirm("Are you sure you want to remove this photo?")) {
       setForm({ ...form, photo: "" });
@@ -199,13 +259,13 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     setForm({ ...form, content: updated });
   };
 
-  // ✅ Updated: Save all changes including photo
+  // ✅ Save all changes
   const handleSave = async () => {
     try {
       const updateData = {
         name: form.name,
         description: form.description,
-        photo: form.photo, // NEW: Include photo
+        photo: form.photo,
         description2: form.description2,
         content: JSON.stringify(form.content)
       };
@@ -298,9 +358,9 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             }}
           >
             <h2 style={{ color: "#1C7C0F" }}>{form.name}</h2>
-            <p>{form.description}</p>
+            {/* ✅ Render description with bold support */}
+            <p dangerouslySetInnerHTML={{ __html: parseBoldText(form.description) }} />
 
-            {/* NEW: Photo Preview */}
             {form.photo && (
               <div style={{ 
                 margin: "15px 0", 
@@ -332,16 +392,7 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             )}
 
             {form.description2 && (
-              <p
-                style={{
-                  marginTop: "10px",
-                  fontStyle: "italic",
-                  color: "#333",
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {form.description2}
-              </p>
+              <p dangerouslySetInnerHTML={{ __html: parseBoldText(form.description2) }} />
             )}
 
             {form.content.map((step, index) => (
@@ -372,12 +423,9 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                   </div>
                 )}
 
-                <p
-                  style={{ whiteSpace: "pre-line" }}
-                  dangerouslySetInnerHTML={{
-                    __html: step.content.replace(/\n/g, "<br />"),
-                  }}
-                />
+                {/* ✅ Render step content with bold support */}
+                <p dangerouslySetInnerHTML={{ __html: parseBoldText(step.content) }} />
+                
                 {step.formFile && (
                   <p>
                     📄{" "}
@@ -409,15 +457,47 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Service Name</label>
             <input name="name" value={form.name} onChange={handleChange} />
 
-            <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description 1</label>
-            <textarea
-              name="description"
-              rows="3"
-              value={form.description}
-              onChange={handleChange}
-            />
+            {/* ✅ Description 1 with Bold Button */}
+            <div style={{ 
+              background: "#f4fff4", 
+              padding: "15px", 
+              borderRadius: "10px",
+              border: "1px solid #bde3b2"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description 1</label>
+                <button
+                  type="button"
+                  onClick={() => formatBold('description')}
+                  style={{
+                    background: "#1C7C0F",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "20px",
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    fontWeight: "bold"
+                  }}
+                  title="Make selected text bold (Ctrl+B)"
+                >
+                  <strong>B</strong> Bold
+                </button>
+              </div>
+              <textarea
+                ref={descriptionRef}
+                name="description"
+                rows="3"
+                value={form.description}
+                onChange={handleChange}
+                style={{ width: "100%" }}
+              />
+              <div style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                💡 Select text and click "Bold" or use <strong>**text**</strong> syntax
+              </div>
+            </div>
 
-            {/* NEW: Photo Upload Section */}
+            {/* Photo Upload Section (unchanged) */}
             <div style={{ 
               background: "#f4fff4", 
               padding: "15px", 
@@ -534,18 +614,49 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                 borderRadius: "6px"
               }}>
                 <strong>Note:</strong> Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB.
-                The photo will appear between Description 1 and Description 2 on the service page.
               </div>
             </div>
 
-            <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description 2</label>
-            <textarea
-              name="description2"
-              rows="3"
-              value={form.description2}
-              onChange={handleChange}
-              placeholder="Enter extra details that appear below the photo..."
-            />
+            {/* ✅ Description 2 with Bold Button */}
+            <div style={{ 
+              background: "#f4fff4", 
+              padding: "15px", 
+              borderRadius: "10px",
+              border: "1px solid #bde3b2"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description 2</label>
+                <button
+                  type="button"
+                  onClick={() => formatBold('description2')}
+                  style={{
+                    background: "#1C7C0F",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "20px",
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    fontWeight: "bold"
+                  }}
+                  title="Make selected text bold (Ctrl+B)"
+                >
+                  <strong>B</strong> Bold
+                </button>
+              </div>
+              <textarea
+                ref={description2Ref}
+                name="description2"
+                rows="3"
+                value={form.description2}
+                onChange={handleChange}
+                placeholder="Enter extra details that appear below the photo..."
+                style={{ width: "100%" }}
+              />
+              <div style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                💡 Select text and click "Bold" or use <strong>**text**</strong> syntax
+              </div>
+            </div>
 
             <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Steps</label>
             {form.content.map((step, index) => (
@@ -604,10 +715,32 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                 </p>
               )}
             
-                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
-                  Step Content
-                </label>
+                {/* ✅ Step Content with Bold Button */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                  <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                    Step Content
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => formatBold('stepContent', index)}
+                    style={{
+                      background: "#1C7C0F",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "20px",
+                      padding: "6px 12px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      fontWeight: "bold"
+                    }}
+                    title="Make selected text bold"
+                  >
+                    <strong>B</strong> Bold
+                  </button>
+                </div>
+                
                 <textarea
+                  ref={el => stepContentRefs.current[index] = el}
                   rows="6"
                   value={step.content}
                   onChange={(e) => handleStepChange(index, e.target.value)}
@@ -621,6 +754,9 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                     marginBottom: "10px"
                   }}
                 />
+                <div style={{ fontSize: "12px", color: "#666", marginTop: "-5px", marginBottom: "10px" }}>
+                  💡 Select text and click "Bold" or use <strong>**text**</strong> syntax
+                </div>
             
                 <div style={{ marginBottom: "10px" }}>
                   <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
