@@ -18,7 +18,7 @@
 .service-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* Changed from center to flex-start */
   background: #f9fff8;
   border: 1px solid #cde7cb;
   border-radius: 10px;
@@ -34,7 +34,7 @@
 
 .service-info {
   flex: 1;
-  min-width: 0; /* Allows text truncation */
+  padding-right: 20px; /* Add space between text and buttons */
 }
 
 .service-info strong {
@@ -48,25 +48,24 @@
   color: #555;
   font-size: 0.95rem;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.4;
 }
 
-/* ========== BUTTON GROUP ========== */
+/* ========== VERTICAL BUTTON GROUP ========== */
 .button-group {
   display: flex;
-  gap: 10px;
-  flex-shrink: 0; /* Prevents shrinking */
-  margin-left: 20px; /* Adds spacing from text */
+  flex-direction: column; /* Stack buttons vertically */
+  gap: 8px; /* Space between buttons */
+  flex-shrink: 0;
+  width: 100px; /* Fixed width for button column */
 }
 
-/* ========== UNIFORM EDIT & DELETE BUTTONS ========== */
+/* ========== EDIT & DELETE BUTTONS ========== */
 .edit-btn,
 .delete-btn {
-  width: 100px;              /* Slightly smaller for better fit */
-  height: 36px;              /* Slightly smaller height */
-  display: inline-flex;
+  width: 100px; /* Fixed width for consistent alignment */
+  height: 36px;
+  display: flex;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
@@ -77,11 +76,10 @@
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  flex-shrink: 0;
   white-space: nowrap;
 }
 
-/* Edit Button Color */
+/* Edit Button */
 .edit-btn {
   background-color: #104C08;
   color: white;
@@ -91,7 +89,7 @@
   background-color: #155a0a;
 }
 
-/* Delete Button Color */
+/* Delete Button */
 .delete-btn {
   background-color: #d32f2f;
   color: white;
@@ -138,27 +136,24 @@
 @media (max-width: 768px) {
   .service-item {
     flex-direction: column;
-    align-items: flex-start;
     gap: 15px;
   }
   
   .service-info {
+    padding-right: 0;
     width: 100%;
-  }
-  
-  .service-info p {
-    white-space: normal;
   }
   
   .button-group {
     width: 100%;
-    justify-content: flex-end;
-    margin-left: 0;
+    flex-direction: row; /* Switch to horizontal on mobile */
+    justify-content: flex-start;
+    gap: 10px;
   }
   
   .edit-btn,
   .delete-btn {
-    width: calc(50% - 5px); /* Take half width minus half gap */
+    width: 120px; /* Slightly wider on mobile */
   }
   
   .add-service-row {
@@ -172,13 +167,14 @@
 }
 
 @media (max-width: 480px) {
+  .button-group {
+    flex-direction: column; /* Back to vertical on very small screens */
+    width: 100%;
+    align-items: stretch;
+  }
+  
   .edit-btn,
   .delete-btn {
     width: 100%;
-  }
-  
-  .button-group {
-    flex-direction: column;
-    gap: 8px;
   }
 }
