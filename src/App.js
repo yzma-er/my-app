@@ -25,6 +25,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Router>
+    <OfflineIndicator /> 
       <div style={{ padding: "1rem" }}>
         <Routes>
           {/* Public Routes */}
