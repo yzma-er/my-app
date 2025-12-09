@@ -1,5 +1,5 @@
 // src/App.js
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Admin Pages
@@ -21,6 +21,44 @@ import RoleSelectionPage from "./pages/RoleSelectionPage";
 import ServiceDetails from "./pages/ServiceDetails";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+
+// Simple Offline Indicator Component
+function OfflineIndicator() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  if (isOnline) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      background: '#ff9800',
+      color: 'white',
+      padding: '10px',
+      textAlign: 'center',
+      zIndex: 9999,
+      fontWeight: 'bold',
+      fontSize: '14px'
+    }}>
+      ⚠️ Offline Mode - Some features limited
+    </div>
+  );
+}
 
 function App() {
   return (
