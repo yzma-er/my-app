@@ -10,6 +10,11 @@ function RoleSelectionPage() {
   const navigate = useNavigate();
   const images = ['/carousel1.jpg', '/carousel2.jpg', '/carousel3.jpg', '/carousel4.jpg'];
 
+
+  
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [current, setCurrent] = useState(0);
   const [showRatings, setShowRatings] = useState(false);
   const [services, setServices] = useState([]);
