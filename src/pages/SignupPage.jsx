@@ -1,4 +1,4 @@
-// SignupPage.jsx - EMAILJS ONLY (No OTP logging)
+// SignupPage.jsx - COMPLETE UPDATED VERSION WITH BACKEND-GENERATED OTP
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
@@ -49,7 +49,7 @@ function SignupPage() {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Step 1: Send OTP via EmailJS ONLY
+  // Step 1: Send OTP via EmailJS (using backend-generated OTP)
   const handleSendOTP = async (e) => {
     e?.preventDefault();
     setIsLoading(true);
@@ -60,7 +60,6 @@ function SignupPage() {
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       alert("Please enter a valid email address.");
@@ -69,37 +68,38 @@ function SignupPage() {
     }
 
     try {
-      // Generate OTP locally
-      const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-
-      // 1. Store OTP in backend first
-      const storeRes = await fetch(`${API_BASE_URL}/api/auth/store-otp`, {
+      // 1. Call backend to generate and store OTP
+      console.log("Step 1: Requesting OTP from backend...");
+      const generateRes = await fetch(`${API_BASE_URL}/api/auth/generate-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp: generatedOTP })
+        body: JSON.stringify({ email })
       });
 
-      const storeData = await storeRes.json();
+      const generateData = await generateRes.json();
       
-      if (!storeRes.ok) {
-        throw new Error(storeData.message || "Failed to process OTP request");
+      if (!generateRes.ok) {
+        throw new Error(generateData.message || "Failed to generate OTP");
       }
 
-      // 2. Send email via EmailJS
+      console.log("Step 2: Backend OTP received");
+
+      // 2. Send email via EmailJS using the OTP from backend
+      console.log("Step 3: Sending email via EmailJS...");
       const emailResult = await emailjs.send(
         EMAILJS_CONFIG.SERVICE_ID,
         EMAILJS_CONFIG.TEMPLATE_ID,
         {
           to_email: email,
           to_name: email.split('@')[0],
-          otp_code: generatedOTP,
+          otp_code: generateData.otp, // Use OTP from backend
           expiration_time: "10 minutes",
           app_name: "Digital Guidance",
           current_year: new Date().getFullYear()
         }
       );
 
-      console.log("✅ Email sent successfully:", emailResult);
+      console.log("✅ Email sent successfully");
       
       // Move to verification step
       setStep(2);
@@ -112,8 +112,10 @@ function SignupPage() {
     } catch (err) {
       console.error("OTP sending error:", err);
       
-      // If EmailJS fails, show error (NO OTP DISPLAY)
-      if (err.text?.includes("emailjs")) {
+      // Better error messages
+      if (err.message.includes("Failed to generate OTP")) {
+        alert("❌ " + err.message);
+      } else if (err.text?.includes("emailjs")) {
         alert("❌ Failed to send verification email. Please check your email address and try again.");
       } else {
         alert("❌ " + (err.message || "Failed to send verification code. Please try again."));
@@ -214,12 +216,51 @@ function SignupPage() {
     }
   };
 
-  // Resend OTP
+  // Resend OTP - Updated to use backend-generated OTP
   const handleResendOTP = async () => {
     if (resendDisabled) return;
     setResendDisabled(true);
-    await handleSendOTP();
-    setTimeout(() => setResendDisabled(false), 60000);
+    setIsLoading(true);
+
+    try {
+      // 1. Call backend to generate new OTP
+      const generateRes = await fetch(`${API_BASE_URL}/api/auth/resend-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+
+      const generateData = await generateRes.json();
+      
+      if (!generateRes.ok) {
+        throw new Error(generateData.message || "Failed to generate new OTP");
+      }
+
+      // 2. Send email via EmailJS using the new OTP
+      await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        {
+          to_email: email,
+          to_name: email.split('@')[0],
+          otp_code: generateData.otp, // Use new OTP from backend
+          expiration_time: "10 minutes",
+          app_name: "Digital Guidance",
+          current_year: new Date().getFullYear()
+        }
+      );
+      
+      alert("✅ New verification code sent to your email!");
+      setTimer(600); // Reset timer to 10 minutes
+      setAttemptsLeft(3); // Reset attempts
+      
+    } catch (err) {
+      console.error("Resend OTP error:", err);
+      alert("❌ " + (err.message || "Failed to resend verification code"));
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setResendDisabled(false), 60000);
+    }
   };
 
   return (
