@@ -1,129 +1,3 @@
-.navbar {
-  background-color: #104C08;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 10px;
-}
-
-.navbar.scrolled {
-  background-color: #155c0b;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.navbar-logo {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.navbar-links {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.navbar-links a {
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.navbar-links a:hover {
-  text-decoration: underline;
-  color: #b2fab4;
-}
-
-.logout-btn {
-  background-color: #b71c1c;
-  border: none;
-  color: white;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.3s;
-}
-
-.logout-btn:hover {
-  background-color: #8b0000;
-}
-
-/* ------------------- */
-/* Mobile Styling */
-/* ------------------- */
-
-.hamburger {
-  display: none;
-  flex-direction: column;
-  cursor: pointer;
-  gap: 5px;
-}
-
-.hamburger span {
-  height: 3px;
-  width: 25px;
-  background-color: white;
-  border-radius: 2px;
-  transition: 0.3s;
-}
-
-/* Transform hamburger into X when open */
-.hamburger.open span:nth-child(1) {
-  transform: rotate(45deg) translateY(8px);
-}
-.hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-.hamburger.open span:nth-child(3) {
-  transform: rotate(-45deg) translateY(-8px);
-}
-
-/* Mobile Menu (hidden by default) */
-@media (max-width: 768px) {
-  .hamburger {
-    display: flex;
-  }
-
-  .navbar-links {
-    position: absolute;
-    top: 60px;
-    right: 0;
-    width: 100%;
-    background-color: #1C7C0F;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    padding: 20px 0;
-    display: none;
-    border-radius: 10px;
-  }
-
-  .navbar-links.active {
-    display: flex;
-    animation: slideDown 0.3s ease forwards;
-  }
-
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
-
 /* Add these styles to your existing NavBar.css */
 
 .navbar {
@@ -170,6 +44,42 @@
   color: #b2fab4;
 }
 
+/* ✅ User Email Display in Navbar */
+.user-email-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: default;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-email-nav:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.user-email-nav i {
+  font-size: 1.1rem;
+  color: #b2fab4;
+}
+
+.user-email-nav span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .logout-btn {
   background-color: #b71c1c;
   border: none;
@@ -179,12 +89,19 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .logout-btn:hover {
   background-color: #8b0000;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3);
+}
+
+.logout-btn i {
+  font-size: 0.9rem;
 }
 
 /* ========== LOGOUT SUCCESS NOTIFICATION ========== */
@@ -325,6 +242,14 @@
     animation: slideDown 0.3s ease forwards;
   }
 
+  /* User email in mobile menu */
+  .user-email-nav {
+    max-width: 90%;
+    padding: 8px 16px;
+    margin: 5px 0;
+    text-align: center;
+  }
+
   /* Mobile notification */
   .logout-success-notification {
     top: 10px;
@@ -377,5 +302,23 @@
     width: 30px;
     height: 30px;
     font-size: 16px;
+  }
+
+  .navbar {
+    padding: 10px 15px;
+  }
+
+  .navbar-logo {
+    font-size: 18px;
+  }
+
+  .user-email-nav {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+
+  .logout-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
   }
 }
