@@ -154,7 +154,7 @@
 .horizontal-scroll-wrapper::-webkit-scrollbar-thumb {
   background: #104C08;
   border-radius: 10px;
-  border: 2px solid #f1f1f1;
+
 }
 
 .horizontal-scroll-wrapper::-webkit-scrollbar-thumb:hover {
@@ -246,41 +246,61 @@
   background: #1C7C0F;
 }
 
-/* SCROLL BUTTONS */
+/* FLOATING BUTTONS OVER CARDS */
 .scroll-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
   border: 2px solid #104C08;
   color: #104C08;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .scroll-btn:hover {
   background: #104C08;
   color: white;
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 6px 20px rgba(16, 76, 8, 0.4);
 }
 
+/* Position at edges of viewport */
 .scroll-btn.left {
-  left: -20px;
+  left: 20px;
 }
 
 .scroll-btn.right {
-  right: -20px;
+  right: 20px;
 }
 
-.scroll-btn i {
-  font-size: 1.2rem;
+/* Remove padding from container since buttons float */
+.horizontal-scroll-container {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 30px auto;
+}
+
+/* Ensure cards scroll behind buttons */
+.horizontal-scroll-wrapper {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #104C08 #e2e8f0;
 }
 
 /* Carousel container - MOVED BELOW RATINGS */
