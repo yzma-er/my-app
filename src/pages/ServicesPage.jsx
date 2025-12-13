@@ -25,33 +25,25 @@ function ServicesPage() {
 
   // ✅ Check if user just logged in and get user email
   useEffect(() => {
-    // Check if user just logged in (from localStorage flag)
-    const justLoggedIn = localStorage.getItem("justLoggedIn");
-    const token = localStorage.getItem("token");
+  // Check if user just logged in
+  const justLoggedIn = localStorage.getItem("justLoggedIn");
+  const storedEmail = localStorage.getItem("userEmail");
+  
+  if (justLoggedIn === "true" && storedEmail) {
+    setUserEmail(storedEmail);
+    setShowWelcome(true);
     
-    if (justLoggedIn === "true" && token) {
-      try {
-        // Decode JWT token to get user info
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const email = payload.email || payload.sub || "";
-        
-        if (email) {
-          setUserEmail(email);
-          setShowWelcome(true);
-          
-          // Remove the flag after showing welcome
-          localStorage.removeItem("justLoggedIn");
-          
-          // Optionally, set timeout to auto-hide
-          setTimeout(() => {
-            setShowWelcome(false);
-          }, 8000); // Auto-hide after 8 seconds
-        }
-      } catch (error) {
-        console.error("Error decoding token:", error);
-      }
-    }
-  }, []);
+    // Remove the flag after showing welcome
+    localStorage.removeItem("justLoggedIn");
+    
+    // Auto-hide after 8 seconds
+    const autoHideTimer = setTimeout(() => {
+      setShowWelcome(false);
+    }, 8000);
+    
+    return () => clearTimeout(autoHideTimer);
+  }
+}, []);
 
   // ✅ Fetch Services
   useEffect(() => {
