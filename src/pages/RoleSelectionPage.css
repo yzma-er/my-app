@@ -277,11 +277,11 @@
 
 /* Position at edges of viewport */
 .scroll-btn.left {
-  left: 20px;
+  left: 15px;
 }
 
 .scroll-btn.right {
-  right: 20px;
+  right: 15px;
 }
 
 /* Remove padding from container since buttons float */
