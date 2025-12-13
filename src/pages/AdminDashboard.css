@@ -10,7 +10,8 @@
 /* ========= Sidebar ========= */
 .sidebar {
   width: 260px;
-  background-color: #57C84D;
+  background-color: #f8de7e;
+  background-image: linear-gradient(319deg, #f8de7e 0%, #29ab87 37%, #442ce0 100%);
   padding: 20px;
   display: flex;
   flex-direction: column;
