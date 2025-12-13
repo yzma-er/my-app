@@ -11,6 +11,7 @@ function ServiceDetails() {
   const [userComments, setUserComments] = useState({}); // Store comments for each step
   const [stepFeedbacks, setStepFeedbacks] = useState({}); // Store all feedback for each step
   const [showRatings, setShowRatings] = useState(false);
+  const [errors, setErrors] = useState({}); // Store validation errors
   const navigate = useNavigate();
 
   const serviceId = window.location.pathname.split("/").pop();
@@ -77,14 +78,47 @@ function ServiceDetails() {
     }
   };
 
-  const handleStepRatingSubmit = async (stepNumber) => {
+  const validateStepRating = (stepNumber) => {
     const rating = userRatings[stepNumber] || 0;
     const comment = userComments[stepNumber] || "";
+    const newErrors = { ...errors };
 
+    // Clear previous error
+    delete newErrors[stepNumber];
+
+    // Validate rating
     if (rating === 0) {
-      alert(`Please select a star rating for Step ${stepNumber} before submitting.`);
+      newErrors[stepNumber] = "Please select a star rating.";
+      setErrors(newErrors);
+      return false;
+    }
+
+    // Validate comment (required)
+    if (!comment.trim()) {
+      newErrors[stepNumber] = "Please write a comment explaining your rating.";
+      setErrors(newErrors);
+      return false;
+    }
+
+    // Validate comment length
+    if (comment.trim().length < 10) {
+      newErrors[stepNumber] = "Please write a more detailed comment (at least 10 characters).";
+      setErrors(newErrors);
+      return false;
+    }
+
+    setErrors(newErrors);
+    return true;
+  };
+
+  const handleStepRatingSubmit = async (stepNumber) => {
+    // Validate input
+    if (!validateStepRating(stepNumber)) {
       return;
     }
+
+    const rating = userRatings[stepNumber];
+    const comment = userComments[stepNumber];
 
     try {
       const user_id = getUserId();
@@ -94,7 +128,7 @@ function ServiceDetails() {
         service_name: service?.name || null,
         step_number: stepNumber,
         rating,
-        comment: comment,
+        comment: comment.trim(),
         user_id: user_id
       });
 
@@ -110,6 +144,7 @@ function ServiceDetails() {
       // Clear individual step rating/comment
       setUserRatings(prev => ({ ...prev, [stepNumber]: 0 }));
       setUserComments(prev => ({ ...prev, [stepNumber]: "" }));
+      setErrors(prev => ({ ...prev, [stepNumber]: undefined }));
       
     } catch (err) {
       console.error("❌ Error submitting feedback:", err);
@@ -345,9 +380,9 @@ function ServiceDetails() {
                         {fb.rating}
                       </div>
                       <div style={{ flex: 1 }}>
-                        {fb.comment && (
-                          <div style={{ color: "#495057" }}>"{fb.comment}"</div>
-                        )}
+                        <div style={{ color: "#495057", fontStyle: "italic" }}>
+                          "{fb.comment}"
+                        </div>
                         <div style={{ fontSize: "12px", color: "#6c757d", marginTop: "3px" }}>
                           {new Date(fb.created_at).toLocaleDateString()} • {new Date(fb.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                         </div>
@@ -533,51 +568,92 @@ function ServiceDetails() {
                       <span
                         key={star}
                         className={`star ${star <= (userRatings[stepNum] || 0) ? "active" : ""}`}
-                        onClick={() => setUserRatings(prev => ({ ...prev, [stepNum]: star }))}
-                        style={{ fontSize: "2.2rem", margin: "0 5px" }}
+                        onClick={() => {
+                          setUserRatings(prev => ({ ...prev, [stepNum]: star }));
+                          // Clear error when rating is selected
+                          if (errors[stepNum]) {
+                            setErrors(prev => ({ ...prev, [stepNum]: undefined }));
+                          }
+                        }}
+                        style={{ fontSize: "2.2rem", margin: "0 5px", cursor: "pointer" }}
                       >
                         ★
                       </span>
                     ))}
                   </div>
                   <div style={{ marginTop: "8px", fontSize: "14px", color: "#666" }}>
-                    {userRatings[stepNum] ? `Selected: ${userRatings[stepNum]}/5` : "Click stars to rate"}
+                    {userRatings[stepNum] ? `Selected: ${userRatings[stepNum]}/5` : "Click stars to rate (required)"}
                   </div>
                 </div>
 
-                <textarea
-                  placeholder={`Your feedback for Step ${stepNum} (optional)...`}
-                  value={userComments[stepNum] || ""}
-                  onChange={(e) => setUserComments(prev => ({ ...prev, [stepNum]: e.target.value }))}
-                  style={{ 
-                    marginTop: "10px", 
-                    width: "100%",
-                    minHeight: "80px",
-                    border: "1px solid #bde3b2",
-                    borderRadius: "8px",
-                    padding: "12px",
-                    fontSize: "15px",
-                    resize: "vertical"
-                  }}
-                />
+                <div style={{ marginTop: "15px" }}>
+                  <div style={{ marginBottom: "8px", display: "flex", justifyContent: "space-between" }}>
+                    <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                      Your Comment: <span style={{ color: "#dc2626" }}>*</span>
+                    </label>
+                    <span style={{ fontSize: "12px", color: "#666" }}>
+                      {userComments[stepNum]?.length || 0}/500 characters
+                    </span>
+                  </div>
+                  <textarea
+                    placeholder={`Please explain your rating for Step ${stepNum} (required, minimum 10 characters)...`}
+                    value={userComments[stepNum] || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 500) {
+                        setUserComments(prev => ({ ...prev, [stepNum]: value }));
+                        // Clear error when user starts typing
+                        if (errors[stepNum] && value.trim().length >= 10) {
+                          setErrors(prev => ({ ...prev, [stepNum]: undefined }));
+                        }
+                      }
+                    }}
+                    style={{ 
+                      width: "100%",
+                      minHeight: "100px",
+                      border: errors[stepNum] ? "1px solid #dc2626" : "1px solid #bde3b2",
+                      borderRadius: "8px",
+                      padding: "12px",
+                      fontSize: "15px",
+                      resize: "vertical",
+                      backgroundColor: errors[stepNum] ? "#fef2f2" : "white"
+                    }}
+                  />
+                  {errors[stepNum] && (
+                    <div style={{ 
+                      color: "#dc2626", 
+                      fontSize: "14px", 
+                      marginTop: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px"
+                    }}>
+                      <i className="fas fa-exclamation-circle"></i>
+                      {errors[stepNum]}
+                    </div>
+                  )}
+                  <div style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                    <i className="fas fa-info-circle"></i> Comments help us improve our services. Please be specific about your experience.
+                  </div>
+                </div>
 
                 <button 
                   className="feedback-btn" 
                   onClick={() => handleStepRatingSubmit(stepNum)}
                   style={{ 
-                    marginTop: "15px",
+                    marginTop: "20px",
                     width: "100%",
-                    background: userRatings[stepNum] ? "#1C7C0F" : "#ccc",
+                    background: (userRatings[stepNum] && userComments[stepNum]?.trim().length >= 10) ? "#1C7C0F" : "#ccc",
                     color: "white",
                     border: "none",
                     borderRadius: "25px",
                     padding: "12px",
-                    cursor: userRatings[stepNum] ? "pointer" : "not-allowed",
+                    cursor: (userRatings[stepNum] && userComments[stepNum]?.trim().length >= 10) ? "pointer" : "not-allowed",
                     fontWeight: "bold",
                     fontSize: "16px",
                     transition: "all 0.3s ease"
                   }}
-                  disabled={!userRatings[stepNum]}
+                  disabled={!(userRatings[stepNum] && userComments[stepNum]?.trim().length >= 10)}
                 >
                   <i className="fas fa-paper-plane"></i> Submit Rating for Step {stepNum}
                 </button>
