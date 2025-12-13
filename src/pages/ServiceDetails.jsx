@@ -10,7 +10,6 @@ function ServiceDetails() {
   const [userRatings, setUserRatings] = useState({}); // Store ratings for each step
   const [userComments, setUserComments] = useState({}); // Store comments for each step
   const [stepFeedbacks, setStepFeedbacks] = useState({}); // Store all feedback for each step
-  const [showRatings, setShowRatings] = useState(false);
   const [errors, setErrors] = useState({}); // Store validation errors
   const navigate = useNavigate();
 
@@ -170,24 +169,6 @@ function ServiceDetails() {
     );
   };
 
-  // Calculate average rating for a specific step
-  const calculateStepAverageRating = (stepNumber) => {
-    const feedbacks = stepFeedbacks[stepNumber];
-    if (!feedbacks || feedbacks.length === 0) return "N/A";
-    
-    const total = feedbacks.reduce((sum, f) => sum + f.rating, 0);
-    return (total / feedbacks.length).toFixed(1);
-  };
-
-  // Calculate overall service average rating
-  const calculateOverallAverageRating = () => {
-    const allFeedbacks = Object.values(stepFeedbacks).flat();
-    if (allFeedbacks.length === 0) return "N/A";
-    
-    const total = allFeedbacks.reduce((sum, f) => sum + f.rating, 0);
-    return (total / allFeedbacks.length).toFixed(1);
-  };
-
   if (loading) return <p>Loading...</p>;
   if (!service) return <p>❌ Service not found.</p>;
 
@@ -273,130 +254,7 @@ function ServiceDetails() {
         { width: "100%" }
       )}
 
-      {/* Service Rating Summary at Top */}
-      <div style={{ 
-        margin: "20px 0", 
-        padding: "20px", 
-        background: "linear-gradient(135deg, #eaf4ea 0%, #d4eed4 100%)",
-        borderRadius: "12px",
-        width: "100%",
-        textAlign: "center",
-        border: "1px solid #bde3b2"
-      }}>
-        <h3 style={{ color: "#1C7C0F", marginBottom: "10px" }}>
-          <i className="fas fa-star"></i> Service Rating Summary
-        </h3>
-        <div style={{ fontSize: "18px", fontWeight: "bold", color: "#104C08" }}>
-          Overall Average: ⭐ {calculateOverallAverageRating()}/5
-        </div>
-        <div style={{ marginTop: "15px", display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "15px" }}>
-          {steps.map((_, index) => {
-            const stepNum = index + 1;
-            const avg = calculateStepAverageRating(stepNum);
-            return (
-              <div key={stepNum} style={{
-                background: "white",
-                padding: "8px 15px",
-                borderRadius: "20px",
-                border: "1px solid #1C7C0F",
-                fontSize: "14px",
-                fontWeight: "bold"
-              }}>
-                Step {stepNum}: ⭐ {avg}/5
-              </div>
-            );
-          })}
-        </div>
-        
-        <button
-          onClick={() => setShowRatings(!showRatings)}
-          style={{
-            marginTop: "15px",
-            background: "transparent",
-            color: "#1C7C0F",
-            border: "2px solid #1C7C0F",
-            borderRadius: "25px",
-            padding: "8px 20px",
-            cursor: "pointer",
-            fontWeight: "bold",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px"
-          }}
-        >
-          {showRatings ? 'Hide All Ratings' : 'View All Ratings'}
-          <i className={`fas fa-chevron-${showRatings ? 'up' : 'down'}`}></i>
-        </button>
-      </div>
-
-      {/* Show all ratings when toggled */}
-      {showRatings && (
-        <div style={{ 
-          margin: "20px 0", 
-          background: "white", 
-          padding: "20px", 
-          borderRadius: "10px",
-          border: "2px solid #bde3b2",
-          width: "100%"
-        }}>
-          <h3 style={{ color: "#1C7C0F", marginBottom: "15px", textAlign: "center" }}>
-            <i className="fas fa-chart-bar"></i> All Step Ratings
-          </h3>
-          {Object.entries(stepFeedbacks).map(([stepNum, feedbacks]) => (
-            <div key={stepNum} style={{ marginBottom: "20px" }}>
-              <h4 style={{ 
-                color: "#104C08", 
-                paddingBottom: "8px",
-                borderBottom: "2px solid #eaf4ea"
-              }}>
-                Step {stepNum}: ⭐ {calculateStepAverageRating(stepNum)}/5 ({feedbacks.length} ratings)
-              </h4>
-              <div style={{ 
-                maxHeight: "150px", 
-                overflowY: "auto", 
-                padding: "10px", 
-                background: "#f8f9fa", 
-                borderRadius: "8px",
-                marginTop: "10px"
-              }}>
-                {feedbacks.map((fb, idx) => (
-                  <div key={idx} style={{ 
-                    padding: "8px 0", 
-                    borderBottom: "1px solid #e9ecef",
-                    fontSize: "14px"
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <div style={{ 
-                        background: "#1C7C0F", 
-                        color: "white", 
-                        width: "30px", 
-                        height: "30px",
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: "bold"
-                      }}>
-                        {fb.rating}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ color: "#495057", fontStyle: "italic" }}>
-                          "{fb.comment}"
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d", marginTop: "3px" }}>
-                          {new Date(fb.created_at).toLocaleDateString()} • {new Date(fb.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* SHOW ALL STEPS - NO UNLOCKING */}
+      {/* SHOW ALL STEPS */}
       <div className="all-steps-container">
         <h2 style={{ 
           color: "#1C7C0F", 
@@ -410,7 +268,6 @@ function ServiceDetails() {
         
         {steps.map((step, index) => {
           const stepNum = index + 1;
-          const stepAverageRating = calculateStepAverageRating(stepNum);
           const stepFeedbacksList = stepFeedbacks[stepNum] || [];
 
           return (
@@ -448,20 +305,6 @@ function ServiceDetails() {
                   </span>
                   {step.customName ? `${step.title} - ${step.customName}` : step.title}
                 </h3>
-                <div style={{ 
-                  background: "#eaf4ea", 
-                  padding: "6px 12px", 
-                  borderRadius: "15px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  color: "#1C7C0F",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px"
-                }}>
-                  <i className="fas fa-star"></i>
-                  Avg: {stepAverageRating} ({stepFeedbacksList.length})
-                </div>
               </div>
               
               {step.videoFile && (
@@ -571,7 +414,7 @@ function ServiceDetails() {
                         onClick={() => {
                           setUserRatings(prev => ({ ...prev, [stepNum]: star }));
                           // Clear error when rating is selected
-                          if (errors[stepNum]) {
+                          if (errors[stepNumber]) {
                             setErrors(prev => ({ ...prev, [stepNum]: undefined }));
                           }
                         }}
