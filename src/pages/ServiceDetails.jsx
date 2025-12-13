@@ -414,7 +414,7 @@ function ServiceDetails() {
                         onClick={() => {
                           setUserRatings(prev => ({ ...prev, [stepNum]: star }));
                           // Clear error when rating is selected
-                          if (errors[stepNumber]) {
+                          if (errors[stepNum]) {
                             setErrors(prev => ({ ...prev, [stepNum]: undefined }));
                           }
                         }}
