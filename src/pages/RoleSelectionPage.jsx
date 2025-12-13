@@ -5,8 +5,8 @@ import axios from 'axios';
 import './RoleSelectionPage.css';
 import StepRatingsModal from "../components/StepRatingsModal";
 
-// Import your NavBar CSS or create new styles
-import './RoleSelectionNavbar.css'; // We'll create this
+// Import your NavBar CSS 
+import './NavBar.css'; // 
 
 function RoleSelectionPage() {
   const navigate = useNavigate();
