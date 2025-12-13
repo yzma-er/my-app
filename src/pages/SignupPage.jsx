@@ -1,25 +1,28 @@
-// src/pages/SignupPage.jsx - UPDATED WITH OTP DISPLAY
+// SignupPage.jsx - Complete EmailJS Version
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import API_BASE_URL from "../config";
+import emailjs from '@emailjs/browser'; // Import EmailJS
+
+// Your EmailJS credentials
+const EMAILJS_CONFIG = {
+  SERVICE_ID: 'YOUR_SERVICE_ID', // Replace with yours
+  TEMPLATE_ID: 'YOUR_TEMPLATE_ID', // Replace with yours
+  PUBLIC_KEY: 'YOUR_PUBLIC_KEY' // Replace with yours
+};
 
 function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
-  const [step, setStep] = useState(1); // 1: email, 2: verify, 3: password
+  const [step, setStep] = useState(1);
   const [timer, setTimer] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(3);
-  const [lastOtpReceived, setLastOtpReceived] = useState(""); // Store last OTP
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
-  const navigate = useNavigate();
+  const [lastOtp, setLastOtp] = useState("");
 
   // Timer for OTP expiration
   useEffect(() => {
@@ -32,14 +35,13 @@ function SignupPage() {
     return () => clearInterval(interval);
   }, [timer]);
 
-  // Format timer
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Step 1: Send OTP - UPDATED TO HANDLE OTP IN RESPONSE
+  // Step 1: Send OTP - UPDATED WITH EMAILJS
   const handleSendOTP = async (e) => {
     e?.preventDefault();
     setIsLoading(true);
@@ -59,32 +61,47 @@ function SignupPage() {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/request-otp`, {
+      // Generate OTP locally
+      const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      setLastOtp(generatedOTP);
+
+      // Store OTP in backend (your existing system)
+      const storeRes = await fetch(`${API_BASE_URL}/api/auth/store-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, otp: generatedOTP })
       });
 
-      const data = await res.json();
+      // Try to send email via EmailJS
+      try {
+        await emailjs.send(
+          EMAILJS_CONFIG.SERVICE_ID,
+          EMAILJS_CONFIG.TEMPLATE_ID,
+          {
+            to_email: email,
+            to_name: email.split('@')[0],
+            otp_code: generatedOTP,
+            expiration_time: "10 minutes",
+            app_name: "Digital Guidance",
+            current_year: new Date().getFullYear()
+          },
+          EMAILJS_CONFIG.PUBLIC_KEY
+        );
 
-      if (res.ok) {
-        // Check if OTP is in response (logging mode)
-        if (data.otp) {
-          setLastOtpReceived(data.otp); // Store the OTP
-          alert(`✅ Verification code: ${data.otp}\n\nCopy this code and enter it below.`);
-          // Auto-fill the OTP field for convenience
-          setOtp(data.otp);
-        } else {
-          alert("✅ OTP sent! Check your email.");
-        }
+        alert("✅ Verification code sent to your email!");
         
-        setStep(2);
-        setTimer(600); // 10 minutes
-        setResendDisabled(true);
-        setTimeout(() => setResendDisabled(false), 60000); // Enable resend after 1 minute
-      } else {
-        alert(data.message || "Failed to get verification code.");
+      } catch (emailError) {
+        console.log("EmailJS failed, showing OTP:", emailError);
+        // Fallback: Show OTP to user
+        alert(`📱 Your verification code: ${generatedOTP}\n\n(Email service temporary unavailable)`);
       }
+
+      // Move to verification step
+      setStep(2);
+      setTimer(600); // 10 minutes
+      setResendDisabled(true);
+      setTimeout(() => setResendDisabled(false), 60000);
+
     } catch (err) {
       console.error("OTP request error:", err);
       alert("An error occurred. Try again later.");
@@ -93,7 +110,7 @@ function SignupPage() {
     }
   };
 
-  // Step 2: Verify OTP
+  // Step 2: Verify OTP - KEEP EXISTING
   const handleVerifyOTP = async (e) => {
     e?.preventDefault();
     setIsLoading(true);
@@ -123,7 +140,6 @@ function SignupPage() {
             alert("Too many failed attempts. Please request a new OTP.");
             setStep(1);
             setOtp("");
-            setLastOtpReceived("");
           }
         }
         alert(data.message || "Invalid OTP.");
@@ -136,7 +152,7 @@ function SignupPage() {
     }
   };
 
-  // Step 3: Complete signup with password - NO CHANGES
+  // Step 3: Complete signup - KEEP EXISTING
   const handleSignup = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -173,7 +189,6 @@ function SignupPage() {
         navigate("/login");
       } else {
         alert(data.message || "❌ Signup failed.");
-        // If verification expired, go back to step 1
         if (data.message?.includes("not verified")) {
           setStep(1);
         }
@@ -186,20 +201,18 @@ function SignupPage() {
     }
   };
 
+  // Resend OTP - UPDATED
   const handleResendOTP = async () => {
     if (resendDisabled) return;
     setResendDisabled(true);
     await handleSendOTP();
-    setTimeout(() => setResendDisabled(false), 60000); // 1 minute cooldown
+    setTimeout(() => setResendDisabled(false), 60000);
   };
 
-  const goBack = () => {
-    if (step === 2) setStep(1);
-    if (step === 3) setStep(2);
-    setOtp("");
-    setPassword("");
-    setConfirmPassword("");
-    setLastOtpReceived("");
+  // Quick copy OTP button
+  const handleCopyOTP = () => {
+    navigator.clipboard.writeText(lastOtp || otp);
+    alert("OTP copied to clipboard!");
   };
 
   return (
@@ -224,12 +237,12 @@ function SignupPage() {
                   style={{ width: "100%" }}
                 />
                 <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
-                  Note: Email service is in testing mode. You'll receive the code directly.
+                  We'll send a verification code to this email.
                 </p>
               </div>
 
               <button type="submit" disabled={isLoading}>
-                {isLoading ? "Getting Code..." : "Get Verification Code"}
+                {isLoading ? "Sending Code..." : "Send Verification Code"}
               </button>
             </form>
           )}
@@ -238,11 +251,11 @@ function SignupPage() {
             <form onSubmit={handleVerifyOTP}>
               <div style={{ marginBottom: "20px" }}>
                 <p style={{ marginBottom: "15px" }}>
-                  Enter the 6-digit code for <strong>{email}</strong>
+                  Enter the 6-digit code sent to <strong>{email}</strong>
                 </p>
                 
-                {/* Show last received OTP if available */}
-                {lastOtpReceived && (
+                {/* Show OTP if available (fallback mode) */}
+                {lastOtp && (
                   <div style={{
                     background: "#f0f9ff",
                     border: "1px dashed #93c5fd",
@@ -250,12 +263,30 @@ function SignupPage() {
                     padding: "15px",
                     marginBottom: "15px"
                   }}>
-                    <p style={{ margin: 0, fontSize: "14px", color: "#1d4ed8" }}>
-                      <strong>Your code:</strong> {lastOtpReceived}
-                    </p>
-                    <p style={{ margin: "5px 0 0 0", fontSize: "12px", color: "#6b7280" }}>
-                      Copy and paste this code below
-                    </p>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <p style={{ margin: 0, fontSize: "14px", color: "#1d4ed8" }}>
+                          <strong>Your code:</strong>
+                        </p>
+                        <p style={{ margin: "5px 0 0 0", fontSize: "20px", fontFamily: "monospace" }}>
+                          {lastOtp}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleCopyOTP}
+                        style={{
+                          background: "#3b82f6",
+                          color: "white",
+                          border: "none",
+                          padding: "8px 16px",
+                          borderRadius: "6px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        Copy
+                      </button>
+                    </div>
                   </div>
                 )}
                 
@@ -303,14 +334,14 @@ function SignupPage() {
                     width: "100%"
                   }}
                 >
-                  {resendDisabled ? "Resend in 60s" : "Get New Code"}
+                  {resendDisabled ? "Resend in 60s" : "Resend Code"}
                 </button>
               </div>
 
               <div style={{ display: "flex", gap: "10px" }}>
                 <button
                   type="button"
-                  onClick={goBack}
+                  onClick={() => { setStep(1); setOtp(""); }}
                   style={{ flex: 1, background: "#6b7280" }}
                 >
                   Back
@@ -341,9 +372,7 @@ function SignupPage() {
                     required
                   />
                   <i
-                    className={`fa-solid ${
-                      showPassword ? "fa-eye-slash" : "fa-eye"
-                    } toggle-icon`}
+                    className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
                     onClick={() => setShowPassword(!showPassword)}
                   ></i>
                 </div>
@@ -366,9 +395,7 @@ function SignupPage() {
                     required
                   />
                   <i
-                    className={`fa-solid ${
-                      showConfirm ? "fa-eye-slash" : "fa-eye"
-                    } toggle-icon`}
+                    className={`fa-solid ${showConfirm ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
                     onClick={() => setShowConfirm(!showConfirm)}
                   ></i>
                 </div>
@@ -383,7 +410,7 @@ function SignupPage() {
               <div style={{ display: "flex", gap: "10px" }}>
                 <button
                   type="button"
-                  onClick={goBack}
+                  onClick={() => setStep(2)}
                   style={{ flex: 1, background: "#6b7280" }}
                 >
                   Back
