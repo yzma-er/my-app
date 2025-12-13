@@ -3,19 +3,21 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './RoleSelectionPage.css';
-
 import StepRatingsModal from "../components/StepRatingsModal";
+
+// Import your NavBar CSS or create new styles
+import './RoleSelectionNavbar.css'; // We'll create this
 
 function RoleSelectionPage() {
   const navigate = useNavigate();
   const images = ['/carousel1.jpg', '/carousel2.jpg', '/carousel3.jpg', '/carousel4.jpg'];
-
 
   const [current, setCurrent] = useState(0);
   const [showRatings, setShowRatings] = useState(false);
   const [services, setServices] = useState([]);
   const [feedback, setFeedback] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // ⭐ MODAL STATES
   const [modalOpen, setModalOpen] = useState(false);
@@ -26,6 +28,15 @@ function RoleSelectionPage() {
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
+
+  // 🧩 Detect scroll position for navbar effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // ⭐ FETCH SERVICES + FEEDBACK
   const fetchData = useCallback(async () => {
@@ -94,6 +105,38 @@ function RoleSelectionPage() {
 
   return (
     <div className="role-container">
+      {/* ⭐ NAVBAR */}
+      <nav className={`role-navbar ${isScrolled ? "scrolled" : ""}`}>
+        <div className="role-navbar-left">
+          <h2 className="role-navbar-logo">ASP Digital Guidance</h2>
+        </div>
+        
+        <div className="role-navbar-buttons">
+          <button 
+            className="role-navbar-btn admin-btn"
+            onClick={() => navigate('/login?role=admin')}
+          >
+            <i className="fas fa-user-shield"></i>
+            Administrator
+          </button>
+          
+          <button 
+            className="role-navbar-btn user-btn"
+            onClick={() => navigate('/login?role=user')}
+          >
+            <i className="fas fa-user"></i>
+            User
+          </button>
+          
+          <button 
+            className="role-navbar-btn ratings-btn"
+            onClick={() => setShowRatings(prev => !prev)}
+          >
+            <i className="fas fa-star"></i>
+            {showRatings ? 'Hide Service Ratings' : 'View Service Ratings'}
+          </button>
+        </div>
+      </nav>
 
       {/* ⭐ CAROUSEL WITH DOTS */}
       <div className="carousel-container">
@@ -125,42 +168,52 @@ function RoleSelectionPage() {
       <h3>Nueva Vizcaya State University</h3>
       <p>Bayombong, Nueva Vizcaya</p>
 
-      <h1>Continue as:</h1>
-
-      {/* ⭐ ROLE BUTTONS */}
-      <div className="button-group">
-        <button onClick={() => navigate('/login?role=admin')}>Administrator</button>
-        <button onClick={() => navigate('/login?role=user')}>User</button>
-      </div>
-
-      {/* ⭐ TOGGLE SERVICE RATINGS */}
-      <button
-        className="ratings-toggle-btn"
-        onClick={() => setShowRatings(prev => !prev)}
-      >
-        {showRatings ? 'Hide Service Ratings' : 'View Service Ratings'}
-      </button>
+      <h1>Welcome to Digital Guidance System</h1>
+      <p className="welcome-subtitle">Select your role to continue</p>
 
       {/* ⭐ SERVICE LIST + SUMMARY */}
       {showRatings && (
         <>
           {isLoading ? (
-            <p>Loading services...</p>
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p>Loading service ratings...</p>
+            </div>
           ) : serviceSummary.length > 0 ? (
-            <div className="role-cards">
-              {serviceSummary.map((s) => (
-                <div
-                  key={s.service_id}
-                  className="role-card"
-                  onClick={() => openRatingsModal(s)}
-                >
-                  <h3>{s.name}</h3>
-                  <p>⭐ {s.avg} ({s.count})</p>
-                </div>
-              ))}
+            <div className="role-cards-container">
+              <h2 className="ratings-title">
+                <i className="fas fa-chart-bar"></i>
+                Service Ratings Summary
+              </h2>
+              <div className="role-cards">
+                {serviceSummary.map((s) => (
+                  <div
+                    key={s.service_id}
+                    className="role-card"
+                    onClick={() => openRatingsModal(s)}
+                  >
+                    <div className="role-card-header">
+                      <h3>{s.name}</h3>
+                      <div className="role-card-rating">
+                        <i className="fas fa-star"></i>
+                        <span className="rating-value">{s.avg}</span>
+                        <span className="rating-count">({s.count} ratings)</span>
+                      </div>
+                    </div>
+                    <div className="role-card-actions">
+                      <button className="view-details-btn">
+                        View Details <i className="fas fa-chevron-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
-            <p>No services found or unable to load ratings.</p>
+            <div className="no-services">
+              <i className="fas fa-info-circle"></i>
+              <p>No services found or unable to load ratings.</p>
+            </div>
           )}
         </>
       )}
@@ -173,6 +226,11 @@ function RoleSelectionPage() {
         stepRatings={stepRatings}
       />
 
+      {/* ⭐ FOOTER */}
+      <footer className="role-footer">
+        <p>© {new Date().getFullYear()} NVSU Auxiliary Services Program. All rights reserved.</p>
+        <p>Bayombong, Nueva Vizcaya, Philippines</p>
+      </footer>
     </div>
   );
 }
