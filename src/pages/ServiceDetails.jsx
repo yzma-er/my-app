@@ -1,4 +1,4 @@
-// src/pages/ServiceDetails.jsx - UPDATED VERSION
+// src/pages/ServiceDetails.jsx - COMPLETE WITH ALL CONTENT
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import "./Services.css";
@@ -147,7 +147,7 @@ function ServiceDetails() {
         }
       });
 
-      const existingFeedback = checkRes.data;
+      const existingFeedback = checkRes.data.exists ? checkRes.data.feedback : null;
 
       if (existingFeedback) {
         // Update existing feedback
@@ -218,8 +218,83 @@ function ServiceDetails() {
 
   return (
     <div className="medical-container">
-      {/* ... (rest of the header code remains the same) ... */}
-      
+      <button
+        onClick={() => navigate("/services")}
+        style={{
+          background: "#1C7C0F",
+          color: "white",
+          border: "none",
+          borderRadius: "25px",
+          padding: "8px 16px",
+          marginBottom: "15px",
+          cursor: "pointer",
+          fontWeight: "bold",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "5px",
+          alignSelf: "flex-start",
+        }}
+      >
+        ← Back to Services
+      </button>
+
+      <h2 style={{ color: "#1C7C0F", marginBottom: "10px", width: "100%", textAlign: "center" }}>
+        {service.name}
+      </h2>
+
+      {/* ✅ DESCRIPTION 1 with bold support - RESTORED */}
+      {service.description && renderWithBold(
+        service.description,
+        "service-description",
+        {
+          marginBottom: "20px",
+          whiteSpace: "pre-line",
+          textAlign: "center",
+          width: "100%",
+        }
+      )}
+
+      {/* SERVICE PHOTO DISPLAY - RESTORED */}
+      {service.photo && (
+        <div style={{ 
+          width: "100%", 
+          margin: "20px 0",
+          textAlign: "center"
+        }}>
+          <div style={{
+            maxWidth: "800px",
+            margin: "0 auto",
+            border: "1px solid #bde3b2",
+            borderRadius: "12px",
+            padding: "15px",
+            background: "#f8fff8",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+          }}>
+            <img 
+              src={service.photo} 
+              alt={service.name} 
+              style={{
+                width: "100%",
+                height: "auto",
+                maxHeight: "400px",
+                borderRadius: "8px",
+                objectFit: "contain"
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ✅ DESCRIPTION 2 with bold support - RESTORED */}
+      {service.description2 && renderWithBold(
+        service.description2,
+        "service-description2",
+        { 
+          width: "100%",
+          marginBottom: "30px"
+        }
+      )}
+
       {/* SHOW ALL STEPS */}
       <div className="all-steps-container">
         <h2 style={{ 
@@ -294,9 +369,94 @@ function ServiceDetails() {
                 )}
               </div>
               
-              {/* Step content, video, form download (same as before) */}
-              {/* ... */}
-              
+              {/* STEP VIDEO - RESTORED */}
+              {step.videoFile && (
+                <div style={{ 
+                  marginTop: "15px", 
+                  marginBottom: "20px",
+                  width: "100%"
+                }}>
+                  <div style={{
+                    width: "100%",
+                    position: "relative",
+                    borderRadius: "10px",
+                    overflow: "hidden",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
+                  }}>
+                    <video 
+                      controls 
+                      style={{ 
+                        width: "100%",
+                        height: "auto",
+                        borderRadius: "10px",
+                        maxHeight: "70vh",
+                        objectFit: "contain"
+                      }}
+                    >
+                      <source src={step.videoFile} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </div>
+              )}
+
+              {/* ✅ STEP CONTENT with bold support - RESTORED */}
+              {renderWithBold(
+                step.content,
+                "",
+                { 
+                  whiteSpace: "pre-line", 
+                  marginBottom: "20px",
+                  lineHeight: "1.6",
+                  fontSize: "16px"
+                }
+              )}
+
+              {/* FORM DOWNLOAD - RESTORED */}
+              {step.formFile && (
+                <div style={{ 
+                  marginTop: "10px", 
+                  marginBottom: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  flexWrap: "wrap"
+                }}>
+                  <a
+                    href={step.formFile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download={step.originalFormName || "form"}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      background: "#1C7C0F",
+                      color: "white",
+                      padding: "8px 16px",
+                      borderRadius: "25px",
+                      textDecoration: "none",
+                      fontWeight: "bold",
+                      gap: "8px",
+                      transition: "all 0.3s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#104C08";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#1C7C0F";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    }}
+                  >
+                    <i className="fas fa-download"></i>
+                    Download Form
+                  </a>
+                  <span style={{ fontSize: "14px", color: "#666" }}>
+                    {step.originalFormName && `(${step.originalFormName})`}
+                  </span>
+                </div>
+              )}
+
               {/* Rate this step section */}
               <div className="feedback-section" style={{ 
                 marginTop: "25px", 
