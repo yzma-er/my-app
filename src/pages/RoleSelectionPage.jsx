@@ -168,8 +168,8 @@ function RoleSelectionPage() {
       <h3>Nueva Vizcaya State University</h3>
       <p>Bayombong, Nueva Vizcaya</p>
 
-      <h1>Welcome to Digital Guidance System</h1>
-      <p className="welcome-subtitle">Select your role to continue</p>
+      <h1>Welcome to ASP Digital Guidance System</h1>
+      <p className="welcome-subtitle"></p>
 
       {/* ⭐ SERVICE LIST + SUMMARY */}
       {showRatings && (
