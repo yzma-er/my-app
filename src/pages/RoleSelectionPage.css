@@ -588,3 +588,40 @@
     margin-bottom: 20px;
   }
 }
+
+/* Smooth scrolling for the whole page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Highlight effect when ratings are shown */
+.ratings-container {
+  scroll-margin-top: 120px; /* Space for fixed navbar */
+  transition: all 0.3s ease;
+}
+
+/* Add a highlight animation when scrolled to */
+.ratings-container.highlight {
+  animation: highlightPulse 2s ease;
+}
+
+@keyframes highlightPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 76, 8, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(16, 76, 8, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 76, 8, 0);
+  }
+}
+
+/* Make sure ratings container has proper spacing */
+.ratings-container {
+  padding-top: 20px;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
