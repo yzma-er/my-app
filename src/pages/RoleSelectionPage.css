@@ -1,4 +1,18 @@
-/* RoleSelectionNavbar.css */
+/* Main container: center everything */
+.role-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  color: #104C08;
+  padding: 20px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #f7fafc 0%, #edf2f7 100%);
+}
+
+/* NAVBAR STYLES */
 .role-navbar {
   position: fixed;
   top: 0;
@@ -8,7 +22,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #104C08 0%, #1C7C0F 100%);
   color: white;
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -17,7 +31,7 @@
 
 .role-navbar.scrolled {
   padding: 0.75rem 2rem;
-  background: rgba(102, 126, 234, 0.95);
+  background: rgba(16, 76, 8, 0.95);
   backdrop-filter: blur(10px);
 }
 
@@ -30,7 +44,7 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-  background: linear-gradient(45deg, #fff, #e0e7ff);
+  background: linear-gradient(45deg, #fff, #e0f7e0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -44,7 +58,7 @@
 .role-navbar-btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 30px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
@@ -85,28 +99,129 @@
 
 /* Add padding to account for fixed navbar */
 .role-container {
-  padding-top: 80px;
-  min-height: 100vh;
-  background: linear-gradient(180deg, #f7fafc 0%, #edf2f7 100%);
+  padding-top: 100px;
 }
 
-/* Welcome message styling */
+/* Carousel container: wide but not too tall */
+.carousel-container {
+  width: 100%;
+  max-width: 1200px;
+  aspect-ratio: 3 / 1;
+  margin-bottom: 20px;
+  overflow: hidden;
+  position: relative;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+/* Slide track */
+.carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+/* Each image */
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* CAROUSEL DOTS */
+.carousel-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background-color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.carousel-dot:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.2);
+}
+
+.carousel-dot.active {
+  background-color: white;
+  border-color: white;
+  transform: scale(1.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* Logo */
+.logo {
+  width: 120px;
+  height: auto;
+  margin: 20px 0;
+}
+
+/* Headings */
+.role-container h1 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  color: #104C08;
+}
+
+.role-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+  color: #104C08;
+}
+
+.role-container h3 {
+  font-size: 1.4rem;
+  margin-bottom: 5px;
+  color: #104C08;
+}
+
+.role-container p {
+  font-size: 1rem;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Welcome subtitle */
 .welcome-subtitle {
   color: #4a5568;
   font-size: 1.1rem;
   margin-bottom: 2rem;
+  max-width: 600px;
+  line-height: 1.6;
 }
+
+/* REMOVED OLD BUTTON GROUP - Now in navbar */
 
 /* Ratings container styling */
 .role-cards-container {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 2rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
 }
 
 .ratings-title {
   text-align: center;
-  color: #2d3748;
+  color: #104C08;
   margin-bottom: 2rem;
   display: flex;
   align-items: center;
@@ -116,29 +231,37 @@
 }
 
 .ratings-title i {
-  color: #667eea;
+  color: #104C08;
 }
 
+/* Card container for multiple services/roles */
 .role-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
+  width: 100%;
+  margin: 20px auto;
 }
 
+/* Individual service/role card - ENHANCED */
 .role-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  background: #f7f7f7;
+  border: 3px solid #104C08;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 150px;
 }
 
 .role-card:hover {
+  background: #eaf4ea;
   transform: translateY(-4px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
+  box-shadow: 0 8px 15px rgba(16, 76, 8, 0.1);
 }
 
 .role-card-header {
@@ -146,16 +269,19 @@
 }
 
 .role-card h3 {
-  color: #2d3748;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 10px;
+  color: #104C08;
   font-size: 1.2rem;
+  text-align: center;
 }
 
 .role-card-rating {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   color: #4a5568;
+  margin-bottom: 1rem;
 }
 
 .role-card-rating i {
@@ -164,7 +290,7 @@
 
 .rating-value {
   font-weight: 600;
-  color: #2d3748;
+  color: #104C08;
   font-size: 1.1rem;
 }
 
@@ -175,15 +301,15 @@
 
 .role-card-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .view-details-btn {
-  background: #667eea;
+  background: #104C08;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: 0.5rem 1.5rem;
+  border-radius: 30px;
   font-size: 0.9rem;
   cursor: pointer;
   display: flex;
@@ -193,7 +319,7 @@
 }
 
 .view-details-btn:hover {
-  background: #5a67d8;
+  background: #1C7C0F;
 }
 
 /* Loading spinner */
@@ -207,7 +333,7 @@
   width: 50px;
   height: 50px;
   border: 3px solid #e2e8f0;
-  border-top-color: #667eea;
+  border-top-color: #104C08;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -227,6 +353,7 @@
   margin: 2rem auto;
   max-width: 600px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
 }
 
 .no-services i {
@@ -244,9 +371,12 @@
   background: white;
   margin-top: 3rem;
   border-top: 1px solid #e2e8f0;
+  width: 100%;
 }
 
-/* Responsive design */
+/* Responsive adjustments */
+
+/* Tablet */
 @media (max-width: 768px) {
   .role-navbar {
     flex-direction: column;
@@ -261,19 +391,52 @@
   }
 
   .role-navbar-btn {
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
+    border-radius: 25px;
   }
 
   .role-container {
     padding-top: 140px;
   }
 
+  .carousel-container {
+    max-width: 95%;
+    aspect-ratio: 3 / 1;
+  }
+
+  .carousel-dots {
+    bottom: 15px;
+    gap: 10px;
+  }
+
+  .carousel-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .logo {
+    width: 100px;
+  }
+
+  .role-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .role-container h2 {
+    font-size: 1.6rem;
+  }
+
+  .role-container h3 {
+    font-size: 1.2rem;
+  }
+
   .role-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 }
 
+/* Mobile */
 @media (max-width: 480px) {
   .role-navbar-buttons {
     flex-direction: column;
@@ -283,9 +446,54 @@
   .role-navbar-btn {
     width: 100%;
     justify-content: center;
+    padding: 0.8rem;
   }
 
   .role-container {
     padding-top: 200px;
+  }
+
+  .carousel-container {
+    aspect-ratio: 2.5 / 2;
+    max-width: 100%;
+  }
+
+  .carousel-dots {
+    bottom: 10px;
+    gap: 8px;
+  }
+
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .logo {
+    width: 80px;
+  }
+
+  .role-container h1 {
+    font-size: 1.6rem;
+  }
+
+  .role-container h2 {
+    font-size: 1.4rem;
+  }
+
+  .role-container h3 {
+    font-size: 1.1rem;
+  }
+
+  .role-container p {
+    font-size: 0.9rem;
+  }
+
+  .role-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .role-cards-container {
+    padding: 1rem;
+    margin: 1rem;
   }
 }
