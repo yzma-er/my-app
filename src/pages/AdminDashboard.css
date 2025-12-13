@@ -10,7 +10,7 @@
 /* ========= Sidebar ========= */
 .sidebar {
   width: 260px;
-  background-color: black;
+  background-color: #57C84D;
   padding: 20px;
   display: flex;
   flex-direction: column;
