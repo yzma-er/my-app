@@ -6,7 +6,7 @@ import './RoleSelectionPage.css';
 import StepRatingsModal from "../components/StepRatingsModal";
 
 // Import your NavBar CSS 
-import './NavBar.css'; // 
+import NavBar from "../components/NavBar";
 
 function RoleSelectionPage() {
   const navigate = useNavigate();
