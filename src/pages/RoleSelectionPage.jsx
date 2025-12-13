@@ -1,5 +1,5 @@
 // src/pages/RoleSelectionPage.jsx
-import React, { useState, useEffect, useCallback, useRef } from 'react'; // Added useRef
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './RoleSelectionPage.css';
@@ -21,8 +21,9 @@ function RoleSelectionPage() {
   const [selectedService, setSelectedService] = useState(null);
   const [stepRatings, setStepRatings] = useState([]);
 
-  // ⭐ HORIZONTAL SCROLL REF
+  // ⭐ REFS
   const scrollContainerRef = useRef(null);
+  const ratingsContainerRef = useRef(null);
 
   const backendURL =
     window.location.hostname === "localhost"
@@ -62,6 +63,20 @@ function RoleSelectionPage() {
     const pollingInterval = setInterval(() => fetchData(), 10000);
     return () => clearInterval(pollingInterval);
   }, [fetchData]);
+
+  // ⭐ AUTO-SCROLL TO RATINGS WHEN SHOWN
+  useEffect(() => {
+    if (showRatings && ratingsContainerRef.current) {
+      // Wait a moment for the ratings to render
+      setTimeout(() => {
+        ratingsContainerRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start', // Align to top of viewport
+          inline: 'nearest'
+        });
+      }, 100);
+    }
+  }, [showRatings]);
 
   // ⭐ CAROUSEL AUTO-SLIDE
   useEffect(() => {
@@ -116,6 +131,22 @@ function RoleSelectionPage() {
     }
   };
 
+  // ⭐ TOGGLE RATINGS WITH SCROLL
+  const toggleRatingsWithScroll = () => {
+    const willShowRatings = !showRatings;
+    setShowRatings(willShowRatings);
+    
+    // If we're showing ratings, the useEffect will handle scrolling
+    // If we're hiding ratings, scroll back to top
+    if (!willShowRatings && ratingsContainerRef.current) {
+      // Scroll to top of page when hiding ratings
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <div className="role-container">
       {/* ⭐ NAVBAR */}
@@ -143,7 +174,7 @@ function RoleSelectionPage() {
           
           <button 
             className="role-navbar-btn ratings-btn"
-            onClick={() => setShowRatings(prev => !prev)}
+            onClick={toggleRatingsWithScroll}
           >
             <i className="fas fa-star"></i>
             {showRatings ? 'Hide Service Ratings' : 'View Service Ratings'}
@@ -152,63 +183,65 @@ function RoleSelectionPage() {
       </nav>
 
       {/* ⭐ SERVICE RATINGS - ABOVE CAROUSEL */}
-      {showRatings && (
-        <div className="ratings-container">
-          <h2 className="ratings-title">
-            <i className="fas fa-chart-bar"></i>
-            Service Ratings
-          </h2>
-          
-          {isLoading ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p>Loading service ratings...</p>
-            </div>
-          ) : serviceSummary.length > 0 ? (
-            <div className="horizontal-scroll-container">
-              <button className="scroll-btn left" onClick={scrollLeft}>
-                <i className="fas fa-chevron-left"></i>
-              </button>
-              
-              <div 
-                className="horizontal-scroll-wrapper"
-                ref={scrollContainerRef}
-              >
-                {serviceSummary.map((s) => (
-                  <div
-                    key={s.service_id}
-                    className="role-card"
-                    onClick={() => openRatingsModal(s)}
-                  >
-                    <div className="role-card-header">
-                      <h3>{s.name}</h3>
-                      <div className="role-card-rating">
-                        <i className="fas fa-star"></i>
-                        <span className="rating-value">{s.avg}</span>
-                        <span className="rating-count">({s.count})</span>
+      <div ref={ratingsContainerRef}>
+        {showRatings && (
+          <div className="ratings-container">
+            <h2 className="ratings-title">
+              <i className="fas fa-chart-bar"></i>
+              Service Ratings
+            </h2>
+            
+            {isLoading ? (
+              <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p>Loading service ratings...</p>
+              </div>
+            ) : serviceSummary.length > 0 ? (
+              <div className="horizontal-scroll-container">
+                <button className="scroll-btn left" onClick={scrollLeft}>
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+                
+                <div 
+                  className="horizontal-scroll-wrapper"
+                  ref={scrollContainerRef}
+                >
+                  {serviceSummary.map((s) => (
+                    <div
+                      key={s.service_id}
+                      className="role-card"
+                      onClick={() => openRatingsModal(s)}
+                    >
+                      <div className="role-card-header">
+                        <h3>{s.name}</h3>
+                        <div className="role-card-rating">
+                          <i className="fas fa-star"></i>
+                          <span className="rating-value">{s.avg}</span>
+                          <span className="rating-count">({s.count})</span>
+                        </div>
+                      </div>
+                      <div className="role-card-actions">
+                        <button className="view-details-btn">
+                          View Details <i className="fas fa-chevron-right"></i>
+                        </button>
                       </div>
                     </div>
-                    <div className="role-card-actions">
-                      <button className="view-details-btn">
-                        View Details <i className="fas fa-chevron-right"></i>
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                
+                <button className="scroll-btn right" onClick={scrollRight}>
+                  <i className="fas fa-chevron-right"></i>
+                </button>
               </div>
-              
-              <button className="scroll-btn right" onClick={scrollRight}>
-                <i className="fas fa-chevron-right"></i>
-              </button>
-            </div>
-          ) : (
-            <div className="no-services">
-              <i className="fas fa-info-circle"></i>
-              <p>No services found or unable to load ratings.</p>
-            </div>
-          )}
-        </div>
-      )}
+            ) : (
+              <div className="no-services">
+                <i className="fas fa-info-circle"></i>
+                <p>No services found or unable to load ratings.</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* ⭐ CAROUSEL WITH DOTS */}
       <div className="carousel-container">
