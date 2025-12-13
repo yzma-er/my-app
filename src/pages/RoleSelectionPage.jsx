@@ -5,10 +5,15 @@ import axios from 'axios';
 import './RoleSelectionPage.css';
 import StepRatingsModal from "../components/StepRatingsModal";
 
+
 // Import your NavBar CSS 
 import NavBar from "../components/NavBar";
 
 function RoleSelectionPage() {
+
+  
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
   const images = ['/carousel1.jpg', '/carousel2.jpg', '/carousel3.jpg', '/carousel4.jpg'];
 
@@ -18,6 +23,7 @@ function RoleSelectionPage() {
   const [feedback, setFeedback] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
+  
 
   // ⭐ MODAL STATES
   const [modalOpen, setModalOpen] = useState(false);
@@ -37,6 +43,79 @@ function RoleSelectionPage() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+
+
+  const scrollLeft = () => {
+  if (scrollContainerRef.current) {
+    scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+  }
+};
+
+const scrollRight = () => {
+  if (scrollContainerRef.current) {
+    scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+  }
+};
+
+// Update the JSX for ratings section:
+{showRatings && (
+  <div className="ratings-container">
+    <h2 className="ratings-title">
+      <i className="fas fa-chart-bar"></i>
+      Service Ratings
+    </h2>
+    
+    {isLoading ? (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading service ratings...</p>
+      </div>
+    ) : serviceSummary.length > 0 ? (
+      <div className="horizontal-scroll-container">
+        <button className="scroll-btn left" onClick={scrollLeft}>
+          <i className="fas fa-chevron-left"></i>
+        </button>
+        
+        <div 
+          className="horizontal-scroll-wrapper"
+          ref={scrollContainerRef}
+        >
+          {serviceSummary.map((s) => (
+            <div
+              key={s.service_id}
+              className="role-card"
+              onClick={() => openRatingsModal(s)}
+            >
+              <div className="role-card-header">
+                <h3>{s.name}</h3>
+                <div className="role-card-rating">
+                  <i className="fas fa-star"></i>
+                  <span className="rating-value">{s.avg}</span>
+                  <span className="rating-count">({s.count})</span>
+                </div>
+              </div>
+              <div className="role-card-actions">
+                <button className="view-details-btn">
+                  View Details <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <button className="scroll-btn right" onClick={scrollRight}>
+          <i className="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    ) : (
+      <div className="no-services">
+        <i className="fas fa-info-circle"></i>
+        <p>No services found or unable to load ratings.</p>
+      </div>
+    )}
+  </div>
+)}
 
   // ⭐ FETCH SERVICES + FEEDBACK
   const fetchData = useCallback(async () => {
