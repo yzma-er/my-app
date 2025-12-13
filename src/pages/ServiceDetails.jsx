@@ -175,6 +175,7 @@ function ServiceDetails() {
         const res = await axios.put(`${backendURL}/api/feedback/${existingFeedback.feedback_id}`, {
           rating,
           comment: comment.trim(),
+          user_id: userId
         });
 
         console.log("✅ Update response:", res.data);
