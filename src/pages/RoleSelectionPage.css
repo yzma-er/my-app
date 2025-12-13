@@ -1,282 +1,291 @@
-
-/* Main container: center everything */
-.role-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  text-align: center;
-  color: #104C08;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-/* Carousel container: wide but not too tall */
-.carousel-container {
-  width: 100%;
-  max-width: 1200px;
-  aspect-ratio: 3 / 1;
-  margin-bottom: 20px;
-  overflow: hidden;
-  position: relative;
-  border-radius: 10px;
-}
-
-/* Slide track */
-.carousel-track {
-  display: flex;
-  height: 100%;
-  transition: transform 0.5s ease-in-out;
-}
-
-/* Each image */
-.carousel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-/* CAROUSEL DOTS */
-.carousel-dots {
-  position: absolute;
-  bottom: 20px;
+/* RoleSelectionNavbar.css */
+.role-navbar {
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  z-index: 10;
-}
-
-.carousel-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid white;
-  background-color: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  padding: 0;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
-.carousel-dot:hover {
-  background-color: rgba(255, 255, 255, 0.6);
-  transform: scale(1.2);
+.role-navbar.scrolled {
+  padding: 0.75rem 2rem;
+  background: rgba(102, 126, 234, 0.95);
+  backdrop-filter: blur(10px);
 }
 
-.carousel-dot.active {
-  background-color: white;
-  border-color: white;
-  transform: scale(1.3);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-}
-
-/* Logo */
-.logo {
-  width: 120px;
-  height: auto;
-  margin: 20px 0;
-}
-
-/* Headings */
-.role-container h2 {
-  font-size: 1.8rem;
-  margin-bottom: 5px;
-}
-
-.role-container h3 {
-  font-size: 1.4rem;
-  margin-bottom: 5px;
-  color: #104C08;
-}
-
-.role-container p {
-  font-size: 1rem;
-  margin-bottom: 30px;
-  color: #333;
-}
-
-/* Buttons */
-.button-group {
+.role-navbar-left {
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 30px;
+  align-items: center;
 }
 
-.button-group button {
-  background-color: #104C08;
-  color: white;
-  padding: 12px 28px;
+.role-navbar-logo {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(45deg, #fff, #e0e7ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.role-navbar-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.role-navbar-btn {
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 30px;
-  font-size: 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  width: 200px;
-  transition: background-color 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.button-group button:hover {
-  background-color: #1C7C0F;
-  transform: scale(1.05);
+.role-navbar-btn i {
+  font-size: 1.1rem;
 }
 
-/* Card container for multiple services/roles */
+.role-navbar-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.role-navbar-btn:active {
+  transform: translateY(0);
+}
+
+.admin-btn {
+  background: linear-gradient(135deg, #f56565 0%, #ed64a6 100%);
+  color: white;
+}
+
+.user-btn {
+  background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+  color: white;
+}
+
+.ratings-btn {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+}
+
+/* Add padding to account for fixed navbar */
+.role-container {
+  padding-top: 80px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f7fafc 0%, #edf2f7 100%);
+}
+
+/* Welcome message styling */
+.welcome-subtitle {
+  color: #4a5568;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+/* Ratings container styling */
+.role-cards-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.ratings-title {
+  text-align: center;
+  color: #2d3748;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.ratings-title i {
+  color: #667eea;
+}
+
 .role-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 15px;
-  width: 100%;
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 0 10px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
-/* Individual service/role card */
 .role-card {
-  background: #f7f7f7;
-  border: 3px solid #104C08;
-  border-radius: 10px;
-  padding: 15px;
-  text-align: center;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100px;
+  border: 1px solid #e2e8f0;
 }
 
 .role-card:hover {
-  background: #eaf4ea;
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.role-card-header {
+  margin-bottom: 1rem;
 }
 
 .role-card h3 {
-  margin: 0 0 5px;
-  color: #104C08;
-  font-size: 18px;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
 }
 
-.role-card p {
-  margin: 0;
-  color: #555;
-  font-size: 14px;
-  line-height: 1.2;
-  text-align: center;
+.role-card-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4a5568;
 }
 
-/* Ratings toggle button */
-.ratings-toggle-btn {
-  background-color: #104C08;
+.role-card-rating i {
+  color: #f6ad55;
+}
+
+.rating-value {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 1.1rem;
+}
+
+.rating-count {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.role-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.view-details-btn {
+  background: #667eea;
   color: white;
-  padding: 12px 28px;
   border: none;
-  border-radius: 30px;
-  font-size: 16px;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
   cursor: pointer;
-  width: 280px;
-  transition: background-color 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.3s ease;
 }
 
-.ratings-toggle-btn:hover {
-  background-color: #1C7C0F;
-  transform: scale(1.05);
+.view-details-btn:hover {
+  background: #5a67d8;
 }
 
-/* Responsive adjustments */
+/* Loading spinner */
+.loading-container {
+  text-align: center;
+  padding: 3rem;
+}
 
-/* Tablet */
+.loading-spinner {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* No services message */
+.no-services {
+  text-align: center;
+  padding: 3rem;
+  color: #718096;
+  background: white;
+  border-radius: 12px;
+  margin: 2rem auto;
+  max-width: 600px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.no-services i {
+  font-size: 3rem;
+  color: #cbd5e0;
+  margin-bottom: 1rem;
+}
+
+/* Footer */
+.role-footer {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+  font-size: 0.9rem;
+  background: white;
+  margin-top: 3rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Responsive design */
 @media (max-width: 768px) {
-  .carousel-container {
-    max-width: 95%;
-    aspect-ratio: 3 / 1;
-  }
-
-  .carousel-dots {
-    bottom: 15px;
-    gap: 10px;
-  }
-
-  .carousel-dot {
-    width: 10px;
-    height: 10px;
-  }
-
-  .logo {
-    width: 100px;
-  }
-
-  .role-container h2 {
-    font-size: 1.6rem;
-  }
-
-  .role-container h3 {
-    font-size: 1.2rem;
-  }
-
-  .button-group {
+  .role-navbar {
     flex-direction: column;
-    width: 80%;
+    padding: 1rem;
+    gap: 1rem;
   }
 
-  .button-group button {
+  .role-navbar-buttons {
     width: 100%;
-    font-size: 15px;
-    padding: 10px 0;
-  }
-}
-
-/* Mobile */
-@media (max-width: 480px) {
-  .carousel-container {
-    aspect-ratio: 2.5 / 2;
-    max-width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
-  .carousel-dots {
-    bottom: 10px;
-    gap: 8px;
-  }
-
-  .carousel-dot {
-    width: 8px;
-    height: 8px;
-  }
-
-  .logo {
-    width: 80px;
-  }
-
-  .role-container h2 {
-    font-size: 1.4rem;
-  }
-
-  .role-container h3 {
-    font-size: 1.1rem;
-  }
-
-  .role-container p {
+  .role-navbar-btn {
+    padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
 
-  .button-group button {
-    width: 100%;
-    font-size: 14px;
-    background: #104C08;
-    padding: 15px;
-    border-radius: 10px;
-    border: 3px solid #104C08;
+  .role-container {
+    padding-top: 140px;
   }
 
-  .ratings-toggle-btn {
-    width: 90%;
-    padding: 10px 20px;
-    font-size: 14px;
+  .role-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .role-navbar-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .role-navbar-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .role-container {
+    padding-top: 200px;
   }
 }
