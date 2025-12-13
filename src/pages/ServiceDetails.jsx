@@ -10,8 +10,6 @@ function ServiceDetails() {
   const [userRatings, setUserRatings] = useState({}); // Store ratings for each step
   const [userComments, setUserComments] = useState({}); // Store comments for each step
   const [stepFeedbacks, setStepFeedbacks] = useState({}); // Store all feedback for each step
-  const [overallRating, setOverallRating] = useState(0);
-  const [overallFeedback, setOverallFeedback] = useState("");
   const [showRatings, setShowRatings] = useState(false);
   const navigate = useNavigate();
 
@@ -116,42 +114,6 @@ function ServiceDetails() {
     } catch (err) {
       console.error("❌ Error submitting feedback:", err);
       alert("Failed to submit feedback.");
-    }
-  };
-
-  const handleOverallRatingSubmit = async () => {
-    if (overallRating === 0) {
-      alert("Please select an overall star rating before submitting.");
-      return;
-    }
-
-    try {
-      const user_id = getUserId();
-      
-      const res = await axios.post(`${backendURL}/api/feedback`, {
-        service_id: service?.service_id,
-        service_name: service?.name || null,
-        step_number: 0, // 0 indicates overall service rating
-        rating: overallRating,
-        comment: overallFeedback,
-        user_id: user_id
-      });
-
-      if (res.data.updated) {
-        alert("✅ Overall rating updated successfully!");
-      } else {
-        alert("✅ Overall feedback submitted successfully!");
-      }
-      
-      setOverallRating(0);
-      setOverallFeedback("");
-      
-      // Refresh feedback data
-      fetchStepFeedbacks();
-      
-    } catch (err) {
-      console.error("❌ Error submitting overall feedback:", err);
-      alert("Failed to submit overall feedback.");
     }
   };
 
@@ -276,43 +238,209 @@ function ServiceDetails() {
         { width: "100%" }
       )}
 
+      {/* Service Rating Summary at Top */}
+      <div style={{ 
+        margin: "20px 0", 
+        padding: "20px", 
+        background: "linear-gradient(135deg, #eaf4ea 0%, #d4eed4 100%)",
+        borderRadius: "12px",
+        width: "100%",
+        textAlign: "center",
+        border: "1px solid #bde3b2"
+      }}>
+        <h3 style={{ color: "#1C7C0F", marginBottom: "10px" }}>
+          <i className="fas fa-star"></i> Service Rating Summary
+        </h3>
+        <div style={{ fontSize: "18px", fontWeight: "bold", color: "#104C08" }}>
+          Overall Average: ⭐ {calculateOverallAverageRating()}/5
+        </div>
+        <div style={{ marginTop: "15px", display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "15px" }}>
+          {steps.map((_, index) => {
+            const stepNum = index + 1;
+            const avg = calculateStepAverageRating(stepNum);
+            return (
+              <div key={stepNum} style={{
+                background: "white",
+                padding: "8px 15px",
+                borderRadius: "20px",
+                border: "1px solid #1C7C0F",
+                fontSize: "14px",
+                fontWeight: "bold"
+              }}>
+                Step {stepNum}: ⭐ {avg}/5
+              </div>
+            );
+          })}
+        </div>
+        
+        <button
+          onClick={() => setShowRatings(!showRatings)}
+          style={{
+            marginTop: "15px",
+            background: "transparent",
+            color: "#1C7C0F",
+            border: "2px solid #1C7C0F",
+            borderRadius: "25px",
+            padding: "8px 20px",
+            cursor: "pointer",
+            fontWeight: "bold",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px"
+          }}
+        >
+          {showRatings ? 'Hide All Ratings' : 'View All Ratings'}
+          <i className={`fas fa-chevron-${showRatings ? 'up' : 'down'}`}></i>
+        </button>
+      </div>
+
+      {/* Show all ratings when toggled */}
+      {showRatings && (
+        <div style={{ 
+          margin: "20px 0", 
+          background: "white", 
+          padding: "20px", 
+          borderRadius: "10px",
+          border: "2px solid #bde3b2",
+          width: "100%"
+        }}>
+          <h3 style={{ color: "#1C7C0F", marginBottom: "15px", textAlign: "center" }}>
+            <i className="fas fa-chart-bar"></i> All Step Ratings
+          </h3>
+          {Object.entries(stepFeedbacks).map(([stepNum, feedbacks]) => (
+            <div key={stepNum} style={{ marginBottom: "20px" }}>
+              <h4 style={{ 
+                color: "#104C08", 
+                paddingBottom: "8px",
+                borderBottom: "2px solid #eaf4ea"
+              }}>
+                Step {stepNum}: ⭐ {calculateStepAverageRating(stepNum)}/5 ({feedbacks.length} ratings)
+              </h4>
+              <div style={{ 
+                maxHeight: "150px", 
+                overflowY: "auto", 
+                padding: "10px", 
+                background: "#f8f9fa", 
+                borderRadius: "8px",
+                marginTop: "10px"
+              }}>
+                {feedbacks.map((fb, idx) => (
+                  <div key={idx} style={{ 
+                    padding: "8px 0", 
+                    borderBottom: "1px solid #e9ecef",
+                    fontSize: "14px"
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <div style={{ 
+                        background: "#1C7C0F", 
+                        color: "white", 
+                        width: "30px", 
+                        height: "30px",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold"
+                      }}>
+                        {fb.rating}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        {fb.comment && (
+                          <div style={{ color: "#495057" }}>"{fb.comment}"</div>
+                        )}
+                        <div style={{ fontSize: "12px", color: "#6c757d", marginTop: "3px" }}>
+                          {new Date(fb.created_at).toLocaleDateString()} • {new Date(fb.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* SHOW ALL STEPS - NO UNLOCKING */}
       <div className="all-steps-container">
+        <h2 style={{ 
+          color: "#1C7C0F", 
+          margin: "30px 0 20px 0", 
+          textAlign: "center",
+          borderBottom: "2px solid #bde3b2",
+          paddingBottom: "10px"
+        }}>
+          <i className="fas fa-list-ol"></i> Service Steps
+        </h2>
+        
         {steps.map((step, index) => {
           const stepNum = index + 1;
           const stepAverageRating = calculateStepAverageRating(stepNum);
           const stepFeedbacksList = stepFeedbacks[stepNum] || [];
 
           return (
-            <div key={index} className="info-section" style={{ marginBottom: "25px", width: "100%" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
-                <h3 style={{ color: "#1C7C0F", margin: 0 }}>
-                  Step {stepNum}: {step.customName ? `${step.title} - ${step.customName}` : step.title}
+            <div key={index} className="info-section" style={{ 
+              marginBottom: "30px", 
+              width: "100%",
+              padding: "20px",
+              background: "white",
+              borderRadius: "12px",
+              border: "1px solid #e0e0e0",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
+            }}>
+              <div style={{ 
+                display: "flex", 
+                justifyContent: "space-between", 
+                alignItems: "center", 
+                marginBottom: "15px",
+                flexWrap: "wrap",
+                gap: "10px"
+              }}>
+                <h3 style={{ color: "#1C7C0F", margin: 0, fontSize: "1.3rem" }}>
+                  <span style={{
+                    background: "#1C7C0F",
+                    color: "white",
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginRight: "10px",
+                    fontSize: "14px"
+                  }}>
+                    {stepNum}
+                  </span>
+                  {step.customName ? `${step.title} - ${step.customName}` : step.title}
                 </h3>
                 <div style={{ 
                   background: "#eaf4ea", 
-                  padding: "5px 10px", 
+                  padding: "6px 12px", 
                   borderRadius: "15px",
                   fontSize: "14px",
                   fontWeight: "bold",
-                  color: "#1C7C0F"
+                  color: "#1C7C0F",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px"
                 }}>
-                  ⭐ Avg: {stepAverageRating} ({stepFeedbacksList.length} ratings)
+                  <i className="fas fa-star"></i>
+                  Avg: {stepAverageRating} ({stepFeedbacksList.length})
                 </div>
               </div>
               
               {step.videoFile && (
                 <div style={{ 
-                  marginTop: "12px", 
-                  marginBottom: "15px",
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center"
+                  marginTop: "15px", 
+                  marginBottom: "20px",
+                  width: "100%"
                 }}>
                   <div style={{
                     width: "100%",
-                    maxWidth: "100%",
-                    position: "relative"
+                    position: "relative",
+                    borderRadius: "10px",
+                    overflow: "hidden",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
                   }}>
                     <video 
                       controls 
@@ -335,102 +463,130 @@ function ServiceDetails() {
               {renderWithBold(
                 step.content,
                 "",
-                { whiteSpace: "pre-line", marginBottom: "15px" }
+                { 
+                  whiteSpace: "pre-line", 
+                  marginBottom: "20px",
+                  lineHeight: "1.6",
+                  fontSize: "16px"
+                }
               )}
 
               {step.formFile && (
-                <div style={{ marginTop: "10px", marginBottom: "20px" }}>
+                <div style={{ 
+                  marginTop: "10px", 
+                  marginBottom: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  flexWrap: "wrap"
+                }}>
                   <a
                     href={step.formFile}
                     target="_blank"
                     rel="noopener noreferrer"
                     download={step.originalFormName || "form"}
                     style={{
-                      display: "inline-block",
+                      display: "inline-flex",
+                      alignItems: "center",
                       background: "#1C7C0F",
                       color: "white",
-                      padding: "8px 14px",
+                      padding: "8px 16px",
                       borderRadius: "25px",
                       textDecoration: "none",
                       fontWeight: "bold",
+                      gap: "8px",
+                      transition: "all 0.3s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#104C08";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#1C7C0F";
+                      e.currentTarget.style.transform = "translateY(0)";
                     }}
                   >
-                    📄 Download Form
+                    <i className="fas fa-download"></i>
+                    Download Form
                   </a>
+                  <span style={{ fontSize: "14px", color: "#666" }}>
+                    {step.originalFormName && `(${step.originalFormName})`}
+                  </span>
                 </div>
               )}
 
               {/* Rate this step section */}
-              <div className="feedback-section" style={{ marginTop: "20px" }}>
-                <h4>Rate this step:</h4>
+              <div className="feedback-section" style={{ 
+                marginTop: "25px", 
+                padding: "20px",
+                background: "#f8fff8",
+                borderRadius: "10px",
+                border: "1px solid #bde3b2"
+              }}>
+                <h4 style={{ color: "#1C7C0F", marginBottom: "15px", textAlign: "center" }}>
+                  <i className="fas fa-edit"></i> Rate This Step
+                </h4>
 
-                <div className="star-rating">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <span
-                      key={star}
-                      className={`star ${star <= (userRatings[stepNum] || 0) ? "active" : ""}`}
-                      onClick={() => setUserRatings(prev => ({ ...prev, [stepNum]: star }))}
-                    >
-                      ★
-                    </span>
-                  ))}
+                <div style={{ textAlign: "center", marginBottom: "15px" }}>
+                  <div className="star-rating">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`star ${star <= (userRatings[stepNum] || 0) ? "active" : ""}`}
+                        onClick={() => setUserRatings(prev => ({ ...prev, [stepNum]: star }))}
+                        style={{ fontSize: "2.2rem", margin: "0 5px" }}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: "8px", fontSize: "14px", color: "#666" }}>
+                    {userRatings[stepNum] ? `Selected: ${userRatings[stepNum]}/5` : "Click stars to rate"}
+                  </div>
                 </div>
 
                 <textarea
-                  placeholder={`Write your feedback for Step ${stepNum} (optional)...`}
+                  placeholder={`Your feedback for Step ${stepNum} (optional)...`}
                   value={userComments[stepNum] || ""}
                   onChange={(e) => setUserComments(prev => ({ ...prev, [stepNum]: e.target.value }))}
-                  style={{ marginTop: "10px" }}
+                  style={{ 
+                    marginTop: "10px", 
+                    width: "100%",
+                    minHeight: "80px",
+                    border: "1px solid #bde3b2",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    fontSize: "15px",
+                    resize: "vertical"
+                  }}
                 />
 
                 <button 
                   className="feedback-btn" 
                   onClick={() => handleStepRatingSubmit(stepNum)}
-                  style={{ marginTop: "10px" }}
+                  style={{ 
+                    marginTop: "15px",
+                    width: "100%",
+                    background: userRatings[stepNum] ? "#1C7C0F" : "#ccc",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "25px",
+                    padding: "12px",
+                    cursor: userRatings[stepNum] ? "pointer" : "not-allowed",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                    transition: "all 0.3s ease"
+                  }}
+                  disabled={!userRatings[stepNum]}
                 >
-                  Submit Rating for Step {stepNum}
+                  <i className="fas fa-paper-plane"></i> Submit Rating for Step {stepNum}
                 </button>
               </div>
-
-              {/* Show previous feedbacks for this step */}
-              {stepFeedbacksList.length > 0 && (
-                <div style={{ 
-                  marginTop: "20px", 
-                  background: "#f8f9fa", 
-                  padding: "15px", 
-                  borderRadius: "10px",
-                  border: "1px solid #dee2e6"
-                }}>
-                  <h5 style={{ color: "#6c757d", marginBottom: "10px" }}>
-                    Previous ratings for this step ({stepFeedbacksList.length}):
-                  </h5>
-                  <div style={{ maxHeight: "150px", overflowY: "auto" }}>
-                    {stepFeedbacksList.map((fb, idx) => (
-                      <div key={idx} style={{ 
-                        padding: "8px", 
-                        borderBottom: "1px solid #e9ecef",
-                        fontSize: "14px"
-                      }}>
-                        <div>
-                          <span style={{ color: "#1C7C0F", fontWeight: "bold" }}>⭐ {fb.rating}/5</span>
-                          {fb.comment && (
-                            <span style={{ marginLeft: "10px", color: "#495057" }}>"{fb.comment}"</span>
-                          )}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d", marginTop: "3px" }}>
-                          {new Date(fb.created_at).toLocaleDateString()}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}
       </div>
-
-      
+    </div>
   );
 }
 
