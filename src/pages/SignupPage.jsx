@@ -1,15 +1,15 @@
-/// SignupPage.jsx - Complete EmailJS Version
+// SignupPage.jsx - EMAILJS ONLY (No OTP logging)
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import API_BASE_URL from "../config";
-import emailjs from '@emailjs/browser'; // Import EmailJS
+import emailjs from '@emailjs/browser';
 
 // Your EmailJS credentials
 const EMAILJS_CONFIG = {
-  SERVICE_ID: 'service_kku64qi', 
-  TEMPLATE_ID: 'template_4sgjelo', 
-  PUBLIC_KEY: 'wyYCTD154FjbgcZZg' 
+  SERVICE_ID: 'service_kku64qi',
+  TEMPLATE_ID: 'template_4sgjelo',
+  PUBLIC_KEY: 'wyYCTD154FjbgcZZg'
 };
 
 function SignupPage() {
@@ -22,12 +22,15 @@ function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(3);
-  const [lastOtp, setLastOtp] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-
+  
   const navigate = useNavigate();
+
+  // Initialize EmailJS
+  useEffect(() => {
+    emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+  }, []);
 
   // Timer for OTP expiration
   useEffect(() => {
@@ -46,7 +49,7 @@ function SignupPage() {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Step 1: Send OTP - UPDATED WITH EMAILJS
+  // Step 1: Send OTP via EmailJS ONLY
   const handleSendOTP = async (e) => {
     e?.preventDefault();
     setIsLoading(true);
@@ -68,54 +71,59 @@ function SignupPage() {
     try {
       // Generate OTP locally
       const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      setLastOtp(generatedOTP);
 
-      // Store OTP in backend (your existing system)
+      // 1. Store OTP in backend first
       const storeRes = await fetch(`${API_BASE_URL}/api/auth/store-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: generatedOTP })
       });
 
-      // Try to send email via EmailJS
-      try {
-        await emailjs.send(
-          EMAILJS_CONFIG.SERVICE_ID,
-          EMAILJS_CONFIG.TEMPLATE_ID,
-          {
-            to_email: email,
-            to_name: email.split('@')[0],
-            otp_code: generatedOTP,
-            expiration_time: "10 minutes",
-            app_name: "Digital Guidance",
-            current_year: new Date().getFullYear()
-          },
-          EMAILJS_CONFIG.PUBLIC_KEY
-        );
-
-        alert("✅ Verification code sent to your email!");
-        
-      } catch (emailError) {
-        console.log("EmailJS failed, showing OTP:", emailError);
-        // Fallback: Show OTP to user
-        alert(`📱 Your verification code: ${generatedOTP}\n\n(Email service temporary unavailable)`);
+      const storeData = await storeRes.json();
+      
+      if (!storeRes.ok) {
+        throw new Error(storeData.message || "Failed to process OTP request");
       }
 
+      // 2. Send email via EmailJS
+      const emailResult = await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        {
+          to_email: email,
+          to_name: email.split('@')[0],
+          otp_code: generatedOTP,
+          expiration_time: "10 minutes",
+          app_name: "Digital Guidance",
+          current_year: new Date().getFullYear()
+        }
+      );
+
+      console.log("✅ Email sent successfully:", emailResult);
+      
       // Move to verification step
       setStep(2);
       setTimer(600); // 10 minutes
       setResendDisabled(true);
       setTimeout(() => setResendDisabled(false), 60000);
-
+      
+      alert("✅ Verification code has been sent to your email!");
+      
     } catch (err) {
-      console.error("OTP request error:", err);
-      alert("An error occurred. Try again later.");
+      console.error("OTP sending error:", err);
+      
+      // If EmailJS fails, show error (NO OTP DISPLAY)
+      if (err.text?.includes("emailjs")) {
+        alert("❌ Failed to send verification email. Please check your email address and try again.");
+      } else {
+        alert("❌ " + (err.message || "Failed to send verification code. Please try again."));
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Step 2: Verify OTP - KEEP EXISTING
+  // Step 2: Verify OTP
   const handleVerifyOTP = async (e) => {
     e?.preventDefault();
     setIsLoading(true);
@@ -142,22 +150,22 @@ function SignupPage() {
         if (data.attemptsLeft !== undefined) {
           setAttemptsLeft(data.attemptsLeft);
           if (data.attemptsLeft <= 0) {
-            alert("Too many failed attempts. Please request a new OTP.");
+            alert("❌ Too many failed attempts. Please request a new OTP.");
             setStep(1);
             setOtp("");
           }
         }
-        alert(data.message || "Invalid OTP.");
+        alert(data.message || "❌ Invalid verification code.");
       }
     } catch (err) {
       console.error("OTP verification error:", err);
-      alert("An error occurred. Try again later.");
+      alert("❌ An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Step 3: Complete signup - KEEP EXISTING
+  // Step 3: Complete signup
   const handleSignup = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -200,24 +208,18 @@ function SignupPage() {
       }
     } catch (err) {
       console.error("Signup error:", err);
-      alert("An error occurred. Try again later.");
+      alert("❌ An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Resend OTP - UPDATED
+  // Resend OTP
   const handleResendOTP = async () => {
     if (resendDisabled) return;
     setResendDisabled(true);
     await handleSendOTP();
     setTimeout(() => setResendDisabled(false), 60000);
-  };
-
-  // Quick copy OTP button
-  const handleCopyOTP = () => {
-    navigator.clipboard.writeText(lastOtp || otp);
-    alert("OTP copied to clipboard!");
   };
 
   return (
@@ -258,42 +260,6 @@ function SignupPage() {
                 <p style={{ marginBottom: "15px" }}>
                   Enter the 6-digit code sent to <strong>{email}</strong>
                 </p>
-                
-                {/* Show OTP if available (fallback mode) */}
-                {lastOtp && (
-                  <div style={{
-                    background: "#f0f9ff",
-                    border: "1px dashed #93c5fd",
-                    borderRadius: "8px",
-                    padding: "15px",
-                    marginBottom: "15px"
-                  }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div>
-                        <p style={{ margin: 0, fontSize: "14px", color: "#1d4ed8" }}>
-                          <strong>Your code:</strong>
-                        </p>
-                        <p style={{ margin: "5px 0 0 0", fontSize: "20px", fontFamily: "monospace" }}>
-                          {lastOtp}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleCopyOTP}
-                        style={{
-                          background: "#3b82f6",
-                          color: "white",
-                          border: "none",
-                          padding: "8px 16px",
-                          borderRadius: "6px",
-                          cursor: "pointer"
-                        }}
-                      >
-                        Copy
-                      </button>
-                    </div>
-                  </div>
-                )}
                 
                 <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
                   Enter Verification Code
