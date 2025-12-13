@@ -108,6 +108,12 @@ function LoginPage() {
             </button>
           </form>
 
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+  <Link to="/forgot-password" style={{ color: "#2563eb", textDecoration: "none" }}>
+    Forgot Password?
+  </Link>
+</div>
+
           {role === "user" && (
             <p className="signup-link">
               New user? <Link to="/signup">Sign Up</Link>
