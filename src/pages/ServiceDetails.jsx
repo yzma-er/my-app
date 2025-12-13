@@ -1,4 +1,4 @@
-// src/pages/ServiceDetails.jsx - COMPLETE WITH ALL CONTENT
+// src/pages/ServiceDetails.jsx - FIXED VERSION
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import "./Services.css";
@@ -7,11 +7,11 @@ import { useNavigate } from "react-router-dom";
 function ServiceDetails() {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userRatings, setUserRatings] = useState({}); // Store ratings for each step
-  const [userComments, setUserComments] = useState({}); // Store comments for each step
-  const [stepFeedbacks, setStepFeedbacks] = useState({}); // Store all feedback for each step
-  const [userHasRated, setUserHasRated] = useState({}); // Track if user has rated each step
-  const [errors, setErrors] = useState({}); // Store validation errors
+  const [userRatings, setUserRatings] = useState({});
+  const [userComments, setUserComments] = useState({});
+  const [stepFeedbacks, setStepFeedbacks] = useState({});
+  const [userHasRated, setUserHasRated] = useState({});
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const serviceId = window.location.pathname.split("/").pop();
@@ -54,15 +54,20 @@ function ServiceDetails() {
       const userId = getUserId();
       if (userId) {
         const hasRated = {};
+        const userRatingsObj = {};
+        const userCommentsObj = {};
+        
         res.data.forEach(feedback => {
           if (feedback.user_id === userId) {
             hasRated[feedback.step_number] = true;
-            // Pre-fill user's previous rating and comment
-            setUserRatings(prev => ({ ...prev, [feedback.step_number]: feedback.rating }));
-            setUserComments(prev => ({ ...prev, [feedback.step_number]: feedback.comment || "" }));
+            userRatingsObj[feedback.step_number] = feedback.rating;
+            userCommentsObj[feedback.step_number] = feedback.comment || "";
           }
         });
+        
         setUserHasRated(hasRated);
+        setUserRatings(prev => ({ ...prev, ...userRatingsObj }));
+        setUserComments(prev => ({ ...prev, ...userCommentsObj }));
       }
       
     } catch (err) {
@@ -102,21 +107,18 @@ function ServiceDetails() {
     // Clear previous error
     delete newErrors[stepNumber];
 
-    // Validate rating
     if (rating === 0) {
       newErrors[stepNumber] = "Please select a star rating.";
       setErrors(newErrors);
       return false;
     }
 
-    // Validate comment (required)
     if (!comment.trim()) {
       newErrors[stepNumber] = "Please write a comment explaining your rating.";
       setErrors(newErrors);
       return false;
     }
 
-    // Validate comment length
     if (comment.trim().length < 10) {
       newErrors[stepNumber] = "Please write a more detailed comment (at least 10 characters).";
       setErrors(newErrors);
@@ -137,6 +139,22 @@ function ServiceDetails() {
     const comment = userComments[stepNumber];
     const userId = getUserId();
 
+    // ✅ ADDED: Check if user is logged in
+    if (!userId) {
+      alert("Please log in to submit feedback.");
+      navigate("/login");
+      return;
+    }
+
+    console.log("📤 Submitting feedback:", {
+      stepNumber,
+      rating,
+      comment,
+      userId,
+      serviceId,
+      serviceName: service?.name
+    });
+
     try {
       // Check if user has already rated this step
       const checkRes = await axios.get(`${backendURL}/api/feedback/check`, {
@@ -147,19 +165,25 @@ function ServiceDetails() {
         }
       });
 
+      console.log("✅ Check response:", checkRes.data);
+
       const existingFeedback = checkRes.data.exists ? checkRes.data.feedback : null;
 
       if (existingFeedback) {
+        console.log("🔄 Updating existing feedback:", existingFeedback.feedback_id);
         // Update existing feedback
         const res = await axios.put(`${backendURL}/api/feedback/${existingFeedback.feedback_id}`, {
           rating,
           comment: comment.trim(),
         });
 
+        console.log("✅ Update response:", res.data);
+
         if (res.data.success) {
           alert(`✅ Rating updated for Step ${stepNumber}!`);
         }
       } else {
+        console.log("🆕 Creating new feedback...");
         // Create new feedback
         const res = await axios.post(`${backendURL}/api/feedback`, {
           service_id: service?.service_id,
@@ -169,6 +193,8 @@ function ServiceDetails() {
           comment: comment.trim(),
           user_id: userId
         });
+
+        console.log("✅ Create response:", res.data);
 
         if (res.data.success) {
           alert(`✅ Feedback submitted for Step ${stepNumber}!`);
@@ -183,11 +209,26 @@ function ServiceDetails() {
       
     } catch (err) {
       console.error("❌ Error submitting feedback:", err);
-      alert("Failed to submit feedback.");
+      
+      // ✅ IMPROVED: Better error messages
+      if (err.response) {
+        console.error("❌ Server response error:", {
+          status: err.response.status,
+          data: err.response.data,
+          headers: err.response.headers
+        });
+        alert(`Error ${err.response.status}: ${err.response.data?.message || "Failed to submit feedback."}`);
+      } else if (err.request) {
+        console.error("❌ No response received:", err.request);
+        alert("Cannot connect to server. Check your internet connection.");
+      } else {
+        console.error("❌ Request setup error:", err.message);
+        alert(`Request error: ${err.message}`);
+      }
     }
   };
 
-  // ✅ Helper function to parse bold text (**text** to <strong>text</strong>)
+  // ✅ Helper function to parse bold text
   const parseBoldText = (text) => {
     if (!text) return text;
     return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -242,7 +283,7 @@ function ServiceDetails() {
         {service.name}
       </h2>
 
-      {/* ✅ DESCRIPTION 1 with bold support - RESTORED */}
+      {/* ✅ DESCRIPTION 1 with bold support */}
       {service.description && renderWithBold(
         service.description,
         "service-description",
@@ -254,7 +295,7 @@ function ServiceDetails() {
         }
       )}
 
-      {/* SERVICE PHOTO DISPLAY - RESTORED */}
+      {/* SERVICE PHOTO DISPLAY */}
       {service.photo && (
         <div style={{ 
           width: "100%", 
@@ -285,7 +326,7 @@ function ServiceDetails() {
         </div>
       )}
 
-      {/* ✅ DESCRIPTION 2 with bold support - RESTORED */}
+      {/* ✅ DESCRIPTION 2 with bold support */}
       {service.description2 && renderWithBold(
         service.description2,
         "service-description2",
@@ -369,7 +410,7 @@ function ServiceDetails() {
                 )}
               </div>
               
-              {/* STEP VIDEO - RESTORED */}
+              {/* STEP VIDEO */}
               {step.videoFile && (
                 <div style={{ 
                   marginTop: "15px", 
@@ -400,7 +441,7 @@ function ServiceDetails() {
                 </div>
               )}
 
-              {/* ✅ STEP CONTENT with bold support - RESTORED */}
+              {/* ✅ STEP CONTENT with bold support */}
               {renderWithBold(
                 step.content,
                 "",
@@ -412,7 +453,7 @@ function ServiceDetails() {
                 }
               )}
 
-              {/* FORM DOWNLOAD - RESTORED */}
+              {/* FORM DOWNLOAD */}
               {step.formFile && (
                 <div style={{ 
                   marginTop: "10px", 
@@ -484,7 +525,6 @@ function ServiceDetails() {
                         className={`star ${star <= (userRatings[stepNum] || 0) ? "active" : ""}`}
                         onClick={() => {
                           setUserRatings(prev => ({ ...prev, [stepNum]: star }));
-                          // Clear error when rating is selected
                           if (errors[stepNum]) {
                             setErrors(prev => ({ ...prev, [stepNum]: undefined }));
                           }
@@ -523,7 +563,6 @@ function ServiceDetails() {
                       const value = e.target.value;
                       if (value.length <= 500) {
                         setUserComments(prev => ({ ...prev, [stepNum]: value }));
-                        // Clear error when user starts typing
                         if (errors[stepNum] && value.trim().length >= 10) {
                           setErrors(prev => ({ ...prev, [stepNum]: undefined }));
                         }
