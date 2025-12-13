@@ -89,7 +89,7 @@ function ForgotPasswordPage() {
             expiration_time: "15 minutes",
             app_name: "Digital Guidance",
             current_year: new Date().getFullYear(),
-            purpose: 'password_reset'
+           
           }
         );
 
