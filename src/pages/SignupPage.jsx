@@ -12,7 +12,7 @@ const EMAILJS_CONFIG = {
   PUBLIC_KEY: 'wyYCTD154FjbgcZZg' 
 };
 
-function SignupPage() 
+function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
