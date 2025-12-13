@@ -27,6 +27,8 @@ function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const navigate = useNavigate();
+
   // Timer for OTP expiration
   useEffect(() => {
     let interval;
