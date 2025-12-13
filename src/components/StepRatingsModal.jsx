@@ -1,10 +1,16 @@
+// src/components/StepRatingsModal.jsx - UPDATED VERSION
 import React from "react";
 import "./StepRatingsModal.css";
 
 function StepRatingsModal({ open, onClose, serviceName, stepRatings }) {
   if (!open) return null;
 
-  console.log("StepRatingsModal received:", stepRatings); // Debug log
+  console.log("StepRatingsModal received:", { 
+    serviceName, 
+    stepRatings,
+    firstStep: stepRatings[0],
+    hasCustomNames: stepRatings.some(step => step.custom_name)
+  });
 
   return (
     <div className="modal-overlay">
@@ -37,6 +43,15 @@ function StepRatingsModal({ open, onClose, serviceName, stepRatings }) {
                     <strong>Step {step.step_number}</strong>
                     {step.custom_name && (
                       <span className="custom-name">— {step.custom_name}</span>
+                    )}
+                    {!step.custom_name && (
+                      <span className="no-custom-name" style={{ 
+                        color: '#666', 
+                        fontSize: '0.85rem',
+                        fontStyle: 'italic'
+                      }}>
+                        (No custom name)
+                      </span>
                     )}
                   </div>
                 </div>
