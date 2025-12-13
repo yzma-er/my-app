@@ -17,6 +17,7 @@ import ServicesPage from "./pages/ServicesPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 // Dynamic Service Page (replaces all Catering, Gym, etc.)
 import ServiceDetails from "./pages/ServiceDetails";
@@ -35,6 +36,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/About" element={<About />} /> 
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           
 
 
