@@ -10,8 +10,8 @@
 /* ========= Sidebar ========= */
 .sidebar {
   width: 260px;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(6px);
+  background-color: rgba(255, 255, 255, 0.20); /* 5% opacity white */
+  backdrop-filter: blur 5px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -31,7 +31,7 @@
 .sidebar h2 {
   font-size: 1.6rem;
   margin-bottom: 25px;
-  color: #4caf50;
+  color: #ffff;
   text-align: center;
   font-weight: bold;
 }
@@ -48,7 +48,7 @@
 .sidebar a {
   color: #fff;
   text-decoration: none;
-  font-size: 1.05rem;
+  font-size: 20px;
   display: block;
   padding: 10px 15px;
   border-radius: 8px;
@@ -56,8 +56,8 @@
 }
 
 .sidebar a:hover {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4caf50;
+  background: #ffff;
+  color: #104C08;
 }
 
 /* ========= Sidebar Footer ========= */
@@ -137,7 +137,7 @@
   }
 
   .dashboard-overlay {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 1);
     padding: 20px;
   }
 }
@@ -148,4 +148,135 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+
+/* Add to AdminDashboard.css */
+
+/* ========== LOGOUT SUCCESS NOTIFICATION ========== */
+.logout-success-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #104C08, #1C7C0F);
+  color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(16, 76, 8, 0.3);
+  z-index: 2000; /* Higher than admin dashboard */
+  animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-in 1.5s forwards;
+  min-width: 300px;
+  border-left: 5px solid #8BC34A;
+}
+
+.logout-success-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.logout-success-icon {
+  background: #8BC34A;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+.logout-success-message h3 {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.logout-success-message p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(139, 195, 74, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(139, 195, 74, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(139, 195, 74, 0);
+  }
+}
+
+/* Mobile notification */
+@media (max-width: 768px) {
+  .logout-success-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    padding: 15px;
+  }
+  
+  .logout-success-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+  }
+  
+  .logout-success-message h3 {
+    font-size: 16px;
+  }
+  
+  .logout-success-message p {
+    font-size: 13px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .logout-success-notification {
+    top: 5px;
+    right: 5px;
+    left: 5px;
+    padding: 12px;
+  }
+  
+  .logout-success-content {
+    gap: 10px;
+  }
+  
+  .logout-success-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
 }

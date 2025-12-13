@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+//EditServiceModal.jsx
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./Services.css";
 
@@ -7,12 +8,17 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
   const [form, setForm] = useState({
     name: "",
     description: "",
+    photo: "",
     description2: "",
     content: [],
   });
-  const [preview, setPreview] = useState(null);
-  const [videoFile, setVideoFile] = useState(null);
-  const backendURL = "http://localhost:5000";
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const backendURL = "https://digital-guidance-api.onrender.com";
+
+  // Refs for textareas to handle bold formatting
+  const descriptionRef = useRef(null);
+  const description2Ref = useRef(null);
+  const stepContentRefs = useRef([]);
 
   // ✅ Fetch service details
   useEffect(() => {
@@ -29,17 +35,20 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             parsedSteps = [{ title: "Step 1", content: data.content || "" }];
           }
 
-          // ✅ Normalize all steps (add formFile key if missing)
           parsedSteps = parsedSteps.map((step, i) => ({
             title: step.title || `Step ${i + 1}`,
+            customName: step.customName || "",
             content: step.content || "",
             formFile: step.formFile || "",
+            originalFormName: step.originalFormName || "",
+            videoFile: step.videoFile || "",
           }));
 
           setService(data);
           setForm({
             name: data.name || "",
             description: data.description || "",
+            photo: data.photo || "",
             description2: data.description2 || "",
             content: parsedSteps,
           });
@@ -59,17 +68,151 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
     setForm({ ...form, content: updated });
   };
 
-  const handleFileChange = (e) => {
+  // ✅ NEW: Format text as bold
+  const formatBold = (fieldName, index = null) => {
+    const textarea = getTextareaRef(fieldName, index);
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    if (selectedText) {
+      const newText = `**${selectedText}**`;
+      const newValue = textarea.value.substring(0, start) + 
+                      newText + 
+                      textarea.value.substring(end);
+      
+      if (fieldName === 'description') {
+        setForm({ ...form, description: newValue });
+      } else if (fieldName === 'description2') {
+        setForm({ ...form, description2: newValue });
+      } else if (fieldName === 'stepContent') {
+        const updated = [...form.content];
+        updated[index].content = newValue;
+        setForm({ ...form, content: updated });
+      }
+      
+      // Restore cursor position
+      setTimeout(() => {
+        const newCursorPos = start + newText.length;
+        if (fieldName === 'description' && descriptionRef.current) {
+          descriptionRef.current.setSelectionRange(newCursorPos, newCursorPos);
+          descriptionRef.current.focus();
+        } else if (fieldName === 'description2' && description2Ref.current) {
+          description2Ref.current.setSelectionRange(newCursorPos, newCursorPos);
+          description2Ref.current.focus();
+        } else if (fieldName === 'stepContent' && stepContentRefs.current[index]) {
+          stepContentRefs.current[index].setSelectionRange(newCursorPos, newCursorPos);
+          stepContentRefs.current[index].focus();
+        }
+      }, 0);
+    }
+  };
+
+  // ✅ Helper to get textarea ref
+  const getTextareaRef = (fieldName, index) => {
+    if (fieldName === 'description') return descriptionRef.current;
+    if (fieldName === 'description2') return description2Ref.current;
+    if (fieldName === 'stepContent') return stepContentRefs.current[index];
+    return null;
+  };
+
+  // ✅ NEW: Parse bold text for preview (using **text** syntax)
+  const parseBoldText = (text) => {
+    if (!text) return text;
+    
+    // Replace **text** with <strong>text</strong>
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  };
+
+  // ✅ Handle custom name changes
+  const handleCustomNameChange = (index, value) => {
+    const updated = [...form.content];
+    updated[index].customName = value;
+    setForm({ ...form, content: updated });
+  };
+
+  // ✅ Handle photo upload
+  const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setPreview(URL.createObjectURL(file));
-      setVideoFile(file);
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image too large. Please select an image smaller than 5MB.");
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Invalid file type. Please select a JPG, PNG, GIF, or WebP image.");
+      return;
+    }
+
+    setUploadingPhoto(true);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await axios.post(`${backendURL}/api/services/upload/photo`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setForm({ ...form, photo: res.data.url });
+      alert("✅ Photo uploaded successfully!");
+    } catch (err) {
+      console.error("❌ Photo upload error:", err);
+      const errorMessage = err.response?.data?.message || "Failed to upload photo";
+      alert(`Photo upload failed: ${errorMessage}`);
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  // ✅ Remove photo
+  const handleRemovePhoto = () => {
+    if (window.confirm("Are you sure you want to remove this photo?")) {
+      setForm({ ...form, photo: "" });
+    }
+  };
+
+  const handleStepVideoUpload = async (index, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("video", file);
+
+    try {
+      const res = await axios.post(`${backendURL}/api/services/upload/step-video`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const updated = [...form.content];
+      updated[index].videoFile = res.data.url;
+      setForm({ ...form, content: updated });
+
+      alert("✅ Step video uploaded successfully!");
+    } catch (err) {
+      console.error("❌ Step video upload error:", err);
+      alert("Failed to upload step video.");
     }
   };
 
   const handleFormUpload = async (index, e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File too large. Please select a file smaller than 10MB.");
+      return;
+    }
+
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Invalid file type. Please select a PDF, DOC, or DOCX file.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("formFile", file);
@@ -79,14 +222,18 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
+      console.log("✅ Upload successful:", res.data);
+
       const updated = [...form.content];
-      updated[index].formFile = res.data.filename;
+      updated[index].formFile = res.data.url;
+      updated[index].originalFormName = res.data.originalName || file.name;
       setForm({ ...form, content: updated });
 
       alert("✅ Form uploaded successfully!");
     } catch (err) {
       console.error("❌ Upload error:", err);
-      alert("Failed to upload form.");
+      const errorMessage = err.response?.data?.message || "Failed to upload form";
+      alert(`Upload failed: ${errorMessage}`);
     }
   };
 
@@ -95,7 +242,14 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
       ...form,
       content: [
         ...form.content,
-        { title: `Step ${form.content.length + 1}`, content: "", formFile: "" },
+        { 
+          title: `Step ${form.content.length + 1}`, 
+          customName: "",
+          content: "", 
+          formFile: "",
+          originalFormName: "",
+          videoFile: ""
+        },
       ],
     });
   };
@@ -108,25 +262,24 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
   // ✅ Save all changes
   const handleSave = async () => {
     try {
-      const formData = new FormData();
-      formData.append("name", form.name);
-      formData.append("description", form.description);
-      formData.append("description2", form.description2);
-      formData.append("content", JSON.stringify(form.content));
+      const updateData = {
+        name: form.name,
+        description: form.description,
+        photo: form.photo,
+        description2: form.description2,
+        content: JSON.stringify(form.content)
+      };
 
-      if (videoFile) {
-        formData.append("video", videoFile);
-      }
-
-      await axios.put(`${backendURL}/api/services/${serviceId}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await axios.put(`${backendURL}/api/services/${serviceId}`, updateData, {
+        headers: { "Content-Type": "application/json" },
       });
 
       alert("✅ Service updated successfully!");
       onSave();
     } catch (err) {
       console.error("❌ Error updating service:", err);
-      alert("Failed to update service.");
+      console.error("Error details:", err.response?.data);
+      alert("Failed to update service. Check console for details.");
     }
   };
 
@@ -143,9 +296,37 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
           flexDirection: "column",
           alignItems: "center",
           padding: "30px",
+          position: "relative"
         }}
       >
-        <button className="close-btn" onClick={onClose}>
+        <button 
+          onClick={onClose}
+          style={{
+            position: "absolute",
+            top: "15px",
+            right: "20px",
+            background: "none",
+            border: "none",
+            fontSize: "24px",
+            cursor: "pointer",
+            color: "#004d00",
+            width: "30px",
+            height: "30px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "50%",
+            transition: "all 0.2s ease"
+          }}
+          onMouseOver={(e) => {
+            e.target.style.background = "#f0f0f0";
+            e.target.style.color = "#b71c1c";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.background = "none";
+            e.target.style.color = "#004d00";
+          }}
+        >
           ✖
         </button>
 
@@ -176,59 +357,84 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
               overflowY: "auto",
             }}
           >
-            <video
-              controls
-              style={{
-                width: "100%",
-                borderRadius: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              <source
-                src={
-                  preview
-                    ? preview
-                    : service.video
-                    ? `${backendURL}/videos/${service.video}`
-                    : ""
-                }
-                type="video/mp4"
-              />
-            </video>
-
             <h2 style={{ color: "#1C7C0F" }}>{form.name}</h2>
-            <p>{form.description}</p>
+            {/* ✅ Render description with bold support */}
+            <p dangerouslySetInnerHTML={{ __html: parseBoldText(form.description) }} />
+
+            {form.photo && (
+              <div style={{ 
+                margin: "15px 0", 
+                textAlign: "center",
+                border: "1px solid #bde3b2",
+                borderRadius: "10px",
+                padding: "10px",
+                background: "#f0f8f0"
+              }}>
+                <img 
+                  src={form.photo} 
+                  alt="Service" 
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "300px",
+                    borderRadius: "8px",
+                    objectFit: "contain"
+                  }}
+                />
+                <p style={{ 
+                  marginTop: "8px", 
+                  fontSize: "14px", 
+                  color: "#666",
+                  fontStyle: "italic"
+                }}>
+                  Service Photo
+                </p>
+              </div>
+            )}
 
             {form.description2 && (
-              <p
-                style={{
-                  marginTop: "10px",
-                  fontStyle: "italic",
-                  color: "#333",
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {form.description2}
-              </p>
+              <p dangerouslySetInnerHTML={{ __html: parseBoldText(form.description2) }} />
             )}
 
             {form.content.map((step, index) => (
-              <div key={index} style={{ marginBottom: "10px" }}>
-                <h4 style={{ color: "#1C7C0F" }}>{step.title}</h4>
-                <p
-                  style={{ whiteSpace: "pre-line" }}
-                  dangerouslySetInnerHTML={{
-                    __html: step.content.replace(/\n/g, "<br />"),
-                  }}
-                />
+              <div key={index} style={{ 
+                marginBottom: "20px", 
+                padding: "15px",
+                background: "#f0f8f0",
+                borderRadius: "8px"
+              }}>
+                <h4 style={{ color: "#1C7C0F" }}>
+                  {step.customName ? `${step.title} - ${step.customName}` : step.title}
+                </h4>
+                
+                {step.videoFile && (
+                  <div style={{ margin: "10px 0", width: "100%" }}>
+                    <video
+                      controls
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        borderRadius: "10px",
+                        maxHeight: "300px",
+                        objectFit: "contain"
+                      }}
+                    >
+                      <source src={step.videoFile} type="video/mp4" />
+                    </video>
+                  </div>
+                )}
+
+                {/* ✅ Render step content with bold support */}
+                <p dangerouslySetInnerHTML={{ __html: parseBoldText(step.content) }} />
+                
                 {step.formFile && (
                   <p>
                     📄{" "}
                     <a
-                      href={`${backendURL}/forms/${step.formFile}`}
+                      href={step.formFile}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ color: "#1C7C0F", textDecoration: "underline" }}
+                      download={step.originalFormName || "form"}
                     >
                       Download Form
                     </a>
@@ -251,25 +457,206 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
             <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Service Name</label>
             <input name="name" value={form.name} onChange={handleChange} />
 
-            <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description (above video)</label>
-            <textarea
-              name="description"
-              rows="3"
-              value={form.description}
-              onChange={handleChange}
-            />
+            {/* ✅ Description 1 with Bold Button */}
+            <div style={{ 
+              background: "#f4fff4", 
+              padding: "15px", 
+              borderRadius: "10px",
+              border: "1px solid #bde3b2"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description 1</label>
+                <button
+                  type="button"
+                  onClick={() => formatBold('description')}
+                  style={{
+                    background: "#1C7C0F",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "20px",
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    fontWeight: "bold"
+                  }}
+                  title="Make selected text bold (Ctrl+B)"
+                >
+                  <strong>B</strong> Bold
+                </button>
+              </div>
+              <textarea
+                ref={descriptionRef}
+                name="description"
+                rows="3"
+                value={form.description}
+                onChange={handleChange}
+                style={{ width: "100%" }}
+              />
+              <div style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                💡 Select text and click "Bold" or use <strong>**text**</strong> syntax
+              </div>
+            </div>
 
-            <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description (below video)</label>
-            <textarea
-              name="description2"
-              rows="3"
-              value={form.description2}
-              onChange={handleChange}
-              placeholder="Enter extra details that appear below the video..."
-            />
+            {/* Photo Upload Section (unchanged) */}
+            <div style={{ 
+              background: "#f4fff4", 
+              padding: "15px", 
+              borderRadius: "10px",
+              border: "1px solid #bde3b2"
+            }}>
+              <label style={{ fontWeight: "bold", color: "#1C7C0F", marginBottom: "10px", display: "block" }}>
+                📷 Service Photo (Between Description 1 and 2)
+              </label>
+              
+              {form.photo ? (
+                <div style={{ 
+                  marginBottom: "15px",
+                  textAlign: "center"
+                }}>
+                  <img 
+                    src={form.photo} 
+                    alt="Preview" 
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "200px",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      border: "1px solid #ddd"
+                    }}
+                  />
+                  <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                    <button
+                      onClick={() => document.getElementById('photo-upload').click()}
+                      style={{
+                        background: "#1C7C0F",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "20px",
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        fontSize: "14px"
+                      }}
+                    >
+                      Change Photo
+                    </button>
+                    <button
+                      onClick={handleRemovePhoto}
+                      style={{
+                        background: "#b71c1c",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "20px",
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        fontSize: "14px"
+                      }}
+                    >
+                      Remove Photo
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ 
+                  border: "2px dashed #bde3b2",
+                  borderRadius: "10px",
+                  padding: "20px",
+                  textAlign: "center",
+                  background: "#f9fff9",
+                  marginBottom: "15px"
+                }}>
+                  <p style={{ color: "#666", marginBottom: "15px" }}>
+                    No photo uploaded. Add a photo that will appear between Description 1 and Description 2.
+                  </p>
+                  <button
+                    onClick={() => document.getElementById('photo-upload').click()}
+                    disabled={uploadingPhoto}
+                    style={{
+                      background: uploadingPhoto ? "#ccc" : "#1C7C0F",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "20px",
+                      padding: "8px 16px",
+                      cursor: uploadingPhoto ? "not-allowed" : "pointer",
+                      fontSize: "14px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px"
+                    }}
+                  >
+                    {uploadingPhoto ? (
+                      <>
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>📷</span>
+                        <span>Upload Photo</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+              
+              <input
+                id="photo-upload"
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                style={{ display: "none" }}
+              />
+              
+              <div style={{ 
+                fontSize: "12px", 
+                color: "#666", 
+                marginTop: "10px",
+                padding: "8px",
+                background: "#f0f8f0",
+                borderRadius: "6px"
+              }}>
+                <strong>Note:</strong> Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB.
+              </div>
+            </div>
 
-            <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Replace Video</label>
-            <input type="file" accept="video/*" onChange={handleFileChange} />
+            {/* ✅ Description 2 with Bold Button */}
+            <div style={{ 
+              background: "#f4fff4", 
+              padding: "15px", 
+              borderRadius: "10px",
+              border: "1px solid #bde3b2"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Description 2</label>
+                <button
+                  type="button"
+                  onClick={() => formatBold('description2')}
+                  style={{
+                    background: "#1C7C0F",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "20px",
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    fontWeight: "bold"
+                  }}
+                  title="Make selected text bold (Ctrl+B)"
+                >
+                  <strong>B</strong> Bold
+                </button>
+              </div>
+              <textarea
+                ref={description2Ref}
+                name="description2"
+                rows="3"
+                value={form.description2}
+                onChange={handleChange}
+                placeholder="Enter extra details that appear below the photo..."
+                style={{ width: "100%" }}
+              />
+              <div style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
+                💡 Select text and click "Bold" or use <strong>**text**</strong> syntax
+              </div>
+            </div>
 
             <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>Steps</label>
             {form.content.map((step, index) => (
@@ -277,56 +664,128 @@ function EditServiceModal({ serviceId, onClose, onSave }) {
                 key={index}
                 style={{
                   background: "#f4fff4",
-                  padding: "10px",
+                  padding: "15px",
                   borderRadius: "10px",
                   border: "1px solid #bde3b2",
-                  marginBottom: "10px",
+                  marginBottom: "15px",
                 }}
               >
-                <h4 style={{ color: "#1C7C0F" }}>{step.title}</h4>
+                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                  Step {index + 1}
+                </label>
+                <br></br>
+                <label style={{ fontWeight: "bold", color: "#1C7C0F", marginTop: "8px" }}>
+                  Step Custom Name (e.g., "Sample Office")
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter custom step name..."
+                  value={step.customName}
+                  onChange={(e) => handleCustomNameChange(index, e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    marginBottom: "10px",
+                    borderRadius: "6px",
+                    border: "1px solid #bde3b2"
+                  }}
+                />
+            
+                <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                  🎥 Step Video
+                </label>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => handleStepVideoUpload(index, e)}
+                  style={{ marginBottom: "10px" }}
+                />
+               
+              {step.videoFile && (
+                <p style={{ 
+                  marginBottom: "10px", 
+                  fontSize: "14px",
+                  background: "#e8f5e8",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  color: "#1C7C0F",
+                  fontWeight: "bold"
+                }}>
+                  ✅ Step video uploaded successfully!
+                </p>
+              )}
+            
+                {/* ✅ Step Content with Bold Button */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                  <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                    Step Content
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => formatBold('stepContent', index)}
+                    style={{
+                      background: "#1C7C0F",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "20px",
+                      padding: "6px 12px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      fontWeight: "bold"
+                    }}
+                    title="Make selected text bold"
+                  >
+                    <strong>B</strong> Bold
+                  </button>
+                </div>
+                
                 <textarea
+                  ref={el => stepContentRefs.current[index] = el}
                   rows="6"
                   value={step.content}
                   onChange={(e) => handleStepChange(index, e.target.value)}
                   placeholder={`Enter content for ${step.title}`}
-                  style={{ width: "100%", resize: "vertical" }}
+                  style={{
+                    width: "100%",
+                    resize: "vertical",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    border: "1px solid #bde3b2",
+                    marginBottom: "10px"
+                  }}
                 />
-
-                <div style={{ marginTop: "8px" }}>
-                  <label>📎 Upload Form (optional)</label>
+                <div style={{ fontSize: "12px", color: "#666", marginTop: "-5px", marginBottom: "10px" }}>
+                  💡 Select text and click "Bold" or use <strong>**text**</strong> syntax
+                </div>
+            
+                <div style={{ marginBottom: "10px" }}>
+                  <label style={{ fontWeight: "bold", color: "#1C7C0F" }}>
+                    📎 Upload Form 
+                  </label>
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx"
                     onChange={(e) => handleFormUpload(index, e)}
                   />
                   {step.formFile && (
-                    <p style={{ marginTop: "4px" }}>
-                      ✅ Uploaded:{" "}
-                      <a
-                        href={`${backendURL}/forms/${step.formFile}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: "#1C7C0F", textDecoration: "underline" }}
-                      >
-                        View Form
-                      </a>
+                    <p style={{ marginTop: "4px", fontSize: "14px" }}>
+                      ✅ Uploaded: {step.originalFormName || step.formFile}
                     </p>
                   )}
                 </div>
-
+            
                 <button
                   style={{
                     background: "#b71c1c",
                     color: "white",
                     border: "none",
                     borderRadius: "20px",
-                    padding: "5px 12px",
-                    marginTop: "6px",
+                    padding: "6px 12px",
                     cursor: "pointer",
                   }}
                   onClick={() => removeStep(index)}
                 >
-                  🗑️ Remove
+                  🗑️ Remove Step
                 </button>
               </div>
             ))}

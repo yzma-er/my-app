@@ -14,17 +14,12 @@ function ServiceDetails() {
 
   const serviceId = window.location.pathname.split("/").pop();
 
-  // backendURL as a stable memoized constant
   const backendURL = useMemo(() => {
     return window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : "http://192.168.1.7:5000";
+      : "https://digital-guidance-api.onrender.com";
   }, []);
 
-  // THREE_DAYS_MS memoized
-  const THREE_DAYS_MS = useMemo(() => 3 * 24 * 60 * 60 * 1000, []);
-
-  // ✅ Fetch service details (memoized callback)
   const fetchService = useCallback(async () => {
     try {
       const res = await axios.get(`${backendURL}/api/services/${serviceId}`);
@@ -40,35 +35,39 @@ function ServiceDetails() {
     fetchService();
   }, [fetchService]);
 
-  // ✅ Load saved progress
   const STORAGE_KEY = `progress_${serviceId}`;
+  
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const data = JSON.parse(saved);
-      const now = Date.now();
-
-      if (now - data.timestamp < THREE_DAYS_MS) {
-        setCurrentStep(data.currentStep);
-      } else {
-        localStorage.removeItem(STORAGE_KEY);
-        setCurrentStep(1);
-      }
+      setCurrentStep(data.currentStep);
     }
-  }, [STORAGE_KEY, THREE_DAYS_MS]);
+  }, [STORAGE_KEY]);
 
-  // ✅ Save progress to localStorage
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
         currentStep,
-        timestamp: Date.now(),
       })
     );
   }, [currentStep, STORAGE_KEY]);
 
-  // ✅ Handle feedback submission
+  const getUserId = () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.user_id;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error getting user ID from token:", error);
+      return null;
+    }
+  };
+
   const handleFeedbackSubmit = async () => {
     if (rating === 0) {
       alert("Please select a star rating before submitting.");
@@ -76,15 +75,23 @@ function ServiceDetails() {
     }
 
     try {
-      await axios.post(`${backendURL}/api/feedback`, {
-        service_id: serviceId,
+      const user_id = getUserId();
+      
+      const res = await axios.post(`${backendURL}/api/feedback`, {
+        service_id: service?.service_id,
         service_name: service?.name || null,
         step_number: currentStep,
         rating,
         comment: feedback,
+        user_id: user_id
       });
 
-      alert("✅ Feedback submitted successfully!");
+      if (res.data.updated) {
+        alert("✅ Rating updated successfully!");
+      } else {
+        alert("✅ Feedback submitted successfully!");
+      }
+      
       setRating(0);
       setFeedback("");
       setCurrentStep((prev) => prev + 1);
@@ -94,19 +101,35 @@ function ServiceDetails() {
     }
   };
 
-  // ✅ Reset progress manually
   const handleResetProgress = () => {
-    if (window.confirm("Are you sure you want to reset your progress?")) {
+    if (window.confirm("Are you sure you want to reset your progress?\n\nThis will clear your progress but will NOT delete your previous ratings.")) {
       localStorage.removeItem(STORAGE_KEY);
       setCurrentStep(1);
-      alert("🔁 Progress has been reset!");
+      alert("🔁 Progress has been reset! You can now go through the steps again.");
     }
+  };
+
+  // ✅ Helper function to parse bold text (**text** to <strong>text</strong>)
+  const parseBoldText = (text) => {
+    if (!text) return text;
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  };
+
+  // ✅ Helper function to render HTML safely with bold support
+  const renderWithBold = (text, className = "", style = {}) => {
+    const html = parseBoldText(text);
+    return (
+      <div 
+        className={className}
+        style={style}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
   };
 
   if (loading) return <p>Loading...</p>;
   if (!service) return <p>❌ Service not found.</p>;
 
-  // Parse JSON steps safely
   let steps = [];
   try {
     steps = JSON.parse(service.content || "[]");
@@ -117,7 +140,6 @@ function ServiceDetails() {
 
   return (
     <div className="medical-container">
-      {/* Back Button */}
       <button
         onClick={() => navigate("/services")}
         style={{
@@ -132,60 +154,119 @@ function ServiceDetails() {
           display: "inline-flex",
           alignItems: "center",
           gap: "5px",
+          alignSelf: "flex-start",
         }}
       >
         ← Back to Services
       </button>
 
-      <h2 style={{ color: "#1C7C0F", marginBottom: "10px" }}>{service.name}</h2>
+      <h2 style={{ color: "#1C7C0F", marginBottom: "10px", width: "100%", textAlign: "center" }}>{service.name}</h2>
 
-      {/* Description (Above Video) */}
-      {service.description && (
-        <p
-          className="service-description"
-          style={{
-            marginBottom: "20px",
-            whiteSpace: "pre-line",
-            textAlign: "justify",
-          }}
-        >
-          {service.description}
-        </p>
+      {/* ✅ Description 1 with bold support */}
+      {service.description && renderWithBold(
+        service.description,
+        "service-description",
+        {
+          marginBottom: "20px",
+          whiteSpace: "pre-line",
+          textAlign: "center",
+          width: "100%",
+        }
       )}
 
-      {/* Video */}
-      <div className="video-container">
-        {service.video ? (
-          <video controls>
-            <source src={`${backendURL}/videos/${service.video}`} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        ) : (
-          <p style={{ marginBottom: "20px" }}>🎥 No video uploaded for this service.</p>
-        )}
-      </div>
+      {/* Service Photo Display */}
+      {service.photo && (
+        <div style={{ 
+          width: "100%", 
+          margin: "20px 0",
+          textAlign: "center"
+        }}>
+          <div style={{
+            maxWidth: "800px",
+            margin: "0 auto",
+            border: "1px solid #bde3b2",
+            borderRadius: "12px",
+            padding: "15px",
+            background: "#f8fff8",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+          }}>
+            <img 
+              src={service.photo} 
+              alt={service.name} 
+              style={{
+                width: "100%",
+                height: "auto",
+                maxHeight: "400px",
+                borderRadius: "8px",
+                objectFit: "contain"
+              }}
+            />
+          </div>
+        </div>
+      )}
 
-      {/* Description 2 (Below Video) */}
-      {service.description2 && <p className="service-description2">{service.description2}</p>}
+      {/* ✅ Description 2 with bold support */}
+      {service.description2 && renderWithBold(
+        service.description2,
+        "service-description2",
+        { width: "100%" }
+      )}
 
-      {/* Service Steps */}
       {steps.map((step, index) => {
         const stepNum = index + 1;
         const isUnlocked = stepNum <= currentStep;
         if (!isUnlocked) return null;
 
         return (
-          <div key={index} className="info-section" style={{ marginBottom: "25px" }}>
-            <h3 style={{ color: "#1C7C0F" }}>{step.title}</h3>
-            <p style={{ whiteSpace: "pre-line" }}>{step.content}</p>
+          <div key={index} className="info-section" style={{ marginBottom: "25px", width: "100%" }}>
+            <h3 style={{ color: "#1C7C0F" }}>
+              {step.customName ? `${step.title} - ${step.customName}` : step.title}
+            </h3>
+            
+            {step.videoFile && (
+              <div style={{ 
+                marginTop: "12px", 
+                marginBottom: "15px",
+                width: "100%",
+                display: "flex",
+                justifyContent: "center"
+              }}>
+                <div style={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  position: "relative"
+                }}>
+                  <video 
+                    controls 
+                    style={{ 
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: "10px",
+                      maxHeight: "70vh",
+                      objectFit: "contain"
+                    }}
+                  >
+                    <source src={step.videoFile} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              </div>
+            )}
 
-            {/* Download Form (below step content) */}
+            {/* ✅ Step content with bold support */}
+            {renderWithBold(
+              step.content,
+              "",
+              { whiteSpace: "pre-line" }
+            )}
+
             {step.formFile && (
               <div style={{ marginTop: "10px" }}>
                 <a
-                  href={`${backendURL}/forms/${step.formFile}`}
+                  href={step.formFile}
                   target="_blank"
                   rel="noopener noreferrer"
+                  download={step.originalFormName || "form"}
                   style={{
                     display: "inline-block",
                     background: "#1C7C0F",
@@ -201,10 +282,9 @@ function ServiceDetails() {
               </div>
             )}
 
-            {/* Feedback Section */}
             {currentStep === stepNum && (
               <div className="feedback-section">
-                <h3>Rate {step.title}</h3>
+                <h3>Rate {step.customName ? `${step.title} - ${step.customName}` : step.title}</h3>
 
                 <div className="star-rating">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -227,22 +307,34 @@ function ServiceDetails() {
                 <button className="feedback-btn" onClick={handleFeedbackSubmit}>
                   Submit Feedback
                 </button>
+                
+                <p style={{ 
+                  fontSize: "12px", 
+                  color: "#666", 
+                  marginTop: "10px",
+                  fontStyle: "italic"
+                }}>
+                  💡 You can update your rating later by resetting progress and re-rating this step.
+                </p>
               </div>
             )}
           </div>
         );
       })}
 
-      {/* Final Step */}
       {currentStep > steps.length && (
-        <div className="info-section" style={{ textAlign: "center", marginTop: "20px" }}>
-          <h3>🎉 You’ve completed all steps for this service!</h3>
-          <p style={{ color: "#1C7C0F" }}>You can reset your progress if you wish to start again.</p>
+        <div className="info-section" style={{ textAlign: "center", marginTop: "20px", width: "100%" }}>
+          <h3>🎉 You've completed all steps for this service!</h3>
+          <p style={{ color: "#1C7C0F" }}>
+            You can reset your progress if you wish to start again.
+          </p>
+          <p style={{ fontSize: "14px", color: "#666", marginTop: "10px" }}>
+            🔄 Resetting progress will allow you to go through the steps again and update your ratings.
+          </p>
         </div>
       )}
 
-      {/* Reset Progress Button */}
-      <div style={{ textAlign: "center", marginTop: "30px" }}>
+      <div style={{ textAlign: "center", marginTop: "30px", width: "100%" }}>
         <button
           onClick={handleResetProgress}
           style={{

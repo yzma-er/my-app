@@ -6,6 +6,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,6 +21,7 @@ function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const res = await fetch(`${backendURL}/api/auth/login`, {
@@ -36,23 +38,30 @@ function LoginPage() {
 
         if (decoded.role !== role) {
           alert("⚠️ Invalid role for this account!");
+          setLoading(false);
           return;
         }
 
         localStorage.setItem("token", data.token);
-        alert("✅ Login successful!");
-
-        if (decoded.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/services");
-        }
+        
+        // Show success message for 1 second before redirecting
+        setTimeout(() => {
+          if (decoded.role === "admin") {
+            navigate("/admin");
+          } else {
+            navigate("/services");
+          }
+          setLoading(false);
+        }, 1000);
+        
       } else {
         alert(data.message || "❌ Login failed.");
+        setLoading(false);
       }
     } catch (err) {
       console.error("❌ Login error:", err);
       alert("Connection error. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -69,6 +78,7 @@ function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
 
             <div className="password-container">
@@ -78,14 +88,24 @@ function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loading}
               />
               <i
-                className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
-                onClick={() => setShowPassword(!showPassword)}
+                className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon ${loading ? 'disabled-icon' : ''}`}
+                onClick={() => !loading && setShowPassword(!showPassword)}
               ></i>
             </div>
 
-            <button type="submit">Log In</button>
+            <button type="submit" disabled={loading} className={loading ? "loading" : ""}>
+              {loading ? (
+                <>
+                  <div className="loader"></div>
+                  Logging in...
+                </>
+              ) : (
+                "Log In"
+              )}
+            </button>
           </form>
 
           {role === "user" && (

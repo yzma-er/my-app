@@ -1,5 +1,6 @@
 // src/pages/ManageServices.jsx
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import EditServiceModal from "./EditServiceModal";
 import "./ManageServices.css";
 
@@ -8,12 +9,13 @@ function ManageServices() {
   const [newService, setNewService] = useState("");
   const [loading, setLoading] = useState(true);
   const [editingServiceId, setEditingServiceId] = useState(null);
+  const navigate = useNavigate();
 
   // ✅ Auto-detect backend (Laptop vs. Phone)
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : "http://192.168.1.7:5000";
+      : "https://digital-guidance-api.onrender.com";
 
   // ✅ Fetch all services
   useEffect(() => {
@@ -59,6 +61,31 @@ function ManageServices() {
 
   return (
     <div className="manage-container">
+      
+      {/* Back button */}
+      <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
+        <button
+          className="back-admin-btn"
+          onClick={() => navigate("/admin")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: "30px",
+            backgroundColor: "#1c7c0f",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "bold",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            position: "absolute",
+            left: 0,
+          }}
+        >
+          <span style={{ fontWeight: "bold", fontSize: "18px" }}>←</span>
+        </button>
+      </div>
+
       <h1>Manage Services</h1>
 
       {loading ? (

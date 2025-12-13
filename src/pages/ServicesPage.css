@@ -1,118 +1,59 @@
+/* ServicesPage.css - Complete Version with Loader */
+
+/* ================================
+   🏠 MAIN CONTAINER
+================================== */
 .services-container {
   padding: 1rem;
   font-family: 'Segoe UI', sans-serif;
   height: 100%;
   min-height: 100vh;
-  overflow-y: auto;  /* ✅ allows scrolling */
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
-.services-container {
-  padding: 1rem;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.search-bar {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #104C08;
-  margin-bottom: 1rem;
-}
-
-.services-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.service-card {
-  background: #f7f7f7;
-  padding: 15px;
-  border-radius: 10px;
-  border: 3px solid #104C08;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.service-card:hover {
-  background: #eaf4ea;
-  transform: translateY(-2px);
-}
-
-.service-card h3 {
-  margin: 0 0 5px;
-}
-
-.service-card p {
-  font-size: 14px;
-  color: #555;
-}
-
-/* Centered loader container */
-.loader-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60vh;
-  text-align: center;
-  color: #2e7d32;
-  font-weight: 500;
-}
-
-/* Green spinning circle loader */
-.loader {
-  border: 4px solid #c8e6c9;
-  border-top: 4px solid #2e7d32;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 15px;
-}
-
-/* Loader animation */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 /* ================================
-   🎠 Dynamic Carousel (fixed size)
+   🎠 CAROUSEL WITH DOTS ONLY (NO ARROWS)
 ================================== */
 .carousel-container {
   width: 100%;
   display: flex;
+  margin: 0 auto;  
   justify-content: center;
   margin-top: 20px;
   margin-bottom: 40px;
 }
 
 .custom-carousel {
-  width: 80%;
-  max-width: 900px; /* ✅ fixed size similar to your screenshot */
-  height: 400px; /* ✅ set a consistent height */
+  width: 100%;
+  max-width: 900px;
+  height: 400px;
   position: relative;
   overflow: hidden;
   border-radius: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Images inside the carousel */
+/* Carousel Track */
+.carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+/* Individual Slide */
 .carousel-slide {
   width: 100%;
   height: 100%;
   position: relative;
+  flex-shrink: 0;
 }
 
 .carousel-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* ✅ ensures the image fits nicely */
+  object-fit: cover;
   border-radius: 20px;
-  transition: transform 0.5s ease-in-out;
 }
 
 /* Caption overlay */
@@ -130,21 +71,189 @@
   font-size: 1rem;
 }
 
-/* Optional fade-in effect for each image */
-.carousel-slide {
-  animation: fade 1s ease-in-out;
+/* Carousel Dots */
+.carousel-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
 }
 
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background-color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
 }
 
-/* Responsive Adjustments */
+.carousel-dot:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.2);
+}
+
+.carousel-dot.active {
+  background-color: white;
+  border-color: white;
+  transform: scale(1.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.loading-carousel {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 18px;
+}
+
+/* ================================
+   🎯 SERVICES HEADER & TITLE
+================================== */
+.services-header {
+  margin: 20px 0 30px 0;
+}
+
+.services-title-container {
+  background: #104C08;
+  color: white;
+  padding: 1rem 1rem;
+  text-align: left;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(16, 76, 8, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.services-title-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.services-title-container:hover::before {
+  left: 100%;
+}
+
+.services-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  letter-spacing: -0.5px;
+}
+
+.services-subtitle {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.9;
+  font-weight: 400;
+  color: #f0f0f0;
+}
+
+.search-section {
+  padding: 0 1rem;
+}
+
+.search-bar {
+  width: 98%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #104C08;
+  margin-bottom: 1rem;
+}
+
+/* ================================
+   📦 SERVICES LIST - CONSISTENT CARD SIZES
+================================== */
+.services-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.service-card {
+  background: #f7f7f7;
+  padding: 20px;
+  border-radius: 10px;
+  border: 3px solid #104C08;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.service-card:hover {
+  background: #eaf4ea;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(16, 76, 8, 0.15);
+}
+
+.service-card h3 {
+  margin: 0 0 10px 0;
+  color: #104C08;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.service-card p {
+  font-size: 14px;
+  color: #555;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ================================
+   🔄 LOADER (GREEN SPINNING CIRCLE)
+================================== */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.loader {
+  border: 4px solid #c8e6c9;
+  border-top: 4px solid #2e7d32;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ================================
+   📱 RESPONSIVE DESIGN
+================================== */
+
+/* Tablet */
 @media (max-width: 768px) {
   .custom-carousel {
     width: 95%;
@@ -154,5 +263,124 @@
   .carousel-caption {
     font-size: 0.9rem;
     padding: 6px 0;
+  }
+
+  .carousel-dots {
+    bottom: 15px;
+    gap: 10px;
+  }
+
+  .carousel-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .services-title-container {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .services-title {
+    font-size: 2rem;
+  }
+  
+  .services-subtitle {
+    font-size: 1rem;
+  }
+  
+  .service-card {
+    padding: 18px;
+    min-height: 90px;
+  }
+  
+  .service-card h3 {
+    font-size: 1.3rem;
+  }
+  
+  .loader {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .custom-carousel {
+    height: 200px;
+  }
+
+  .carousel-dots {
+    bottom: 10px;
+    gap: 8px;
+  }
+
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .services-title {
+    font-size: 1.75rem;
+  }
+  
+  .services-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .search-bar {
+    width: 96%;
+  }
+  
+  .service-card {
+    padding: 15px;
+    min-height: 85px;
+  }
+  
+  .service-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  
+  .service-card p {
+    font-size: 13px;
+  }
+  
+  .loader {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 360px) {
+  .custom-carousel {
+    height: 180px;
+  }
+  
+  .carousel-caption {
+    font-size: 0.8rem;
+    padding: 4px 0;
+  }
+  
+  .services-title {
+    font-size: 1.5rem;
+  }
+  
+  .search-bar {
+    width: 94%;
+  }
+  
+  .service-card {
+    padding: 12px;
+    min-height: 80px;
+  }
+  
+  .service-card h3 {
+    font-size: 1.1rem;
+  }
+  
+  .loader {
+    width: 30px;
+    height: 30px;
   }
 }

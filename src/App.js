@@ -1,6 +1,7 @@
 // src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import OfflineNotice from './components/OfflineNotice';
 
 // Admin Pages
 import AdminDashboard from "./pages/AdminDashboard";
@@ -8,6 +9,7 @@ import ManageServices from "./pages/ManageServices";
 import ManageUsers from "./pages/ManageUsers";
 import ViewFeedback from "./pages/ViewFeedback";
 import ManageCarousel from "./pages/ManageCarousel";
+import About from "./pages/About";
 
 // User & Auth Pages
 import HomePage from "./pages/HomePage";
@@ -24,6 +26,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Router>
+     <OfflineNotice />
       <div style={{ padding: "1rem" }}>
         <Routes>
           {/* Public Routes */}
@@ -31,6 +34,7 @@ function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/About" element={<About />} /> 
           
 
 

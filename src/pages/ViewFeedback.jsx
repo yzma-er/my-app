@@ -1,5 +1,6 @@
-// src/pages/ViewFeedback.jsx
+// src/pages/ViewFeedback.jsx - UPDATED to show user emails
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ViewFeedback.css";
 import StepRatingsModal from "../components/StepRatingsModal";
@@ -8,6 +9,7 @@ function ViewFeedback() {
   const [feedback, setFeedback] = useState([]);
   const [services, setServices] = useState([]);
   const [filter, setFilter] = useState("All Services");
+  const navigate = useNavigate();
 
   // For modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -17,7 +19,7 @@ function ViewFeedback() {
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
-      : "http://192.168.1.7:5000";
+      : "https://digital-guidance-api.onrender.com";
 
   // memoized fetch functions to satisfy eslint rules
   const fetchFeedback = useCallback(async () => {
@@ -89,9 +91,7 @@ function ViewFeedback() {
     setSelectedService(service);
 
     try {
-      const res = await axios.get(
-        `${backendURL}/api/feedback/step-ratings/${service.service_id}`
-      );
+      const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
       setStepRatings(res.data);
     } catch (err) {
       console.error("❌ Error loading step ratings:", err);
@@ -103,6 +103,31 @@ function ViewFeedback() {
 
   return (
     <div className="feedback-container">
+      
+      {/* Back button */}
+      <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
+        <button
+          className="back-admin-btn"
+          onClick={() => navigate("/admin")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: "30px",
+            backgroundColor: "#1c7c0f",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "bold",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            position: "absolute",
+            left: 0,
+          }}
+        >
+          <span style={{ fontWeight: "bold", fontSize: "18px" }}>←</span>
+        </button>
+      </div>
+
       <h2>📋 Feedback Records</h2>
 
       {/* Summary Section */}
@@ -145,6 +170,7 @@ function ViewFeedback() {
       <table className="feedback-table">
         <thead>
           <tr>
+            <th>User Email</th>
             <th>Service</th>
             <th>Step</th>
             <th>Rating</th>
@@ -157,11 +183,27 @@ function ViewFeedback() {
           {filteredFeedback.length > 0 ? (
             filteredFeedback.map((item) => (
               <tr key={item.feedback_id}>
+                <td>
+                  {item.user_email ? (
+                    <span title={`User ID: ${item.user_id}`}>
+                      {item.user_email}
+                    </span>
+                  ) : (
+                    <span style={{ color: '#999', fontStyle: 'italic' }}>
+                      Anonymous
+                    </span>
+                  )}
+                </td>
                 <td>{item.service_name || "—"}</td>
                 <td>{item.step_number ? `Step ${item.step_number}` : "—"}</td>
                 <td>
-                  {"★".repeat(item.rating)}
-                  {"☆".repeat(5 - item.rating)}
+                  <span style={{ color: '#ffa500' }}>
+                    {"★".repeat(item.rating)}
+                    {"☆".repeat(5 - item.rating)}
+                  </span>
+                  <span style={{ marginLeft: '8px', fontSize: '12px', color: '#666' }}>
+                    ({item.rating}/5)
+                  </span>
                 </td>
                 <td>{item.comment || "No comment"}</td>
                 <td>
@@ -182,13 +224,14 @@ function ViewFeedback() {
             ))
           ) : (
             <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>
+              <td colSpan="7" style={{ textAlign: "center" }}>
                 No feedback available.
               </td>
             </tr>
           )}
         </tbody>
       </table>
+
 
       {/* Step Ratings Modal */}
       <StepRatingsModal
