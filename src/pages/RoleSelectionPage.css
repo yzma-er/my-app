@@ -154,6 +154,7 @@
 .horizontal-scroll-wrapper::-webkit-scrollbar-thumb {
   background: #104C08;
   border-radius: 10px;
+  border: 2px solid #f1f1f1;
 }
 
 .horizontal-scroll-wrapper::-webkit-scrollbar-thumb:hover {
