@@ -1,4 +1,4 @@
-// src/pages/SignupPage.jsx
+// src/pages/SignupPage.jsx - UPDATED WITH OTP DISPLAY
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
@@ -14,6 +14,7 @@ function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(3);
+  const [lastOtpReceived, setLastOtpReceived] = useState(""); // Store last OTP
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -38,7 +39,7 @@ function SignupPage() {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Step 1: Send OTP
+  // Step 1: Send OTP - UPDATED TO HANDLE OTP IN RESPONSE
   const handleSendOTP = async (e) => {
     e?.preventDefault();
     setIsLoading(true);
@@ -67,13 +68,22 @@ function SignupPage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("✅ OTP sent! Check your email.");
+        // Check if OTP is in response (logging mode)
+        if (data.otp) {
+          setLastOtpReceived(data.otp); // Store the OTP
+          alert(`✅ Verification code: ${data.otp}\n\nCopy this code and enter it below.`);
+          // Auto-fill the OTP field for convenience
+          setOtp(data.otp);
+        } else {
+          alert("✅ OTP sent! Check your email.");
+        }
+        
         setStep(2);
         setTimer(600); // 10 minutes
         setResendDisabled(true);
         setTimeout(() => setResendDisabled(false), 60000); // Enable resend after 1 minute
       } else {
-        alert(data.message || "Failed to send OTP.");
+        alert(data.message || "Failed to get verification code.");
       }
     } catch (err) {
       console.error("OTP request error:", err);
@@ -113,6 +123,7 @@ function SignupPage() {
             alert("Too many failed attempts. Please request a new OTP.");
             setStep(1);
             setOtp("");
+            setLastOtpReceived("");
           }
         }
         alert(data.message || "Invalid OTP.");
@@ -125,7 +136,7 @@ function SignupPage() {
     }
   };
 
-  // Step 3: Complete signup with password
+  // Step 3: Complete signup with password - NO CHANGES
   const handleSignup = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -188,6 +199,7 @@ function SignupPage() {
     setOtp("");
     setPassword("");
     setConfirmPassword("");
+    setLastOtpReceived("");
   };
 
   return (
@@ -211,10 +223,13 @@ function SignupPage() {
                   required
                   style={{ width: "100%" }}
                 />
+                <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
+                  Note: Email service is in testing mode. You'll receive the code directly.
+                </p>
               </div>
 
               <button type="submit" disabled={isLoading}>
-                {isLoading ? "Sending OTP..." : "Send Verification Code"}
+                {isLoading ? "Getting Code..." : "Get Verification Code"}
               </button>
             </form>
           )}
@@ -223,8 +238,26 @@ function SignupPage() {
             <form onSubmit={handleVerifyOTP}>
               <div style={{ marginBottom: "20px" }}>
                 <p style={{ marginBottom: "15px" }}>
-                  We sent a 6-digit code to <strong>{email}</strong>
+                  Enter the 6-digit code for <strong>{email}</strong>
                 </p>
+                
+                {/* Show last received OTP if available */}
+                {lastOtpReceived && (
+                  <div style={{
+                    background: "#f0f9ff",
+                    border: "1px dashed #93c5fd",
+                    borderRadius: "8px",
+                    padding: "15px",
+                    marginBottom: "15px"
+                  }}>
+                    <p style={{ margin: 0, fontSize: "14px", color: "#1d4ed8" }}>
+                      <strong>Your code:</strong> {lastOtpReceived}
+                    </p>
+                    <p style={{ margin: "5px 0 0 0", fontSize: "12px", color: "#6b7280" }}>
+                      Copy and paste this code below
+                    </p>
+                  </div>
+                )}
                 
                 <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
                   Enter Verification Code
@@ -266,10 +299,11 @@ function SignupPage() {
                     marginTop: "10px",
                     background: "transparent",
                     color: "#2563eb",
-                    border: "1px solid #2563eb"
+                    border: "1px solid #2563eb",
+                    width: "100%"
                   }}
                 >
-                  {resendDisabled ? "Resend in 60s" : "Resend Code"}
+                  {resendDisabled ? "Resend in 60s" : "Get New Code"}
                 </button>
               </div>
 
