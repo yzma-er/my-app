@@ -13,7 +13,6 @@ const EMAILJS_CONFIG = {
 };
 
 function SignupPage() 
-  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
