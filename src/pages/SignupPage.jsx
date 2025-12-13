@@ -24,6 +24,9 @@ function SignupPage() {
   const [attemptsLeft, setAttemptsLeft] = useState(3);
   const [lastOtp, setLastOtp] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   // Timer for OTP expiration
   useEffect(() => {
     let interval;
