@@ -7,9 +7,9 @@ import emailjs from '@emailjs/browser'; // Import EmailJS
 
 // Your EmailJS credentials
 const EMAILJS_CONFIG = {
-  SERVICE_ID: 'YOUR_SERVICE_ID', // Replace with yours
-  TEMPLATE_ID: 'YOUR_TEMPLATE_ID', // Replace with yours
-  PUBLIC_KEY: 'YOUR_PUBLIC_KEY' // Replace with yours
+  SERVICE_ID: 'service_kku64qi', 
+  TEMPLATE_ID: 'template_4sgjelo', 
+  PUBLIC_KEY: 'wyYCTD154FjbgcZZg' 
 };
 
 function SignupPage() {
