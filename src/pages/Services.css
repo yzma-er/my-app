@@ -309,3 +309,144 @@ p {
     max-height: 250px;
   }
 }
+
+/* All Steps Container */
+.all-steps-container {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Step Header */
+.info-section h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+/* Star Rating Styling */
+.star-rating {
+  margin: 10px 0;
+  font-size: 1.8rem;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.star {
+  color: #ccc;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+.star.active {
+  color: gold;
+}
+
+/* Overall Rating Section */
+.overall-rating-section {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Feedback textarea styling */
+.feedback-section textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid #1C7C0F;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 1rem;
+  resize: vertical;
+  margin: 10px 0;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+.feedback-section textarea:focus {
+  outline: none;
+  border-color: #104C08;
+  box-shadow: 0 0 0 2px rgba(16, 76, 8, 0.1);
+}
+
+/* Rating summary boxes */
+.rating-summary {
+  background: #f8fff8;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 15px 0;
+  border: 1px solid #bde3b2;
+}
+
+.rating-summary h5 {
+  color: #1C7C0F;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Scrollable feedback lists */
+.scrollable-feedback {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.scrollable-feedback::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-feedback::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.scrollable-feedback::-webkit-scrollbar-thumb {
+  background: #1C7C0F;
+  border-radius: 3px;
+}
+
+.scrollable-feedback::-webkit-scrollbar-thumb:hover {
+  background: #104C08;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .info-section h3 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .star-rating {
+    font-size: 1.5rem;
+  }
+  
+  .overall-rating-section {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .star-rating {
+    font-size: 1.3rem;
+    gap: 3px;
+  }
+  
+  .feedback-section textarea {
+    min-height: 60px;
+    font-size: 14px;
+  }
+}
