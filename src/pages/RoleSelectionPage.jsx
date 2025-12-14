@@ -381,8 +381,7 @@ function RoleSelectionPage() {
                 
                 {/* Privacy notice */}
                 <div className="privacy-notice">
-                  <i className="fas fa-user-shield"></i>
-                  <span>User identity protected for privacy</span>
+                  
                 </div>
               </div>
             ))}
