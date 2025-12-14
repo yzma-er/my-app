@@ -80,8 +80,8 @@ function ManageServices() {
       for (const userEmail of userEmails.slice(0, 10)) { // Limit to 10 for demo
         try {
           await emailjs.send(
-            'YOUR_EMAILJS_SERVICE_ID', // Replace with your service ID
-            'YOUR_EMAILJS_TEMPLATE_ID', // Replace with your template ID
+            'service_272iigq', 
+            'template_4rlwtmh', 
             {
               service_name: serviceName,
               user_email: userEmail,
