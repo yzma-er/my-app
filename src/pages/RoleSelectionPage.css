@@ -1286,19 +1286,5 @@ html {
   color: #4a5568;
 }
 
-/* Animation for privacy notice */
-@keyframes fadeInPrivacy {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-.privacy-notice {
-  animation: fadeInPrivacy 0.5s ease;
-}
 
