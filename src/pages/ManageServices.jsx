@@ -95,7 +95,7 @@ function ManageServices() {
               frontend_url: window.location.origin,
               to_email: userEmail,
             },
-            'YOUR_EMAILJS_PUBLIC_KEY' // Replace with your public key
+            'nZ7vZJT3MytIs9BqH' 
           );
           
           successfulSends.push(userEmail);
