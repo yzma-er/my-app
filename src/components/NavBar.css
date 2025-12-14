@@ -1,5 +1,4 @@
-/* Add these styles to your existing NavBar.css */
-
+/* src/components/NavBar.css - FIXED VERSION */
 .navbar {
   background-color: #104C08;
   color: white;
@@ -32,76 +31,108 @@
   gap: 20px;
 }
 
-.navbar-links a {
+/* ✅ FIXED: About Button with Background Color */
+.about-btn {
+  background-color: #1C7C0F;
   color: white;
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(28, 124, 15, 0.2);
 }
 
-.navbar-links a:hover {
-  text-decoration: underline;
-  color: #b2fab4;
+.about-btn:hover {
+  background-color: #155a0a;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(28, 124, 15, 0.3);
+  text-decoration: none;
+  color: white;
 }
 
-/* ✅ User Email Display in Navbar */
+/* ✅ FIXED: User Email Display - ALWAYS VISIBLE */
 .user-email-nav {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: white;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 0.9rem;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 18px;
+  border-radius: 25px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 15px;
+  font-weight: 600;
   transition: all 0.3s ease;
   cursor: default;
-  max-width: 180px;
+  max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .user-email-nav:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .user-email-nav i {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: #b2fab4;
 }
 
 .user-email-nav span {
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 500;
 }
 
+/* ✅ FIXED: Logout Button with Centered Text */
 .logout-btn {
   background-color: #b71c1c;
   border: none;
   color: white;
-  padding: 6px 14px;
-  border-radius: 6px;
+  padding: 8px 22px;
+  border-radius: 25px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
+  font-size: 15px;
+  min-width: 120px;
+  box-shadow: 0 3px 8px rgba(183, 28, 28, 0.2);
+  text-align: center;
+}
+
+.logout-btn span {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logout-btn:hover {
   background-color: #8b0000;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3);
+  box-shadow: 0 5px 12px rgba(139, 0, 0, 0.3);
 }
 
 .logout-btn i {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 /* ========== LOGOUT SUCCESS NOTIFICATION ========== */
@@ -242,12 +273,17 @@
     animation: slideDown 0.3s ease forwards;
   }
 
-  /* User email in mobile menu */
-  .user-email-nav {
-    max-width: 90%;
-    padding: 8px 16px;
+  /* Mobile buttons */
+  .about-btn, .logout-btn, .user-email-nav {
+    width: 85%;
+    max-width: 300px;
+    justify-content: center;
+    padding: 12px 24px;
     margin: 5px 0;
-    text-align: center;
+  }
+
+  .logout-btn span {
+    justify-content: center;
   }
 
   /* Mobile notification */
@@ -312,13 +348,33 @@
     font-size: 18px;
   }
 
-  .user-email-nav {
-    font-size: 0.85rem;
-    padding: 6px 12px;
+  .about-btn, .logout-btn, .user-email-nav {
+    font-size: 14px;
+    padding: 10px 20px;
   }
 
-  .logout-btn {
-    padding: 6px 12px;
-    font-size: 0.9rem;
+  .user-email-nav span {
+    font-size: 13px;
+  }
+
+  .navbar-links {
+    gap: 12px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .navbar-logo {
+    font-size: 16px;
+  }
+
+  .about-btn, .logout-btn, .user-email-nav {
+    width: 90%;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .logout-btn span {
+    font-size: 13px;
   }
 }
