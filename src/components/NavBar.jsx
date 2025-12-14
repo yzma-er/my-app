@@ -1,4 +1,4 @@
-// src/components/NavBar.jsx - UPDATED VERSIOnN
+// src/components/NavBar.jsx - UPDATED VERSION
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./NavBar.css";
