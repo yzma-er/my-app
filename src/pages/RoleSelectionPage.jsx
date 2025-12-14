@@ -379,10 +379,7 @@ function RoleSelectionPage() {
                     : comment.comment}"
                 </div>
                 
-                {/* Privacy notice */}
-                <div className="privacy-notice">
-                  
-                </div>
+                
               </div>
             ))}
           </div>
