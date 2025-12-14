@@ -1,4 +1,4 @@
-// src/pages/RoleSelectionPage.jsx
+// src/pages/RoleSelectionPage.jsx - UPDATED WITH RECENT COMMENTS
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -13,7 +13,9 @@ function RoleSelectionPage() {
   const [showRatings, setShowRatings] = useState(false);
   const [services, setServices] = useState([]);
   const [feedback, setFeedback] = useState([]);
+  const [recentComments, setRecentComments] = useState([]); // NEW STATE
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingComments, setIsLoadingComments] = useState(true); // NEW STATE
   const [isScrolled, setIsScrolled] = useState(false);
 
   // ⭐ MODAL STATES
@@ -24,6 +26,7 @@ function RoleSelectionPage() {
   // ⭐ REFS
   const scrollContainerRef = useRef(null);
   const ratingsContainerRef = useRef(null);
+  const commentsContainerRef = useRef(null); // NEW REF
 
   const backendURL =
     window.location.hostname === "localhost"
@@ -39,39 +42,43 @@ function RoleSelectionPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ⭐ FETCH SERVICES + FEEDBACK
+  // ⭐ FETCH SERVICES + FEEDBACK + RECENT COMMENTS
   const fetchData = useCallback(async () => {
     setIsLoading(true);
+    setIsLoadingComments(true);
     try {
-      const [s, f] = await Promise.all([
+      const [s, f, rc] = await Promise.all([
         axios.get(`${backendURL}/api/services`),
-        axios.get(`${backendURL}/api/feedback`)
+        axios.get(`${backendURL}/api/feedback`),
+        axios.get(`${backendURL}/api/feedback/recent-comments`) // NEW FETCH
       ]);
 
       setServices(s.data);
       setFeedback(f.data);
+      setRecentComments(rc.data);
     } catch (err) {
-      console.error("❌ Error loading ratings:", err);
+      console.error("❌ Error loading data:", err);
       setServices([]);
+      setRecentComments([]);
     } finally {
       setIsLoading(false);
+      setIsLoadingComments(false);
     }
   }, [backendURL]);
 
   useEffect(() => {
     fetchData();
-    const pollingInterval = setInterval(() => fetchData(), 10000);
+    const pollingInterval = setInterval(() => fetchData(), 15000); // Reduced to 15 seconds
     return () => clearInterval(pollingInterval);
   }, [fetchData]);
 
   // ⭐ AUTO-SCROLL TO RATINGS WHEN SHOWN
   useEffect(() => {
     if (showRatings && ratingsContainerRef.current) {
-      // Wait a moment for the ratings to render
       setTimeout(() => {
         ratingsContainerRef.current.scrollIntoView({
           behavior: 'smooth',
-          block: 'start', // Align to top of viewport
+          block: 'start',
           inline: 'nearest'
         });
       }, 100);
@@ -136,15 +143,47 @@ function RoleSelectionPage() {
     const willShowRatings = !showRatings;
     setShowRatings(willShowRatings);
     
-    // If we're showing ratings, the useEffect will handle scrolling
-    // If we're hiding ratings, scroll back to top
     if (!willShowRatings && ratingsContainerRef.current) {
-      // Scroll to top of page when hiding ratings
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
       });
     }
+  };
+
+  // ⭐ FORMAT DATE FOR COMMENTS
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffMins < 60) {
+      return `${diffMins}m ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours}h ago`;
+    } else if (diffDays < 7) {
+      return `${diffDays}d ago`;
+    } else {
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: diffDays < 365 ? undefined : 'numeric'
+      });
+    }
+  };
+
+  // ⭐ GET USER DISPLAY NAME
+  const getUserDisplayName = (user) => {
+    if (user.first_name && user.last_name) {
+      return `${user.first_name} ${user.last_name.charAt(0)}.`;
+    } else if (user.user_email) {
+      const namePart = user.user_email.split('@')[0];
+      return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    }
+    return 'Anonymous';
   };
 
   return (
@@ -177,10 +216,66 @@ function RoleSelectionPage() {
             onClick={toggleRatingsWithScroll}
           >
             <i className="fas fa-star"></i>
-            {showRatings ? 'Hide Service Ratings' : 'View Service Ratings'}
+            {showRatings ? 'Hide Ratings' : 'View Ratings'}
           </button>
         </div>
       </nav>
+
+      {/* ⭐ RECENT COMMENTS SECTION - ADDED BELOW NAVBAR */}
+      <div ref={commentsContainerRef} className="recent-comments-container">
+        <h2 className="recent-comments-title">
+          <i className="fas fa-comments"></i>
+          Recent User Feedback
+        </h2>
+        
+        {isLoadingComments ? (
+          <div className="comments-loading">
+            <div className="loading-spinner small"></div>
+            <p>Loading comments...</p>
+          </div>
+        ) : recentComments.length > 0 ? (
+          <div className="comments-grid">
+            {recentComments.map((comment, index) => (
+              <div key={comment.feedback_id} className="comment-card">
+                <div className="comment-header">
+                  <div className="comment-user-info">
+                    <div className="user-avatar">
+                      <i className="fas fa-user"></i>
+                    </div>
+                    <div className="user-details">
+                      <span className="user-name">{getUserDisplayName(comment)}</span>
+                      <span className="comment-time">{formatDate(comment.created_at)}</span>
+                    </div>
+                  </div>
+                  <div className="comment-rating">
+                    <span className="rating-stars">
+                      {"★".repeat(comment.rating)}
+                      {"☆".repeat(5 - comment.rating)}
+                    </span>
+                    <span className="rating-number">({comment.rating}/5)</span>
+                  </div>
+                </div>
+                
+                <div className="comment-service">
+                  <i className="fas fa-tag"></i>
+                  <span className="service-name">{comment.service_name}</span>
+                </div>
+                
+                <div className="comment-text">
+                  "{comment.comment.length > 150 
+                    ? comment.comment.substring(0, 150) + '...' 
+                    : comment.comment}"
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="no-comments">
+            <i className="fas fa-comment-slash"></i>
+            <p>No feedback comments yet. Be the first to share your experience!</p>
+          </div>
+        )}
+      </div>
 
       {/* ⭐ SERVICE RATINGS - ABOVE CAROUSEL */}
       <div ref={ratingsContainerRef}>
@@ -217,7 +312,7 @@ function RoleSelectionPage() {
                         <div className="role-card-rating">
                           <i className="fas fa-star"></i>
                           <span className="rating-value">{s.avg}</span>
-                          <span className="rating-count">({s.count})</span>
+                          <span className="rating-count">({s.count} ratings)</span>
                         </div>
                       </div>
                       <div className="role-card-actions">
