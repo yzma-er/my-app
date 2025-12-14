@@ -1,4 +1,4 @@
-// src/pages/RoleSelectionPage.jsx - UPDATED WITH RECENT COMMENTS
+// src/pages/RoleSelectionPage.jsx - UPDATED WITH POSITION AND PRIVACY
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -13,9 +13,9 @@ function RoleSelectionPage() {
   const [showRatings, setShowRatings] = useState(false);
   const [services, setServices] = useState([]);
   const [feedback, setFeedback] = useState([]);
-  const [recentComments, setRecentComments] = useState([]); // NEW STATE
+  const [recentComments, setRecentComments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingComments, setIsLoadingComments] = useState(true); // NEW STATE
+  const [isLoadingComments, setIsLoadingComments] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
 
   // ⭐ MODAL STATES
@@ -26,7 +26,7 @@ function RoleSelectionPage() {
   // ⭐ REFS
   const scrollContainerRef = useRef(null);
   const ratingsContainerRef = useRef(null);
-  const commentsContainerRef = useRef(null); // NEW REF
+  const commentsContainerRef = useRef(null);
 
   const backendURL =
     window.location.hostname === "localhost"
@@ -50,7 +50,7 @@ function RoleSelectionPage() {
       const [s, f, rc] = await Promise.all([
         axios.get(`${backendURL}/api/services`),
         axios.get(`${backendURL}/api/feedback`),
-        axios.get(`${backendURL}/api/feedback/recent-comments`) // NEW FETCH
+        axios.get(`${backendURL}/api/feedback/recent-comments`)
       ]);
 
       setServices(s.data);
@@ -68,7 +68,7 @@ function RoleSelectionPage() {
 
   useEffect(() => {
     fetchData();
-    const pollingInterval = setInterval(() => fetchData(), 15000); // Reduced to 15 seconds
+    const pollingInterval = setInterval(() => fetchData(), 15000);
     return () => clearInterval(pollingInterval);
   }, [fetchData]);
 
@@ -175,15 +175,30 @@ function RoleSelectionPage() {
     }
   };
 
-  // ⭐ GET USER DISPLAY NAME
+  // ⭐ PROTECT EMAIL PRIVACY (show only first 2 letters, rest as asterisks)
+  const protectEmail = (email) => {
+    if (!email) return 'Anonymous';
+    
+    const [username, domain] = email.split('@');
+    if (username.length <= 2) {
+      return `${username}***@${domain}`;
+    }
+    
+    // Show first 2 characters, then asterisks
+    const protectedUsername = username.substring(0, 2) + '*'.repeat(3);
+    return `${protectedUsername}@${domain}`;
+  };
+
+  // ⭐ GET USER DISPLAY NAME (with privacy protection)
   const getUserDisplayName = (user) => {
     if (user.first_name && user.last_name) {
+      // For users with names, show first name + last initial
       return `${user.first_name} ${user.last_name.charAt(0)}.`;
     } else if (user.user_email) {
-      const namePart = user.user_email.split('@')[0];
-      return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+      // For email-only users, show protected email
+      return protectEmail(user.user_email);
     }
-    return 'Anonymous';
+    return 'Anonymous User';
   };
 
   return (
@@ -220,62 +235,6 @@ function RoleSelectionPage() {
           </button>
         </div>
       </nav>
-
-      {/* ⭐ RECENT COMMENTS SECTION - ADDED BELOW NAVBAR */}
-      <div ref={commentsContainerRef} className="recent-comments-container">
-        <h2 className="recent-comments-title">
-          <i className="fas fa-comments"></i>
-          Recent User Feedback
-        </h2>
-        
-        {isLoadingComments ? (
-          <div className="comments-loading">
-            <div className="loading-spinner small"></div>
-            <p>Loading comments...</p>
-          </div>
-        ) : recentComments.length > 0 ? (
-          <div className="comments-grid">
-            {recentComments.map((comment, index) => (
-              <div key={comment.feedback_id} className="comment-card">
-                <div className="comment-header">
-                  <div className="comment-user-info">
-                    <div className="user-avatar">
-                      <i className="fas fa-user"></i>
-                    </div>
-                    <div className="user-details">
-                      <span className="user-name">{getUserDisplayName(comment)}</span>
-                      <span className="comment-time">{formatDate(comment.created_at)}</span>
-                    </div>
-                  </div>
-                  <div className="comment-rating">
-                    <span className="rating-stars">
-                      {"★".repeat(comment.rating)}
-                      {"☆".repeat(5 - comment.rating)}
-                    </span>
-                    <span className="rating-number">({comment.rating}/5)</span>
-                  </div>
-                </div>
-                
-                <div className="comment-service">
-                  <i className="fas fa-tag"></i>
-                  <span className="service-name">{comment.service_name}</span>
-                </div>
-                
-                <div className="comment-text">
-                  "{comment.comment.length > 150 
-                    ? comment.comment.substring(0, 150) + '...' 
-                    : comment.comment}"
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="no-comments">
-            <i className="fas fa-comment-slash"></i>
-            <p>No feedback comments yet. Be the first to share your experience!</p>
-          </div>
-        )}
-      </div>
 
       {/* ⭐ SERVICE RATINGS - ABOVE CAROUSEL */}
       <div ref={ratingsContainerRef}>
@@ -370,6 +329,72 @@ function RoleSelectionPage() {
 
       <h1>Welcome to ASP Digital Guidance System</h1>
       <p className="welcome-subtitle">Sign In Above to Continue</p>
+
+      {/* ⭐ RECENT COMMENTS SECTION - MOVED BELOW WELCOME MESSAGE */}
+      <div ref={commentsContainerRef} className="recent-comments-container">
+        <h2 className="recent-comments-title">
+          <i className="fas fa-comment-dots"></i>
+          Recent User Feedback
+        </h2>
+        <p className="recent-comments-subtitle">
+          See what others are saying about our services
+        </p>
+        
+        {isLoadingComments ? (
+          <div className="comments-loading">
+            <div className="loading-spinner small"></div>
+            <p>Loading recent feedback...</p>
+          </div>
+        ) : recentComments.length > 0 ? (
+          <div className="comments-grid">
+            {recentComments.map((comment, index) => (
+              <div key={comment.feedback_id} className="comment-card">
+                <div className="comment-header">
+                  <div className="comment-user-info">
+                    <div className="user-avatar">
+                      <i className="fas fa-user"></i>
+                    </div>
+                    <div className="user-details">
+                      <span className="user-name">{getUserDisplayName(comment)}</span>
+                      <span className="comment-time">{formatDate(comment.created_at)}</span>
+                    </div>
+                  </div>
+                  <div className="comment-rating">
+                    <span className="rating-stars">
+                      {"★".repeat(comment.rating)}
+                      {"☆".repeat(5 - comment.rating)}
+                    </span>
+                    <span className="rating-number">({comment.rating}/5)</span>
+                  </div>
+                </div>
+                
+                <div className="comment-service">
+                  <i className="fas fa-tag"></i>
+                  <span className="service-name">{comment.service_name}</span>
+                </div>
+                
+                <div className="comment-text">
+                  "{comment.comment.length > 150 
+                    ? comment.comment.substring(0, 150) + '...' 
+                    : comment.comment}"
+                </div>
+                
+                {/* Privacy notice */}
+                <div className="privacy-notice">
+                  <i className="fas fa-user-shield"></i>
+                  <span>User identity protected for privacy</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="no-comments">
+            <i className="fas fa-comment-slash"></i>
+            <h3>No feedback yet</h3>
+            <p>Be the first to share your experience! Sign in and rate our services.</p>
+          </div>
+        )}
+      </div>
 
       {/* ⭐ STEP RATINGS MODAL */}
       <StepRatingsModal
