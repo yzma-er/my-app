@@ -77,7 +77,7 @@ function NavBar() {
 
       <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
         <div className="navbar-left">
-          <h2 className="navbar-logo">ASP Digital Guidance</h2>
+          <h2 className="navbar-logo">ASP DigiGuide</h2>
         </div>
 
         {/* Hamburger icon */}
