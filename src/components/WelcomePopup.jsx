@@ -11,10 +11,10 @@ function WelcomePopup({ userEmail, onClose }) {
       setIsVisible(true);
     }, 300);
 
-    // Auto-close after 5 seconds
+    // Auto-close after 10 seconds
     const autoCloseTimer = setTimeout(() => {
       handleClose();
-    }, 5000);
+    }, 10000);
 
     return () => {
       clearTimeout(timer);
@@ -60,7 +60,7 @@ function WelcomePopup({ userEmail, onClose }) {
         </div>
         
         <div className="welcome-content">
-          <h3>Welcome back, {getUserName(userEmail)}! 👋</h3>
+          <h3>Welcome, {getUserName(userEmail)}! 👋</h3>
           <p>You're successfully logged in as:</p>
           <div className="user-email-display">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
