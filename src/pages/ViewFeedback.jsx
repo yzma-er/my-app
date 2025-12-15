@@ -1,13 +1,12 @@
-// src/pages/ViewFeedback.jsx - CaOMPLETE with jspdf
+// src/pages/ViewFeedback.jsx - WORKING VERSION WITHOUT jspdf-autotable
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ViewFeedback.css";
 import StepRatingsModal from "../components/StepRatingsModal";
 
-// Import jspdf - Make sure these are installed
+// CORRECT: Only jsPDF, NO autotable
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
 
 function ViewFeedback() {
   const [feedback, setFeedback] = useState([]);
@@ -76,30 +75,71 @@ function ViewFeedback() {
 
   // Get feedback filtered by date range for reports
   const getDateFilteredFeedback = () => {
-    const now = new Date();
     let startDate, endDate;
 
     switch (reportType) {
       case "monthly":
         startDate = new Date(selectedYear, selectedMonth - 1, 1);
-        endDate = new Date(selectedYear, selectedMonth, 0);
+        endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59, 999);
         break;
       case "semi-annually":
         const isFirstHalf = selectedMonth <= 6;
         startDate = new Date(selectedYear, isFirstHalf ? 0 : 6, 1);
-        endDate = new Date(selectedYear, isFirstHalf ? 5 : 11, 31);
+        endDate = new Date(selectedYear, isFirstHalf ? 5 : 11, 31, 23, 59, 59, 999);
         break;
       case "annually":
         startDate = new Date(selectedYear, 0, 1);
-        endDate = new Date(selectedYear, 11, 31);
+        endDate = new Date(selectedYear, 11, 31, 23, 59, 59, 999);
         break;
       default:
         return filteredFeedback;
     }
 
+    // Helper function to parse dates correctly
+    const parseFeedbackDate = (dateString) => {
+      if (!dateString) return null;
+      
+      // If it's already a Date object
+      if (dateString instanceof Date) return dateString;
+      
+      try {
+        // Try parsing as ISO string first
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) return date;
+        
+        // Try parsing "MM/DD/YY, HH:MM:SS AM/PM" format
+        if (typeof dateString === 'string' && dateString.includes('/')) {
+          const [datePart, timePart] = dateString.split(', ');
+          const [month, day, yearShort] = datePart.split('/').map(Number);
+          const year = yearShort < 100 ? yearShort + 2000 : yearShort;
+          
+          let hour = 0, minute = 0, second = 0;
+          if (timePart) {
+            const [time, period] = timePart.split(' ');
+            const [h, m, s] = time.split(':').map(Number);
+            hour = period?.toUpperCase() === 'PM' && h < 12 ? h + 12 : h;
+            minute = m || 0;
+            second = s || 0;
+          }
+          
+          return new Date(year, month - 1, day, hour, minute, second);
+        }
+      } catch (error) {
+        console.error("Error parsing date:", error);
+      }
+      
+      return null;
+    };
+
     return filteredFeedback.filter((item) => {
-      const itemDate = new Date(item.created_at);
-      return itemDate >= startDate && itemDate <= endDate;
+      try {
+        const itemDate = parseFeedbackDate(item.created_at);
+        if (!itemDate || isNaN(itemDate.getTime())) return false;
+        return itemDate >= startDate && itemDate <= endDate;
+      } catch (error) {
+        console.error("Error filtering date:", error);
+        return false;
+      }
     });
   };
 
@@ -114,31 +154,39 @@ function ViewFeedback() {
       };
     }
 
-    const totalRating = feedbackList.reduce((sum, item) => sum + item.rating, 0);
-    const averageRating = totalRating / feedbackList.length;
+    const validFeedback = feedbackList.filter(item => 
+      item.rating >= 1 && item.rating <= 5
+    );
+    
+    const totalRating = validFeedback.reduce((sum, item) => sum + item.rating, 0);
+    const averageRating = validFeedback.length > 0 ? totalRating / validFeedback.length : 0;
     
     const serviceCounts = {};
     const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
-    feedbackList.forEach((item) => {
-      // Count by service
+    validFeedback.forEach((item) => {
       const serviceName = item.service_name || "Unknown";
       serviceCounts[serviceName] = (serviceCounts[serviceName] || 0) + 1;
-      
-      // Count by rating
-      ratingDistribution[item.rating]++;
+      const rating = Math.min(Math.max(1, item.rating), 5);
+      ratingDistribution[rating]++;
     });
 
     return {
-      totalFeedbacks: feedbackList.length,
+      totalFeedbacks: validFeedback.length,
       averageRating: averageRating.toFixed(2),
       serviceCounts,
       ratingDistribution,
     };
   };
 
-  // Generate PDF Report
+  // Generate PDF Report - SIMPLE WORKING VERSION WITHOUT AUTOTABLE
   const generatePDFReport = async () => {
+    // Check if data is loaded
+    if (feedback.length === 0) {
+      alert("⚠️ Please wait for feedback data to load before generating report.");
+      return;
+    }
+    
     setLoadingReport(true);
     
     try {
@@ -147,10 +195,11 @@ function ViewFeedback() {
       
       // Create new PDF document
       const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.width;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
       let yPos = 20;
       
-      // Add header with logo and title
+      // Add header
       doc.setFillColor(28, 124, 15);
       doc.rect(0, 0, pageWidth, 40, 'F');
       
@@ -189,31 +238,34 @@ function ViewFeedback() {
       yPos += 7;
       doc.setFont("helvetica", "normal");
       Object.entries(stats.ratingDistribution).forEach(([rating, count]) => {
-        const stars = "★".repeat(parseInt(rating)) + "☆".repeat(5 - parseInt(rating));
-        doc.text(`${stars} (${rating}/5): ${count} feedbacks`, 20, yPos);
+        doc.text(`Rating ${rating}/5: ${count} feedbacks`, 20, yPos);
         yPos += 7;
       });
       
       // Service breakdown
-      yPos += 10;
-      doc.setFont("helvetica", "bold");
-      doc.text("Service Breakdown:", 14, yPos);
-      
-      yPos += 7;
-      doc.setFont("helvetica", "normal");
-      Object.entries(stats.serviceCounts).forEach(([service, count]) => {
-        if (yPos > 250) {
-          doc.addPage();
-          yPos = 20;
-        }
-        doc.text(`${service}: ${count} feedbacks`, 20, yPos);
+      if (Object.keys(stats.serviceCounts).length > 0) {
+        yPos += 10;
+        doc.setFont("helvetica", "bold");
+        doc.text("Service Breakdown:", 14, yPos);
+        
         yPos += 7;
-      });
+        doc.setFont("helvetica", "normal");
+        Object.entries(stats.serviceCounts).forEach(([service, count]) => {
+          if (yPos > 250) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(`${service}: ${count} feedbacks`, 20, yPos);
+          yPos += 7;
+        });
+      }
       
-      // Detailed feedback table
+      // Detailed feedback - SIMPLE TABLE WITHOUT AUTOTABLE
       if (reportFeedback.length > 0) {
         yPos += 10;
-        if (yPos > 200) {
+        
+        // Check if we need new page
+        if (yPos > 180) {
           doc.addPage();
           yPos = 20;
         }
@@ -222,25 +274,59 @@ function ViewFeedback() {
         doc.text("Detailed Feedback", 14, yPos);
         yPos += 10;
         
-        const tableData = reportFeedback.map((item, index) => [
-          index + 1,
-          item.user_email || "Anonymous",
-          item.service_name || "—",
-          item.step_number ? `Step ${item.step_number}` : "—",
-          "★".repeat(item.rating) + "☆".repeat(5 - item.rating),
-          item.comment ? item.comment.substring(0, 50) + (item.comment.length > 50 ? "..." : "") : "No comment",
-          new Date(item.created_at).toLocaleDateString(),
-        ]);
+        // Simple table header
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("#", 14, yPos);
+        doc.text("User", 24, yPos);
+        doc.text("Service", 70, yPos);
+        doc.text("Step", 120, yPos);
+        doc.text("Rating", 140, yPos);
+        doc.text("Date", 160, yPos);
         
-        doc.autoTable({
-          startY: yPos,
-          head: [["#", "User Email", "Service", "Step", "Rating", "Comment", "Date"]],
-          body: tableData,
-          theme: 'grid',
-          headStyles: { fillColor: [28, 124, 15] },
-          styles: { fontSize: 8, cellPadding: 2 },
-          margin: { left: 14, right: 14 },
+        // Draw header line
+        yPos += 3;
+        doc.line(14, yPos, pageWidth - 14, yPos);
+        yPos += 7;
+        
+        // Table rows
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        
+        reportFeedback.slice(0, 30).forEach((item, index) => {
+          // Check if we need new page
+          if (yPos > 260) {
+            doc.addPage();
+            yPos = 20;
+            // Draw headers on new page
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("#", 14, yPos);
+            doc.text("User", 24, yPos);
+            doc.text("Service", 70, yPos);
+            doc.text("Step", 120, yPos);
+            doc.text("Rating", 140, yPos);
+            doc.text("Date", 160, yPos);
+            yPos += 10;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+          }
+          
+          doc.text(`${index + 1}`, 14, yPos);
+          doc.text(item.user_email?.substring(0, 15) || "Anonymous", 24, yPos);
+          doc.text(item.service_name?.substring(0, 20) || "—", 70, yPos);
+          doc.text(item.step_number ? `S${item.step_number}` : "—", 120, yPos);
+          doc.text(`${item.rating}/5`, 140, yPos);
+          doc.text(new Date(item.created_at).toLocaleDateString('en-US'), 160, yPos);
+          
+          yPos += 7;
         });
+        
+        if (reportFeedback.length > 30) {
+          yPos += 5;
+          doc.setFont("helvetica", "italic");
+          doc.text(`... and ${reportFeedback.length - 30} more records`, 14, yPos);
+        }
       } else {
         yPos += 20;
         doc.text("No feedback available for selected period.", 14, yPos);
@@ -252,12 +338,15 @@ function ViewFeedback() {
         doc.setPage(i);
         doc.setFontSize(10);
         doc.setTextColor(128, 128, 128);
-        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, doc.internal.pageSize.height - 10);
-        doc.text("Digital Guidance System", 20, doc.internal.pageSize.height - 10);
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, pageHeight - 10);
+        doc.text("Digital Guidance System", 20, pageHeight - 10);
       }
       
       // Save PDF
-      doc.save(`Feedback_Report_${getReportPeriodText().replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
+      const fileName = `Feedback_Report_${getReportPeriodText().replace(/\s+/g, '_')}.pdf`;
+      doc.save(fileName);
+      
+      console.log("PDF generated successfully!");
       
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -390,9 +479,10 @@ function ViewFeedback() {
             <button 
               onClick={generatePDFReport} 
               className="generate-report-btn"
-              disabled={loadingReport}
+              disabled={loadingReport || feedback.length === 0}
             >
-              {loadingReport ? "⏳ Generating..." : "📥 Download PDF Report"}
+              {loadingReport ? "⏳ Generating..." : 
+               feedback.length === 0 ? "📋 Loading data..." : "📥 Download PDF Report"}
             </button>
           </div>
         </div>
@@ -402,12 +492,19 @@ function ViewFeedback() {
             Selected Period: <strong>{getReportPeriodText()}</strong>
           </p>
           <p className="report-stats">
-            Feedbacks in period: <strong>{reportData.length}</strong> | 
-            Average Rating: <strong>{stats.averageRating}/5</strong>
+            {feedback.length === 0 ? (
+              "⏳ Loading feedback data..."
+            ) : (
+              <>
+                Feedbacks in period: <strong>{reportData.length}</strong> | 
+                Average Rating: <strong>{stats.averageRating}/5</strong>
+              </>
+            )}
           </p>
         </div>
       </div>
 
+      {/* Rest of your component remains the same... */}
       {/* Summary Section */}
       <div className="summary-section">
         <h3>Average Ratings per Service</h3>
