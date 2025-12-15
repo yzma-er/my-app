@@ -74,34 +74,69 @@ function ViewFeedback() {
             f.service_name?.trim().toLowerCase() === filter.trim().toLowerCase()
         );
 
-  // Get feedback filtered by date range for reports
-  const getDateFilteredFeedback = () => {
-    const now = new Date();
-    let startDate, endDate;
+  // Get feedback filtered by date range for reports - FIXED VERSION
+const getDateFilteredFeedback = () => {
+  let startDate, endDate;
 
-    switch (reportType) {
-      case "monthly":
-        startDate = new Date(selectedYear, selectedMonth - 1, 1);
-        endDate = new Date(selectedYear, selectedMonth, 0);
-        break;
-      case "semi-annually":
-        const isFirstHalf = selectedMonth <= 6;
-        startDate = new Date(selectedYear, isFirstHalf ? 0 : 6, 1);
-        endDate = new Date(selectedYear, isFirstHalf ? 5 : 11, 31);
-        break;
-      case "annually":
-        startDate = new Date(selectedYear, 0, 1);
-        endDate = new Date(selectedYear, 11, 31);
-        break;
-      default:
-        return filteredFeedback;
-    }
+  switch (reportType) {
+    case "monthly":
+      // Create dates for the selected month
+      startDate = new Date(selectedYear, selectedMonth - 1, 1);
+      endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59, 999); // End of month
+      break;
+    case "semi-annually":
+      const isFirstHalf = selectedMonth <= 6;
+      startDate = new Date(selectedYear, isFirstHalf ? 0 : 6, 1);
+      endDate = new Date(selectedYear, isFirstHalf ? 5 : 11, 31, 23, 59, 59, 999);
+      break;
+    case "annually":
+      startDate = new Date(selectedYear, 0, 1);
+      endDate = new Date(selectedYear, 11, 31, 23, 59, 59, 999);
+      break;
+    default:
+      return filteredFeedback;
+  }
 
-    return filteredFeedback.filter((item) => {
-      const itemDate = new Date(item.created_at);
+  console.log("Filtering dates from:", startDate, "to:", endDate);
+  
+  return filteredFeedback.filter((item) => {
+    try {
+      // Parse the date string from the database
+      let itemDate;
+      if (item.created_at) {
+        // Try different date parsing methods
+        if (typeof item.created_at === 'string') {
+          // If it's already a proper date string
+          if (item.created_at.includes('-')) {
+            // ISO format: "2025-12-14T06:26:38.000Z"
+            itemDate = new Date(item.created_at);
+          } else {
+            // Try parsing as locale string
+            itemDate = new Date(item.created_at);
+          }
+        } else {
+          itemDate = new Date(item.created_at);
+        }
+      } else {
+        return false;
+      }
+      
+      // Check if date is valid
+      if (isNaN(itemDate.getTime())) {
+        console.warn("Invalid date for item:", item);
+        return false;
+      }
+      
+      console.log("Checking item date:", itemDate, "vs range:", startDate, "-", endDate);
+      
+      // Check if item date is within range
       return itemDate >= startDate && itemDate <= endDate;
-    });
-  };
+    } catch (error) {
+      console.error("Error parsing date:", error, "for item:", item);
+      return false;
+    }
+  });
+};
 
   // Calculate statistics for report
   const calculateStatistics = (feedbackList) => {
