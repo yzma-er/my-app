@@ -1,4 +1,4 @@
-// ForgotPasswordPage.jsx - Request password reset
+// ForgotPasswordPage.jsx - UPDATED WITH CONSISTENT DESIGN
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
@@ -89,7 +89,6 @@ function ForgotPasswordPage() {
             expiration_time: "15 minutes",
             app_name: "Digital Guidance",
             current_year: new Date().getFullYear(),
-           
           }
         );
 
@@ -249,181 +248,232 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="login-wrapper">
-      <div className="login-container">
-        <div className="login-form">
-          <h1>Forgot Password</h1>
-          <h3>Reset your Digital Guidance password</h3>
+    <div className="auth-wrapper-split">
+      {/* Left Side - Image/Decoration */}
+      <div className="auth-left-side">
+        <div className="auth-image-placeholder">
+          <div className="auth-image-content">
+            <h2>Reset Password</h2>
+            <p>Secure your account with a new password</p>
+            <div className="auth-image-decoration">
+              <div className="auth-decoration-circle"></div>
+              <div className="auth-decoration-square"></div>
+              <div className="auth-decoration-triangle"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          {step === 1 && (
-            <form onSubmit={handleRequestReset}>
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  placeholder="Enter your registered email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  style={{ width: "100%" }}
-                />
-                <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
-                  We'll send a verification code to this email.
-                </p>
-              </div>
-
-              <button type="submit" disabled={isLoading}>
-                {isLoading ? "Sending Code..." : "Send Reset Code"}
+      {/* Right Side - Forgot Password Form */}
+      <div className="auth-right-side">
+        <div className="auth-container">
+          <div className="auth-content">
+            {/* Back Button */}
+            <div className="back-button-container">
+              <button 
+                className="back-button"
+                onClick={() => navigate("/login")}
+                disabled={isLoading}
+              >
+                ← Back to Login
               </button>
+            </div>
 
-              <div style={{ textAlign: "center", marginTop: "20px" }}>
-                <Link to="/login" style={{ color: "#2563eb" }}>
-                  ← Back to Login
-                </Link>
-              </div>
-            </form>
-          )}
+            <div className="auth-header">
+              <h1>Forgot Password</h1>
+              <p className="auth-welcome-text">Reset your Digital Guidance password</p>
+            </div>
 
-          {step === 2 && (
-            <form onSubmit={handleVerifyResetOTP}>
-              <div style={{ marginBottom: "20px" }}>
-                <p style={{ marginBottom: "15px" }}>
-                  Enter the 6-digit code sent to <strong>{email}</strong>
-                </p>
-                
-                <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
-                  Reset Code
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter 6-digit code"
-                  value={otp}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    if (value.length <= 6) setOtp(value);
-                  }}
-                  maxLength={6}
-                  required
-                  style={{ 
-                    width: "100%",
-                    fontSize: "20px",
-                    letterSpacing: "10px",
-                    textAlign: "center"
-                  }}
-                />
-                
-                <div style={{ marginTop: "10px", fontSize: "14px" }}>
-                  {timer > 0 ? (
-                    <p style={{ color: "#dc2626" }}>
-                      Code expires in: {formatTime(timer)}
+            {step === 1 && (
+              <form onSubmit={handleRequestReset} className="auth-form">
+                <div className="auth-form-group">
+                  <label htmlFor="email">Email Address</label>
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your registered email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="auth-input"
+                  />
+                  <p className="auth-hint">
+                    We'll send a verification code to this email.
+                  </p>
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="auth-button"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Sending Code..." : "Send Reset Code"}
+                </button>
+              </form>
+            )}
+
+            {step === 2 && (
+              <form onSubmit={handleVerifyResetOTP} className="auth-form">
+                <div className="auth-form-group">
+                  <p className="auth-info">
+                    Enter the 6-digit code sent to <strong>{email}</strong>
+                  </p>
+                  
+                  <label htmlFor="otp">Reset Code</label>
+                  <input
+                    id="otp"
+                    type="text"
+                    placeholder="Enter 6-digit code"
+                    value={otp}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      if (value.length <= 6) setOtp(value);
+                    }}
+                    maxLength={6}
+                    required
+                    disabled={isLoading}
+                    className="auth-input auth-otp-input"
+                  />
+                  
+                  <div className="auth-timer-info">
+                    {timer > 0 ? (
+                      <p className="auth-timer">
+                        Code expires in: {formatTime(timer)}
+                      </p>
+                    ) : (
+                      <p className="auth-timer-expired">Code expired</p>
+                    )}
+                    <p>Attempts left: {attemptsLeft}</p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleResendResetOTP}
+                    disabled={resendDisabled || isLoading}
+                    className="auth-button-secondary"
+                  >
+                    {resendDisabled ? "Resend in 60s" : "Resend Code"}
+                  </button>
+                </div>
+
+                <div className="auth-button-group">
+                  <button
+                    type="button"
+                    onClick={() => { setStep(1); setOtp(""); }}
+                    disabled={isLoading}
+                    className="auth-button-outline"
+                  >
+                    Back
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="auth-button"
+                  >
+                    {isLoading ? "Verifying..." : "Verify Code"}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {step === 3 && (
+              <form onSubmit={handleResetPassword} className="auth-form">
+                <div className="auth-form-group">
+                  <p className="auth-info">
+                    Set new password for <strong>{email}</strong>
+                  </p>
+
+                  <label htmlFor="newPassword">New Password</label>
+                  <div className="auth-password-container">
+                    <input
+                      id="newPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      placeholder="Enter new password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      disabled={isLoading}
+                      className="auth-input"
+                    />
+                    <button
+                      type="button"
+                      className="auth-password-toggle"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      disabled={isLoading}
+                    >
+                      {showNewPassword ? "🙈" : "👁️"}
+                    </button>
+                  </div>
+
+                  {newPassword.length > 0 && newPassword.length < 8 && (
+                    <p className="auth-error">
+                      Password must be at least 8 characters long.
                     </p>
-                  ) : (
-                    <p style={{ color: "#dc2626" }}>Code expired</p>
                   )}
-                  <p>Attempts left: {attemptsLeft}</p>
+
+                  <label htmlFor="confirmPassword">Confirm New Password</label>
+                  <div className="auth-password-container">
+                    <input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm new password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      disabled={isLoading}
+                      className="auth-input"
+                    />
+                    <button
+                      type="button"
+                      className="auth-password-toggle"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={isLoading}
+                    >
+                      {showConfirmPassword ? "🙈" : "👁️"}
+                    </button>
+                  </div>
+
+                  {confirmPassword.length > 0 && confirmPassword !== newPassword && (
+                    <p className="auth-error">
+                      Passwords do not match.
+                    </p>
+                  )}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleResendResetOTP}
-                  disabled={resendDisabled || isLoading}
-                  style={{
-                    marginTop: "10px",
-                    background: "transparent",
-                    color: "#2563eb",
-                    border: "1px solid #2563eb",
-                    width: "100%"
-                  }}
-                >
-                  {resendDisabled ? "Resend in 60s" : "Resend Code"}
-                </button>
-              </div>
-
-              <div style={{ display: "flex", gap: "10px" }}>
-                <button
-                  type="button"
-                  onClick={() => { setStep(1); setOtp(""); }}
-                  style={{ flex: 1, background: "#6b7280" }}
-                >
-                  Back
-                </button>
-                <button type="submit" disabled={isLoading} style={{ flex: 2 }}>
-                  {isLoading ? "Verifying..." : "Verify Code"}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {step === 3 && (
-            <form onSubmit={handleResetPassword}>
-              <div style={{ marginBottom: "20px" }}>
-                <p style={{ marginBottom: "15px" }}>
-                  Set new password for <strong>{email}</strong>
-                </p>
-
-                <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
-                  New Password
-                </label>
-                <div className="password-container">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    placeholder="Enter new password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                  />
-                  <i
-                    className={`fa-solid ${showNewPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                  ></i>
+                <div className="auth-button-group">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    disabled={isLoading}
+                    className="auth-button-outline"
+                  >
+                    Back
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="auth-button"
+                  >
+                    {isLoading ? "Resetting..." : "Reset Password"}
+                  </button>
                 </div>
+              </form>
+            )}
 
-                {newPassword.length > 0 && newPassword.length < 8 && (
-                  <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
-                    Password must be at least 8 characters long.
-                  </p>
-                )}
-
-                <label style={{ display: "block", marginBottom: "8px", marginTop: "15px", fontWeight: "500" }}>
-                  Confirm New Password
-                </label>
-                <div className="password-container">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm new password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                  <i
-                    className={`fa-solid ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  ></i>
-                </div>
-
-                {confirmPassword.length > 0 && confirmPassword !== newPassword && (
-                  <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
-                    Passwords do not match.
-                  </p>
-                )}
-              </div>
-
-              <div style={{ display: "flex", gap: "10px" }}>
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  style={{ flex: 1, background: "#6b7280" }}
+            <div className="auth-footer">
+              <p>
+                Remember your password?{" "}
+                <Link 
+                  to="/login" 
+                  className="auth-link auth-link-bold"
+                  onClick={(e) => isLoading && e.preventDefault()}
                 >
-                  Back
-                </button>
-                <button type="submit" disabled={isLoading} style={{ flex: 2 }}>
-                  {isLoading ? "Resetting..." : "Reset Password"}
-                </button>
-              </div>
-            </form>
-          )}
+                  Back to Login
+                </Link>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
