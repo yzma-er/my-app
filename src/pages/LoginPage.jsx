@@ -1,4 +1,3 @@
-//Loginpage
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import "./LoginPage.css";
@@ -12,7 +11,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 🔥 FIX: Correct backend URL (local = localhost, deployed = render)
+  // 🔥 FIX: Correct backend URL
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
@@ -46,11 +45,8 @@ function LoginPage() {
 
         // Store token
         localStorage.setItem("token", data.token);
-        
-        // ✅ ADD THIS: Store email for welcome popup
         localStorage.setItem("userEmail", email);
         
-        // ✅ ADD THIS: Set flag for welcome popup (only for users, not admins)
         if (decoded.role === "user") {
           localStorage.setItem("justLoggedIn", "true");
         }
@@ -77,34 +73,45 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-wrapper-split">
+    <div className="auth-wrapper-split">
       {/* Left Side - Image/Decoration */}
-      <div className="login-left-side">
-        <div className="login-image-placeholder">
-          <div className="image-content">
+      <div className="auth-left-side">
+        <div className="auth-image-placeholder">
+          <div className="auth-image-content">
             <h2>Digital Guidance</h2>
             <p>Your journey to digital excellence starts here</p>
-            <div className="image-decoration">
-              <div className="decoration-circle"></div>
-              <div className="decoration-square"></div>
-              <div className="decoration-triangle"></div>
+            <div className="auth-image-decoration">
+              <div className="auth-decoration-circle"></div>
+              <div className="auth-decoration-square"></div>
+              <div className="auth-decoration-triangle"></div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="login-right-side">
-        <div className="login-container-split">
-          <div className="login-content-split">
-            <div className="login-header-split">
+      <div className="auth-right-side">
+        <div className="auth-container">
+          <div className="auth-content">
+            {/* Back Button */}
+            <div className="back-button-container">
+              <button 
+                className="back-button"
+                onClick={() => navigate("/")}
+                disabled={loading}
+              >
+                ← Back to Home
+              </button>
+            </div>
+
+            <div className="auth-header">
               <h1>Login</h1>
-              <p className="welcome-text-split">Welcome back! Please login to your account.</p>
+              <p className="auth-welcome-text">Welcome back! Please login to your account.</p>
             </div>
 
             {/* Login Form */}
-            <form onSubmit={handleLogin}>
-              <div className="form-group-split">
+            <form onSubmit={handleLogin} className="auth-form">
+              <div className="auth-form-group">
                 <label htmlFor="email">Email</label>
                 <input
                   id="email"
@@ -114,13 +121,13 @@ function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={loading}
-                  className="email-input-split"
+                  className="auth-input"
                 />
               </div>
 
-              <div className="form-group-split">
+              <div className="auth-form-group">
                 <label htmlFor="password">Password</label>
-                <div className="password-container-split">
+                <div className="auth-password-container">
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -129,10 +136,11 @@ function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={loading}
+                    className="auth-input"
                   />
                   <button
                     type="button"
-                    className="password-toggle-split"
+                    className="auth-password-toggle"
                     onClick={() => !loading && setShowPassword(!showPassword)}
                     disabled={loading}
                   >
@@ -141,8 +149,8 @@ function LoginPage() {
                 </div>
               </div>
 
-              <div className="login-options-split">
-                <label className="remember-me-split">
+              <div className="auth-options">
+                <label className="auth-remember-me">
                   <input
                     type="checkbox"
                     checked={rememberMe}
@@ -153,7 +161,7 @@ function LoginPage() {
                 </label>
                 <Link 
                   to="/forgot-password" 
-                  className="forgot-password-link-split"
+                  className="auth-link"
                   onClick={(e) => loading && e.preventDefault()}
                 >
                   Forgot Password?
@@ -162,12 +170,12 @@ function LoginPage() {
 
               <button 
                 type="submit" 
-                className="login-btn-split"
+                className="auth-button"
                 disabled={loading}
               >
                 {loading ? (
                   <>
-                    <div className="loader-split"></div>
+                    <div className="auth-loader"></div>
                     Logging in...
                   </>
                 ) : (
@@ -176,12 +184,12 @@ function LoginPage() {
               </button>
             </form>
 
-            <div className="signup-link-container-split">
+            <div className="auth-footer">
               <p>
                 Don't have an account?{" "}
                 <Link 
                   to="/signup" 
-                  className="signup-link-new-split"
+                  className="auth-link auth-link-bold"
                   onClick={(e) => loading && e.preventDefault()}
                 >
                   Sign up
