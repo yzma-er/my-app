@@ -1,446 +1,539 @@
-// SignupPage.jsx - COMPLETE UPDATED VERSION WITH BACKEND-GENERATED OTP
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./LoginPage.css";
-import API_BASE_URL from "../config";
-import emailjs from '@emailjs/browser';
+// src/pages/ViewFeedback.jsx - COMPLETE with jspdf
+import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./ViewFeedback.css";
+import StepRatingsModal from "../components/StepRatingsModal";
 
-// Your EmailJS credentials
-const EMAILJS_CONFIG = {
-  SERVICE_ID: 'service_kku64qi',
-  TEMPLATE_ID: 'template_4sgjelo',
-  PUBLIC_KEY: 'wyYCTD154FjbgcZZg'
-};
+// Import jspdf - Make sure these are installed
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
-function SignupPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState(1);
-  const [timer, setTimer] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [resendDisabled, setResendDisabled] = useState(false);
-  const [attemptsLeft, setAttemptsLeft] = useState(3);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  
+function ViewFeedback() {
+  const [feedback, setFeedback] = useState([]);
+  const [services, setServices] = useState([]);
+  const [filter, setFilter] = useState("All Services");
   const navigate = useNavigate();
 
-  // Initialize EmailJS
+  // For modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [stepRatings, setStepRatings] = useState([]);
+
+  // Report generation states
+  const [reportType, setReportType] = useState("monthly");
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [loadingReport, setLoadingReport] = useState(false);
+
+  const backendURL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : "https://digital-guidance-api.onrender.com";
+
+  // memoized fetch functions
+  const fetchFeedback = useCallback(async () => {
+    try {
+      const res = await axios.get(`${backendURL}/api/feedback`);
+      setFeedback(res.data);
+    } catch (err) {
+      console.error("❌ Error fetching feedback:", err);
+    }
+  }, [backendURL]);
+
+  const fetchServices = useCallback(async () => {
+    try {
+      const res = await axios.get(`${backendURL}/api/services`);
+      setServices(res.data);
+    } catch (err) {
+      console.error("❌ Error fetching services:", err);
+    }
+  }, [backendURL]);
+
   useEffect(() => {
-    emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
-  }, []);
+    fetchFeedback();
+    fetchServices();
+  }, [fetchFeedback, fetchServices]);
 
-  // Timer for OTP expiration
-  useEffect(() => {
-    let interval;
-    if (timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this feedback?")) return;
+    try {
+      await axios.delete(`${backendURL}/api/feedback/${id}`);
+      fetchFeedback();
+    } catch (err) {
+      console.error("❌ Error deleting feedback:", err);
     }
-    return () => clearInterval(interval);
-  }, [timer]);
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Step 1: Send OTP via EmailJS (using backend-generated OTP)
-  const handleSendOTP = async (e) => {
-    e?.preventDefault();
-    setIsLoading(true);
+  // Filtered feedback based on service filter
+  const filteredFeedback =
+    filter === "All Services"
+      ? feedback
+      : feedback.filter(
+          (f) =>
+            f.service_name?.trim().toLowerCase() === filter.trim().toLowerCase()
+        );
 
-    if (!email) {
-      alert("Please enter your email address.");
-      setIsLoading(false);
-      return;
+  // Get feedback filtered by date range for reports
+  const getDateFilteredFeedback = () => {
+    const now = new Date();
+    let startDate, endDate;
+
+    switch (reportType) {
+      case "monthly":
+        startDate = new Date(selectedYear, selectedMonth - 1, 1);
+        endDate = new Date(selectedYear, selectedMonth, 0);
+        break;
+      case "semi-annually":
+        const isFirstHalf = selectedMonth <= 6;
+        startDate = new Date(selectedYear, isFirstHalf ? 0 : 6, 1);
+        endDate = new Date(selectedYear, isFirstHalf ? 5 : 11, 31);
+        break;
+      case "annually":
+        startDate = new Date(selectedYear, 0, 1);
+        endDate = new Date(selectedYear, 11, 31);
+        break;
+      default:
+        return filteredFeedback;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address.");
-      setIsLoading(false);
-      return;
+    return filteredFeedback.filter((item) => {
+      const itemDate = new Date(item.created_at);
+      return itemDate >= startDate && itemDate <= endDate;
+    });
+  };
+
+  // Calculate statistics for report
+  const calculateStatistics = (feedbackList) => {
+    if (feedbackList.length === 0) {
+      return {
+        totalFeedbacks: 0,
+        averageRating: 0,
+        serviceCounts: {},
+        ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      };
     }
 
+    const totalRating = feedbackList.reduce((sum, item) => sum + item.rating, 0);
+    const averageRating = totalRating / feedbackList.length;
+    
+    const serviceCounts = {};
+    const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+    feedbackList.forEach((item) => {
+      // Count by service
+      const serviceName = item.service_name || "Unknown";
+      serviceCounts[serviceName] = (serviceCounts[serviceName] || 0) + 1;
+      
+      // Count by rating
+      ratingDistribution[item.rating]++;
+    });
+
+    return {
+      totalFeedbacks: feedbackList.length,
+      averageRating: averageRating.toFixed(2),
+      serviceCounts,
+      ratingDistribution,
+    };
+  };
+
+  // Generate PDF Report
+  const generatePDFReport = async () => {
+    setLoadingReport(true);
+    
     try {
-      // 1. Call backend to generate and store OTP
-      console.log("Step 1: Requesting OTP from backend...");
-      const generateRes = await fetch(`${API_BASE_URL}/api/auth/generate-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+      const reportFeedback = getDateFilteredFeedback();
+      const stats = calculateStatistics(reportFeedback);
+      
+      // Create new PDF document
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+      let yPos = 20;
+      
+      // Add header with logo and title
+      doc.setFillColor(28, 124, 15);
+      doc.rect(0, 0, pageWidth, 40, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.setFont("helvetica", "bold");
+      doc.text("Feedback Report", pageWidth / 2, 25, { align: "center" });
+      
+      doc.setFontSize(12);
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 35, { align: "center" });
+      
+      // Report period info
+      yPos = 50;
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Report Period: ${getReportPeriodText()}`, 14, yPos);
+      
+      // Statistics section
+      yPos += 15;
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Summary Statistics", 14, yPos);
+      
+      yPos += 10;
+      doc.setFont("helvetica", "normal");
+      doc.text(`Total Feedbacks: ${stats.totalFeedbacks}`, 20, yPos);
+      yPos += 7;
+      doc.text(`Average Rating: ${stats.averageRating}/5`, 20, yPos);
+      
+      // Rating distribution
+      yPos += 12;
+      doc.setFont("helvetica", "bold");
+      doc.text("Rating Distribution:", 14, yPos);
+      
+      yPos += 7;
+      doc.setFont("helvetica", "normal");
+      Object.entries(stats.ratingDistribution).forEach(([rating, count]) => {
+        const stars = "★".repeat(parseInt(rating)) + "☆".repeat(5 - parseInt(rating));
+        doc.text(`${stars} (${rating}/5): ${count} feedbacks`, 20, yPos);
+        yPos += 7;
       });
-
-      const generateData = await generateRes.json();
       
-      if (!generateRes.ok) {
-        throw new Error(generateData.message || "Failed to generate OTP");
-      }
-
-      console.log("Step 2: Backend OTP received");
-
-      // 2. Send email via EmailJS using the OTP from backend
-      console.log("Step 3: Sending email via EmailJS...");
-      const emailResult = await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_ID,
-        EMAILJS_CONFIG.TEMPLATE_ID,
-        {
-          to_email: email,
-          to_name: email.split('@')[0],
-          otp_code: generateData.otp, // Use OTP from backend
-          expiration_time: "10 minutes",
-          app_name: "Digital Guidance",
-          current_year: new Date().getFullYear()
+      // Service breakdown
+      yPos += 10;
+      doc.setFont("helvetica", "bold");
+      doc.text("Service Breakdown:", 14, yPos);
+      
+      yPos += 7;
+      doc.setFont("helvetica", "normal");
+      Object.entries(stats.serviceCounts).forEach(([service, count]) => {
+        if (yPos > 250) {
+          doc.addPage();
+          yPos = 20;
         }
-      );
-
-      console.log("✅ Email sent successfully");
+        doc.text(`${service}: ${count} feedbacks`, 20, yPos);
+        yPos += 7;
+      });
       
-      // Move to verification step
-      setStep(2);
-      setTimer(600); // 10 minutes
-      setResendDisabled(true);
-      setTimeout(() => setResendDisabled(false), 60000);
-      
-      alert("✅ Verification code has been sent to your email!");
-      
-    } catch (err) {
-      console.error("OTP sending error:", err);
-      
-      // Better error messages
-      if (err.message.includes("Failed to generate OTP")) {
-        alert("❌ " + err.message);
-      } else if (err.text?.includes("emailjs")) {
-        alert("❌ Failed to send verification email. Please check your email address and try again.");
+      // Detailed feedback table
+      if (reportFeedback.length > 0) {
+        yPos += 10;
+        if (yPos > 200) {
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("Detailed Feedback", 14, yPos);
+        yPos += 10;
+        
+        const tableData = reportFeedback.map((item, index) => [
+          index + 1,
+          item.user_email || "Anonymous",
+          item.service_name || "—",
+          item.step_number ? `Step ${item.step_number}` : "—",
+          "★".repeat(item.rating) + "☆".repeat(5 - item.rating),
+          item.comment ? item.comment.substring(0, 50) + (item.comment.length > 50 ? "..." : "") : "No comment",
+          new Date(item.created_at).toLocaleDateString(),
+        ]);
+        
+        doc.autoTable({
+          startY: yPos,
+          head: [["#", "User Email", "Service", "Step", "Rating", "Comment", "Date"]],
+          body: tableData,
+          theme: 'grid',
+          headStyles: { fillColor: [28, 124, 15] },
+          styles: { fontSize: 8, cellPadding: 2 },
+          margin: { left: 14, right: 14 },
+        });
       } else {
-        alert("❌ " + (err.message || "Failed to send verification code. Please try again."));
+        yPos += 20;
+        doc.text("No feedback available for selected period.", 14, yPos);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Step 2: Verify OTP
-  const handleVerifyOTP = async (e) => {
-    e?.preventDefault();
-    setIsLoading(true);
-
-    if (!otp || otp.length !== 6) {
-      alert("Please enter a valid 6-digit OTP.");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("✅ Email verified successfully!");
-        setStep(3);
-      } else {
-        if (data.attemptsLeft !== undefined) {
-          setAttemptsLeft(data.attemptsLeft);
-          if (data.attemptsLeft <= 0) {
-            alert("❌ Too many failed attempts. Please request a new OTP.");
-            setStep(1);
-            setOtp("");
-          }
-        }
-        alert(data.message || "❌ Invalid verification code.");
-      }
-    } catch (err) {
-      console.error("OTP verification error:", err);
-      alert("❌ An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Step 3: Complete signup
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    if (!password || !confirmPassword) {
-      alert("Please fill in all fields.");
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 8) {
-      alert("Password must be at least 8 characters long.");
-      setIsLoading(false);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      alert("Passwords do not match.");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, otp }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("✅ Account created successfully!");
-        navigate("/login");
-      } else {
-        alert(data.message || "❌ Signup failed.");
-        if (data.message?.includes("not verified")) {
-          setStep(1);
-        }
-      }
-    } catch (err) {
-      console.error("Signup error:", err);
-      alert("❌ An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Resend OTP - Updated to use backend-generated OTP
-  const handleResendOTP = async () => {
-    if (resendDisabled) return;
-    setResendDisabled(true);
-    setIsLoading(true);
-
-    try {
-      // 1. Call backend to generate new OTP
-      const generateRes = await fetch(`${API_BASE_URL}/api/auth/resend-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
-      });
-
-      const generateData = await generateRes.json();
       
-      if (!generateRes.ok) {
-        throw new Error(generateData.message || "Failed to generate new OTP");
+      // Footer
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, doc.internal.pageSize.height - 10);
+        doc.text("Digital Guidance System", 20, doc.internal.pageSize.height - 10);
       }
-
-      // 2. Send email via EmailJS using the new OTP
-      await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_ID,
-        EMAILJS_CONFIG.TEMPLATE_ID,
-        {
-          to_email: email,
-          to_name: email.split('@')[0],
-          otp_code: generateData.otp, // Use new OTP from backend
-          expiration_time: "10 minutes",
-          app_name: "Digital Guidance",
-          current_year: new Date().getFullYear()
-        }
-      );
       
-      alert("✅ New verification code sent to your email!");
-      setTimer(600); // Reset timer to 10 minutes
-      setAttemptsLeft(3); // Reset attempts
+      // Save PDF
+      doc.save(`Feedback_Report_${getReportPeriodText().replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
       
-    } catch (err) {
-      console.error("Resend OTP error:", err);
-      alert("❌ " + (err.message || "Failed to resend verification code"));
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Failed to generate PDF report. Please try again.");
     } finally {
-      setIsLoading(false);
-      setTimeout(() => setResendDisabled(false), 60000);
+      setLoadingReport(false);
     }
   };
+
+  // Helper function to get report period text
+  const getReportPeriodText = () => {
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    switch (reportType) {
+      case "monthly":
+        return `${monthNames[selectedMonth - 1]} ${selectedYear}`;
+      case "semi-annually":
+        const half = selectedMonth <= 6 ? "First Half" : "Second Half";
+        return `${half} ${selectedYear}`;
+      case "annually":
+        return `Year ${selectedYear}`;
+      default:
+        return "Custom Period";
+    }
+  };
+
+  // Open modal and load step ratings
+  const openStepRatings = async (service) => {
+    setSelectedService(service);
+    try {
+      const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
+      setStepRatings(res.data);
+    } catch (err) {
+      console.error("❌ Error loading step ratings:", err);
+      setStepRatings([]);
+    }
+    setModalOpen(true);
+  };
+
+  // Generate months array for dropdown
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  // Generate years array (last 5 years)
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  // Get current report data
+  const reportData = getDateFilteredFeedback();
+  const stats = calculateStatistics(reportData);
 
   return (
-    <div className="login-wrapper">
-      <div className="login-container">
-        <div className="login-form">
-          <h1>Create Account</h1>
-          <h3>Sign Up to Digital Guidance</h3>
+    <div className="feedback-container">
+      
+      {/* Back button */}
+      <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
+        <button
+          className="back-admin-btn"
+          onClick={() => navigate("/admin")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: "30px",
+            backgroundColor: "#1c7c0f",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "bold",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            position: "absolute",
+            left: 0,
+          }}
+        >
+          <span style={{ fontWeight: "bold", fontSize: "18px" }}>←</span>
+        </button>
+      </div>
 
-          {step === 1 && (
-            <form onSubmit={handleSendOTP}>
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  style={{ width: "100%" }}
-                />
-                <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
-                  We'll send a verification code to this email.
-                </p>
-              </div>
+      <h2>📋 Feedback Records</h2>
 
-              <button type="submit" disabled={isLoading}>
-                {isLoading ? "Sending Code..." : "Send Verification Code"}
-              </button>
-            </form>
-          )}
-
-          {step === 2 && (
-            <form onSubmit={handleVerifyOTP}>
-              <div style={{ marginBottom: "20px" }}>
-                <p style={{ marginBottom: "15px" }}>
-                  Enter the 6-digit code sent to <strong>{email}</strong>
-                </p>
-                
-                <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
-                  Enter Verification Code
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter 6-digit code"
-                  value={otp}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    if (value.length <= 6) setOtp(value);
-                  }}
-                  maxLength={6}
-                  required
-                  style={{ 
-                    width: "100%",
-                    fontSize: "20px",
-                    letterSpacing: "10px",
-                    textAlign: "center"
-                  }}
-                />
-                
-                <div style={{ marginTop: "10px", fontSize: "14px" }}>
-                  {timer > 0 ? (
-                    <p style={{ color: "#dc2626" }}>
-                      Code expires in: {formatTime(timer)}
-                    </p>
-                  ) : (
-                    <p style={{ color: "#dc2626" }}>Code expired</p>
-                  )}
-                  <p>Attempts left: {attemptsLeft}</p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleResendOTP}
-                  disabled={resendDisabled || isLoading}
-                  style={{
-                    marginTop: "10px",
-                    background: "transparent",
-                    color: "#2563eb",
-                    border: "1px solid #2563eb",
-                    width: "100%"
-                  }}
-                >
-                  {resendDisabled ? "Resend in 60s" : "Resend Code"}
-                </button>
-              </div>
-
-              <div style={{ display: "flex", gap: "10px" }}>
-                <button
-                  type="button"
-                  onClick={() => { setStep(1); setOtp(""); }}
-                  style={{ flex: 1, background: "#6b7280" }}
-                >
-                  Back
-                </button>
-                <button type="submit" disabled={isLoading} style={{ flex: 2 }}>
-                  {isLoading ? "Verifying..." : "Verify Code"}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {step === 3 && (
-            <form onSubmit={handleSignup}>
-              <div style={{ marginBottom: "20px" }}>
-                <p style={{ marginBottom: "15px" }}>
-                  Email verified: <strong>{email}</strong>
-                </p>
-
-                <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
-                  Password
-                </label>
-                <div className="password-container">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <i
-                    className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
-                    onClick={() => setShowPassword(!showPassword)}
-                  ></i>
-                </div>
-
-                {password.length > 0 && password.length < 8 && (
-                  <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
-                    Password must be at least 8 characters long.
-                  </p>
-                )}
-
-                <label style={{ display: "block", marginBottom: "8px", marginTop: "15px", fontWeight: "500" }}>
-                  Confirm Password
-                </label>
-                <div className="password-container">
-                  <input
-                    type={showConfirm ? "text" : "password"}
-                    placeholder="Confirm password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                  <i
-                    className={`fa-solid ${showConfirm ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
-                    onClick={() => setShowConfirm(!showConfirm)}
-                  ></i>
-                </div>
-
-                {confirmPassword.length > 0 && confirmPassword !== password && (
-                  <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
-                    Passwords do not match.
-                  </p>
-                )}
-              </div>
-
-              <div style={{ display: "flex", gap: "10px" }}>
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  style={{ flex: 1, background: "#6b7280" }}
-                >
-                  Back
-                </button>
-                <button type="submit" disabled={isLoading} style={{ flex: 2 }}>
-                  {isLoading ? "Creating Account..." : "Create Account"}
-                </button>
-              </div>
-            </form>
-          )}
-
-          <p className="signup-link">
-            Already have an account? <Link to="/login">Log In</Link>
+      {/* Report Generation Section */}
+      <div className="report-section">
+        <h3>📊 Generate Report</h3>
+        <div className="report-controls">
+          <div className="control-group">
+            <label>Report Type:</label>
+            <select 
+              value={reportType} 
+              onChange={(e) => setReportType(e.target.value)}
+              className="report-select"
+            >
+              <option value="monthly">Monthly Report</option>
+              <option value="semi-annually">Semi-Annual Report</option>
+              <option value="annually">Annual Report</option>
+            </select>
+          </div>
+          
+          <div className="control-group">
+            <label>Month:</label>
+            <select 
+              value={selectedMonth} 
+              onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+              className="report-select"
+            >
+              {months.map((month, index) => (
+                <option key={index} value={index + 1}>{month}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="control-group">
+            <label>Year:</label>
+            <select 
+              value={selectedYear} 
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              className="report-select"
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="control-group">
+            <button 
+              onClick={generatePDFReport} 
+              className="generate-report-btn"
+              disabled={loadingReport}
+            >
+              {loadingReport ? "⏳ Generating..." : "📥 Download PDF Report"}
+            </button>
+          </div>
+        </div>
+        
+        <div className="report-preview">
+          <p className="report-period">
+            Selected Period: <strong>{getReportPeriodText()}</strong>
+          </p>
+          <p className="report-stats">
+            Feedbacks in period: <strong>{reportData.length}</strong> | 
+            Average Rating: <strong>{stats.averageRating}/5</strong>
           </p>
         </div>
       </div>
+
+      {/* Summary Section */}
+      <div className="summary-section">
+        <h3>Average Ratings per Service</h3>
+        <div className="summary-grid">
+          {services.map((s) => {
+            const serviceFeedback = feedback.filter(
+              (f) =>
+                f.service_name?.trim().toLowerCase() === s.name.trim().toLowerCase()
+            );
+            const avg =
+              serviceFeedback.length > 0
+                ? (
+                    serviceFeedback.reduce((sum, f) => sum + f.rating, 0) /
+                    serviceFeedback.length
+                  ).toFixed(1)
+                : "N/A";
+            const count = serviceFeedback.length;
+            
+            return (
+              <div
+                key={s.service_id}
+                className="summary-card"
+                onClick={() => openStepRatings(s)}
+                style={{ cursor: "pointer" }}
+              >
+                <strong>{s.name}</strong>
+                <p>
+                  ⭐ {avg}{" "}
+                  <span style={{ fontSize: "13px", color: "#555" }}>
+                    ({count} feedbacks)
+                  </span>
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Filter */}
+      <div className="filter-container">
+        <label>Filter by Service:</label>
+        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <option value="All Services">All Services</option>
+          {services.map((s) => (
+            <option key={s.service_id} value={s.name}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Feedback Table */}
+      <table className="feedback-table">
+        <thead>
+          <tr>
+            <th>User Email</th>
+            <th>Service</th>
+            <th>Step</th>
+            <th>Rating</th>
+            <th>Comment</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredFeedback.length > 0 ? (
+            filteredFeedback.map((item) => (
+              <tr key={item.feedback_id}>
+                <td>
+                  {item.user_email ? (
+                    <span title={`User ID: ${item.user_id}`}>
+                      {item.user_email}
+                    </span>
+                  ) : (
+                    <span style={{ color: '#999', fontStyle: 'italic' }}>
+                      Anonymous
+                    </span>
+                  )}
+                </td>
+                <td>{item.service_name || "—"}</td>
+                <td>{item.step_number ? `Step ${item.step_number}` : "—"}</td>
+                <td>
+                  <span style={{ color: '#ffa500' }}>
+                    {"★".repeat(item.rating)}
+                    {"☆".repeat(5 - item.rating)}
+                  </span>
+                  <span style={{ marginLeft: '8px', fontSize: '12px', color: '#666' }}>
+                    ({item.rating}/5)
+                  </span>
+                </td>
+                <td>{item.comment || "No comment"}</td>
+                <td>
+                  {new Date(item.created_at).toLocaleString("en-US", {
+                    dateStyle: "short",
+                    timeStyle: "medium",
+                  })}
+                </td>
+                <td>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(item.feedback_id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="7" style={{ textAlign: "center" }}>
+                No feedback available.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
+      {/* Step Ratings Modal */}
+      <StepRatingsModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        serviceName={selectedService?.name}
+        stepRatings={stepRatings}
+      />
     </div>
   );
 }
 
-export default SignupPage;
+export default ViewFeedback;
