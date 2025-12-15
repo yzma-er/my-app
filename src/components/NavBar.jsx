@@ -1,4 +1,4 @@
-// src/components/NavBar.jsx
+// src/components/NavBar.jsx - FIXED VERSION
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./NavBar.css";
@@ -8,8 +8,10 @@ function NavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLogoutSuccess, setShowLogoutSuccess] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // 🧩 Detect scroll position
+  // Detect scroll position
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -18,20 +20,41 @@ function NavBar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ✅ MATCHES AdminDashboard logout behavior with success message
+  // Check if user is logged in and get email
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const email = localStorage.getItem("userEmail");
+    
+    if (token && email) {
+      setIsLoggedIn(true);
+      setUserEmail(email);
+    } else {
+      setIsLoggedIn(false);
+      setUserEmail("");
+    }
+  }, []);
+
+  // Logout function
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("justLoggedIn");
     
-    // Show success notification
+    setIsLoggedIn(false);
+    setUserEmail("");
     setShowLogoutSuccess(true);
-    
-    // Close mobile menu if open
     setMenuOpen(false);
     
-    // Navigate after showing notification
     setTimeout(() => {
-      navigate("/");   // ⬅ Sends user back to Role Selection page
-    }, 2000); // Show notification for 2 seconds before redirect
+      navigate("/");
+    }, 2000);
+  };
+
+  // Format email to show just the name part
+  const getDisplayName = (email) => {
+    if (!email) return "";
+    const namePart = email.split('@')[0];
+    return namePart.charAt(0).toUpperCase() + namePart.slice(1);
   };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -54,7 +77,7 @@ function NavBar() {
 
       <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
         <div className="navbar-left">
-          <h2 className="navbar-logo">ASP Digital Guidance</h2>
+          <h2 className="navbar-logo">ASP DigiGuide</h2>
         </div>
 
         {/* Hamburger icon */}
@@ -65,10 +88,23 @@ function NavBar() {
         </div>
 
         <div className={`navbar-links ${menuOpen ? "active" : ""}`}>
-          <Link to="/about" onClick={closeMenu}>About</Link>
+          {/* About Button with Background Color */}
+          <Link to="/about" className="about-btn" onClick={closeMenu}>
+            About
+          </Link>
+          
+          {/* User Email Display */}
+          {isLoggedIn && userEmail && (
+            <div className="user-email-nav" title={`Logged in as: ${userEmail}`}>
+              <i className="fas fa-user-circle"></i>
+              <span>{getDisplayName(userEmail)}</span>
+            </div>
+          )}
 
+          {/* Logout Button with Centered Text */}
           <button className="logout-btn" onClick={handleLogout}>
-            Logout
+            <i className="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
           </button>
         </div>
       </nav>

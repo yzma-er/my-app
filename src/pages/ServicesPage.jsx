@@ -1,9 +1,10 @@
-// ServicesPage.jsx
+// src/pages/ServicesPage.jsx - UPDATED WITH WELCOME POPUP
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ServicesPage.css";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import WelcomePopup from "../components/WelcomePopup"; // Add this import
 import axios from "axios";
 
 function ServicesPage() {
@@ -12,13 +13,37 @@ function ServicesPage() {
   const [carouselImages, setCarouselImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false); // Add this state
+  const [userEmail, setUserEmail] = useState(""); // Add this state
   const navigate = useNavigate();
 
-  // Auto-detect backend (Localhost vs Web)
+  // Auto-detect backend
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
+
+  // ✅ Check if user just logged in and get user email
+  useEffect(() => {
+  // Check if user just logged in
+  const justLoggedIn = localStorage.getItem("justLoggedIn");
+  const storedEmail = localStorage.getItem("userEmail");
+  
+  if (justLoggedIn === "true" && storedEmail) {
+    setUserEmail(storedEmail);
+    setShowWelcome(true);
+    
+    // Remove the flag after showing welcome
+    localStorage.removeItem("justLoggedIn");
+    
+    // Auto-hide after 8 seconds
+    const autoHideTimer = setTimeout(() => {
+      setShowWelcome(false);
+    }, 8000);
+    
+    return () => clearTimeout(autoHideTimer);
+  }
+}, []);
 
   // ✅ Fetch Services
   useEffect(() => {
@@ -35,7 +60,7 @@ function ServicesPage() {
     fetchServices();
   }, [backendURL]);
 
-  // ✅ Fetch Carousel Images (Cloudinary URLs already stored in DB)
+  // ✅ Fetch Carousel Images
   useEffect(() => {
     const fetchCarousel = async () => {
       try {
@@ -64,7 +89,10 @@ function ServicesPage() {
     setCurrentIndex(index);
   };
 
-  
+  // Handle welcome popup close
+  const handleWelcomeClose = () => {
+    setShowWelcome(false);
+  };
 
   // Filter services by search
   const filteredServices = services.filter((service) =>
@@ -74,6 +102,14 @@ function ServicesPage() {
   return (
     <div className="services-container">
       <NavBar />
+      
+      {/* ✅ WELCOME POPUP - Shows when user logs in */}
+      {showWelcome && (
+        <WelcomePopup 
+          userEmail={userEmail} 
+          onClose={handleWelcomeClose}
+        />
+      )}
 
       {/* ✅ CAROUSEL */}
       <div className="carousel-container">
@@ -99,7 +135,6 @@ function ServicesPage() {
               ))}
             </div>
 
-           
             {/* Carousel Dots */}
             <div className="carousel-dots">
               {carouselImages.map((_, index) => (

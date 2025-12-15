@@ -189,3 +189,67 @@
     width: 100%;
   }
 }
+/* Add to ManageServices.css */
+.email-sending-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #e8f5e9;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border-left: 4px solid #1C7C0F;
+  animation: pulse 2s infinite;
+}
+
+.email-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #c8e6c9;
+  border-top-color: #1C7C0F;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.9; }
+  50% { opacity: 1; }
+  100% { opacity: 0.9; }
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+.email-notification-info {
+  background: #f0f8ff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  border: 1px solid #d4e8ff;
+  font-size: 14px;
+}
+
+.email-notification-info strong {
+  color: #1C7C0F;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.add-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

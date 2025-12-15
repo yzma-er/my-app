@@ -1,29 +1,29 @@
-// SignupPage.jsx - COMPLETE UPDATED VERSION WITH BACKEND-GENERATED OTP
+// ForgotPasswordPage.jsx - Request password reset
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import API_BASE_URL from "../config";
 import emailjs from '@emailjs/browser';
 
-// Your EmailJS credentials
 const EMAILJS_CONFIG = {
   SERVICE_ID: 'service_kku64qi',
-  TEMPLATE_ID: 'template_4sgjelo',
+  TEMPLATE_ID: 'template_ajktzw8',
   PUBLIC_KEY: 'wyYCTD154FjbgcZZg'
 };
 
-function SignupPage() {
+function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState(1);
-  const [timer, setTimer] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = useState(1); // 1: Enter email, 2: Enter OTP, 3: New password
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(0);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(3);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [resetToken, setResetToken] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const navigate = useNavigate();
 
@@ -49,9 +49,9 @@ function SignupPage() {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Step 1: Send OTP via EmailJS (using backend-generated OTP)
-  const handleSendOTP = async (e) => {
-    e?.preventDefault();
+  // Step 1: Request password reset
+  const handleRequestReset = async (e) => {
+    e.preventDefault();
     setIsLoading(true);
 
     if (!email) {
@@ -68,195 +68,180 @@ function SignupPage() {
     }
 
     try {
-      // 1. Call backend to generate and store OTP
-      console.log("Step 1: Requesting OTP from backend...");
-      const generateRes = await fetch(`${API_BASE_URL}/api/auth/generate-otp`, {
+      // Request reset OTP from backend
+      const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
 
-      const generateData = await generateRes.json();
-      
-      if (!generateRes.ok) {
-        throw new Error(generateData.message || "Failed to generate OTP");
-      }
+      const data = await res.json();
 
-      console.log("Step 2: Backend OTP received");
+      if (res.ok) {
+        // Send email via EmailJS
+        await emailjs.send(
+          EMAILJS_CONFIG.SERVICE_ID,
+          EMAILJS_CONFIG.TEMPLATE_ID,
+          {
+            to_email: email,
+            to_name: email.split('@')[0],
+            otp_code: data.otp,
+            expiration_time: "15 minutes",
+            app_name: "Digital Guidance",
+            current_year: new Date().getFullYear(),
+           
+          }
+        );
 
-      // 2. Send email via EmailJS using the OTP from backend
-      console.log("Step 3: Sending email via EmailJS...");
-      const emailResult = await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_ID,
-        EMAILJS_CONFIG.TEMPLATE_ID,
-        {
-          to_email: email,
-          to_name: email.split('@')[0],
-          otp_code: generateData.otp, // Use OTP from backend
-          expiration_time: "10 minutes",
-          app_name: "Digital Guidance",
-          current_year: new Date().getFullYear()
-        }
-      );
-
-      console.log("✅ Email sent successfully");
-      
-      // Move to verification step
-      setStep(2);
-      setTimer(600); // 10 minutes
-      setResendDisabled(true);
-      setTimeout(() => setResendDisabled(false), 60000);
-      
-      alert("✅ Verification code has been sent to your email!");
-      
-    } catch (err) {
-      console.error("OTP sending error:", err);
-      
-      // Better error messages
-      if (err.message.includes("Failed to generate OTP")) {
-        alert("❌ " + err.message);
-      } else if (err.text?.includes("emailjs")) {
-        alert("❌ Failed to send verification email. Please check your email address and try again.");
+        alert("✅ Password reset code sent to your email!");
+        setStep(2);
+        setTimer(900); // 15 minutes
+        setResendDisabled(true);
+        setTimeout(() => setResendDisabled(false), 60000);
       } else {
-        alert("❌ " + (err.message || "Failed to send verification code. Please try again."));
+        alert(data.message || "Failed to send reset code.");
       }
+    } catch (err) {
+      console.error("Request reset error:", err);
+      alert("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Step 2: Verify OTP
-  const handleVerifyOTP = async (e) => {
-    e?.preventDefault();
+  // Step 2: Verify reset OTP
+  const handleVerifyResetOTP = async (e) => {
+    e.preventDefault();
     setIsLoading(true);
 
     if (!otp || otp.length !== 6) {
-      alert("Please enter a valid 6-digit OTP.");
+      alert("Please enter a valid 6-digit code.");
       setIsLoading(false);
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/verify-reset-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ email, otp })
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        alert("✅ Email verified successfully!");
+        setResetToken(data.resetToken);
+        alert("✅ Code verified! Now set your new password.");
         setStep(3);
       } else {
         if (data.attemptsLeft !== undefined) {
           setAttemptsLeft(data.attemptsLeft);
           if (data.attemptsLeft <= 0) {
-            alert("❌ Too many failed attempts. Please request a new OTP.");
+            alert("Too many failed attempts. Please request a new code.");
             setStep(1);
             setOtp("");
           }
         }
-        alert(data.message || "❌ Invalid verification code.");
+        alert(data.message || "Invalid code.");
       }
     } catch (err) {
-      console.error("OTP verification error:", err);
-      alert("❌ An error occurred. Please try again.");
+      console.error("Verify OTP error:", err);
+      alert("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Step 3: Complete signup
-  const handleSignup = async (e) => {
+  // Step 3: Reset password
+  const handleResetPassword = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (!password || !confirmPassword) {
-      alert("Please fill in all fields.");
+    if (!newPassword || !confirmPassword) {
+      alert("Please fill in all password fields.");
       setIsLoading(false);
       return;
     }
 
-    if (password.length < 8) {
+    if (newPassword.length < 8) {
       alert("Password must be at least 8 characters long.");
       setIsLoading(false);
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       alert("Passwords do not match.");
       setIsLoading(false);
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, otp }),
+        body: JSON.stringify({
+          email,
+          resetToken,
+          newPassword,
+          confirmPassword
+        })
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        alert("✅ Account created successfully!");
+        alert("✅ Password reset successfully! You can now login with your new password.");
         navigate("/login");
       } else {
-        alert(data.message || "❌ Signup failed.");
-        if (data.message?.includes("not verified")) {
-          setStep(1);
-        }
+        alert(data.message || "Failed to reset password.");
       }
     } catch (err) {
-      console.error("Signup error:", err);
-      alert("❌ An error occurred. Please try again.");
+      console.error("Reset password error:", err);
+      alert("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Resend OTP - Updated to use backend-generated OTP
-  const handleResendOTP = async () => {
+  // Resend reset OTP
+  const handleResendResetOTP = async () => {
     if (resendDisabled) return;
     setResendDisabled(true);
     setIsLoading(true);
 
     try {
-      // 1. Call backend to generate new OTP
-      const generateRes = await fetch(`${API_BASE_URL}/api/auth/resend-otp`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/resend-reset-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
 
-      const generateData = await generateRes.json();
-      
-      if (!generateRes.ok) {
-        throw new Error(generateData.message || "Failed to generate new OTP");
-      }
+      const data = await res.json();
 
-      // 2. Send email via EmailJS using the new OTP
-      await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_ID,
-        EMAILJS_CONFIG.TEMPLATE_ID,
-        {
-          to_email: email,
-          to_name: email.split('@')[0],
-          otp_code: generateData.otp, // Use new OTP from backend
-          expiration_time: "10 minutes",
-          app_name: "Digital Guidance",
-          current_year: new Date().getFullYear()
-        }
-      );
-      
-      alert("✅ New verification code sent to your email!");
-      setTimer(600); // Reset timer to 10 minutes
-      setAttemptsLeft(3); // Reset attempts
-      
+      if (res.ok) {
+        // Send email via EmailJS
+        await emailjs.send(
+          EMAILJS_CONFIG.SERVICE_ID,
+          EMAILJS_CONFIG.TEMPLATE_ID,
+          {
+            to_email: email,
+            to_name: email.split('@')[0],
+            otp_code: data.otp,
+            expiration_time: "15 minutes",
+            app_name: "Digital Guidance",
+            current_year: new Date().getFullYear(),
+            purpose: 'password_reset'
+          }
+        );
+
+        alert("✅ New reset code sent to your email!");
+        setTimer(900); // Reset to 15 minutes
+      } else {
+        alert(data.message || "Failed to resend code.");
+      }
     } catch (err) {
-      console.error("Resend OTP error:", err);
-      alert("❌ " + (err.message || "Failed to resend verification code"));
+      console.error("Resend error:", err);
+      alert("Failed to resend code.");
     } finally {
       setIsLoading(false);
       setTimeout(() => setResendDisabled(false), 60000);
@@ -267,18 +252,18 @@ function SignupPage() {
     <div className="login-wrapper">
       <div className="login-container">
         <div className="login-form">
-          <h1>Create Account</h1>
-          <h3>Sign Up to Digital Guidance</h3>
+          <h1>Forgot Password</h1>
+          <h3>Reset your Digital Guidance password</h3>
 
           {step === 1 && (
-            <form onSubmit={handleSendOTP}>
+            <form onSubmit={handleRequestReset}>
               <div style={{ marginBottom: "20px" }}>
                 <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
                   Email Address
                 </label>
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Enter your registered email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -290,20 +275,26 @@ function SignupPage() {
               </div>
 
               <button type="submit" disabled={isLoading}>
-                {isLoading ? "Sending Code..." : "Send Verification Code"}
+                {isLoading ? "Sending Code..." : "Send Reset Code"}
               </button>
+
+              <div style={{ textAlign: "center", marginTop: "20px" }}>
+                <Link to="/login" style={{ color: "#2563eb" }}>
+                  ← Back to Login
+                </Link>
+              </div>
             </form>
           )}
 
           {step === 2 && (
-            <form onSubmit={handleVerifyOTP}>
+            <form onSubmit={handleVerifyResetOTP}>
               <div style={{ marginBottom: "20px" }}>
                 <p style={{ marginBottom: "15px" }}>
                   Enter the 6-digit code sent to <strong>{email}</strong>
                 </p>
                 
                 <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
-                  Enter Verification Code
+                  Reset Code
                 </label>
                 <input
                   type="text"
@@ -336,7 +327,7 @@ function SignupPage() {
 
                 <button
                   type="button"
-                  onClick={handleResendOTP}
+                  onClick={handleResendResetOTP}
                   disabled={resendDisabled || isLoading}
                   style={{
                     marginTop: "10px",
@@ -366,53 +357,53 @@ function SignupPage() {
           )}
 
           {step === 3 && (
-            <form onSubmit={handleSignup}>
+            <form onSubmit={handleResetPassword}>
               <div style={{ marginBottom: "20px" }}>
                 <p style={{ marginBottom: "15px" }}>
-                  Email verified: <strong>{email}</strong>
+                  Set new password for <strong>{email}</strong>
                 </p>
 
                 <label style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}>
-                  Password
+                  New Password
                 </label>
                 <div className="password-container">
                   <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    type={showNewPassword ? "text" : "password"}
+                    placeholder="Enter new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                     required
                   />
                   <i
-                    className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
-                    onClick={() => setShowPassword(!showPassword)}
+                    className={`fa-solid ${showNewPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
+                    onClick={() => setShowNewPassword(!showNewPassword)}
                   ></i>
                 </div>
 
-                {password.length > 0 && password.length < 8 && (
+                {newPassword.length > 0 && newPassword.length < 8 && (
                   <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
                     Password must be at least 8 characters long.
                   </p>
                 )}
 
                 <label style={{ display: "block", marginBottom: "8px", marginTop: "15px", fontWeight: "500" }}>
-                  Confirm Password
+                  Confirm New Password
                 </label>
                 <div className="password-container">
                   <input
-                    type={showConfirm ? "text" : "password"}
-                    placeholder="Confirm password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                   />
                   <i
-                    className={`fa-solid ${showConfirm ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
-                    onClick={() => setShowConfirm(!showConfirm)}
+                    className={`fa-solid ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   ></i>
                 </div>
 
-                {confirmPassword.length > 0 && confirmPassword !== password && (
+                {confirmPassword.length > 0 && confirmPassword !== newPassword && (
                   <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
                     Passwords do not match.
                   </p>
@@ -428,19 +419,15 @@ function SignupPage() {
                   Back
                 </button>
                 <button type="submit" disabled={isLoading} style={{ flex: 2 }}>
-                  {isLoading ? "Creating Account..." : "Create Account"}
+                  {isLoading ? "Resetting..." : "Reset Password"}
                 </button>
               </div>
             </form>
           )}
-
-          <p className="signup-link">
-            Already have an account? <Link to="/login">Log In</Link>
-          </p>
         </div>
       </div>
     </div>
   );
 }
 
-export default SignupPage;
+export default ForgotPasswordPage;

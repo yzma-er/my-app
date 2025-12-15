@@ -1,3 +1,6 @@
+/* =========================
+   Main Container - FIXED
+========================= */
 .medical-container {
   display: flex;
   flex-direction: column;
@@ -29,75 +32,94 @@
 }
 
 /* =========================
-   Video Section
+   Video Section - FIXED
 ========================= */
 .video-container {
-  width: 100%;         /* ✅ full width inside container */
+  width: 100%;
+  max-width: 800px; /* Add max-width to center it */
   margin: 0 auto 20px;
   border-radius: 10px;
-  overflow: hidden; /* crop overflow when rounding */
+  overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .video-container video {
   width: 100%;
-  aspect-ratio: 16 / 9;   /* ✅ keeps proportional height */
+  aspect-ratio: 16 / 9;
   object-fit: cover;
   display: block;
   border-radius: 10px;
 }
 
 /* =========================
-   Info Section
+   Info Section - FIXED & CENTERED
 ========================= */
 .info-section {
   text-align: left;
-  margin: 20px 0;
-  padding: 10px;
-  width: 100%;   /* ✅ aligns with video/feedback */
+  margin: 20px auto; /* Changed from 20px 0 to auto */
+  padding: 20px; /* Increased padding */
+  width: 100%;
+  max-width: 800px; /* Add max-width to center content */
+  background: #f8fff8;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
 }
 
 .info-section h2 {
   font-size: 25px;
   margin-bottom: 10px;
+  color: #1C7C0F;
+  text-align: center;
 }
 
 p {
-   font-size: 1.05rem;
+  font-size: 1.05rem;
   line-height: 1.6;
   color: #000;
 }
 
 /* =========================
-   Feedback Section
+   Feedback Section - FIXED
 ========================= */
 .feedback-section {
-  width: 100%;          /* ✅ same width as video */
-  margin: 20px auto;
+  width: 100%;
+  margin: 20px 0;
   padding: 20px;
   background: #eaf4ea;
   border-radius: 10px;
-  box-shadow: 0 4px 12px #1C7C0F(0, 0, 0, 0.2);
-  box-sizing: border-box;  /* ✅ ensures padding doesn't break width */
+  box-shadow: 0 4px 12px rgba(28, 124, 15, 0.2); /* Fixed color syntax */
+  box-sizing: border-box;
 }
 
-.feedback-section h3 {
+.feedback-section h3,
+.feedback-section h4 {
   margin-bottom: 15px;
   font-size: 1.5rem;
   text-align: center;
+  color: #1C7C0F;
 }
 
 /* Star Rating */
 .star-rating {
-  margin-bottom: 10px;
+  margin: 10px 0;
   font-size: 1.8rem;
   cursor: pointer;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 .star {
   color: #ccc;
   margin: 0 3px;
+  transition: all 0.2s ease;
+}
+
+.star:hover {
+  transform: scale(1.2);
 }
 
 .star.active {
@@ -106,16 +128,23 @@ p {
 
 /* Textarea */
 .feedback-section textarea {
-  width: 100%;                 /* ✅ fills container */
+  width: 100%;
   min-height: 120px;
   border: 1px solid #1C7C0F;
-  border-radius: 6px;
-  padding: 10px;
+  border-radius: 8px;
+  padding: 12px;
   font-size: 1rem;
   resize: vertical;
   display: block;
-  margin: 15px 0;              /* ✅ spacing inside container */
-  box-sizing: border-box;      /* ✅ no overflow from padding */
+  margin: 15px 0;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.feedback-section textarea:focus {
+  outline: none;
+  border-color: #104C08;
+  box-shadow: 0 0 0 2px rgba(16, 76, 8, 0.1);
 }
 
 /* Button */
@@ -124,11 +153,11 @@ p {
   color: white;
   border: none;
   padding: 12px 24px;
-  border-radius: 20px;
+  border-radius: 25px;
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
   margin: 15px auto 0;
   display: block;
   width: fit-content;
@@ -144,24 +173,13 @@ p {
   transform: scale(0.98);
 }
 
-.see-more-btn {
-  background-color: #1C7C0F;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  margin-top: 15px;
-  display: inline-block; /* 👈 keeps it aligned to the left */
+.feedback-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
 }
 
-.see-more-btn:hover {
-  background-color: #104C08;
-  transform: scale(1.05);
-}
+/* Download Link */
 .download-link {
   color: #1C7C0F;
   font-weight: bold;
@@ -174,138 +192,169 @@ p {
   color: #145a0b;
 }
 
-/* Add to Services.css for better step title styling */
+/* Step Title Styling */
 .info-section h3 {
   display: flex;
   align-items: center;
-  gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 15px;
+  font-size: 1.3rem;
+  color: #1C7C0F;
 }
 
-/* If you want to style the custom name differently */
-.info-section h3::after {
-  content: "";
-  /* This will show the custom name after a dash */
-}
-
-/* Or keep it as is - the JSX handles the " - " separator */
-
+/* Step Content */
 .info-section p,
 .info-section div {
-  white-space: pre-line; /* ✅ Keeps line breaks and spacing */
-}
-
-/* Ensure container adjusts for small screens */
-.medical-container {
-  max-width: 100%;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
-/* Make each step section flexible and readable */
-.info-section {
-  background: #f8fff8;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  word-wrap: break-word;      /* ✅ Break long words */
-  overflow-wrap: break-word;  /* ✅ Support long text wrapping */
-}
-
-/* Step text should wrap and not overflow */
-.info-section p {
   white-space: pre-line;
-  text-align: justify;
-  font-size: 16px;
   line-height: 1.6;
   color: #333;
   margin: 10px 0;
 }
 
-/* Make videos responsive */
-.video-container video {
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-}
-
-/* Feedback section responsive */
-.feedback-section {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Make stars and text areas fit well */
-.star-rating {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap; /* ✅ Wrap stars if needed */
-  font-size: 28px;
-}
-
-.feedback-section textarea {
-  width: 100%;
-  min-height: 80px;
-  resize: vertical;
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-}
-
-/* Feedback button full-width on mobile */
-.feedback-btn {
-  background: #1C7C0F;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-weight: bold;
-  width: fit-content;
-  align-self: center;
-}
-
+/* Service Description */
+.service-description,
 .service-description2 {
-  text-align: left !important;
+  text-align: center;
   display: block;
-  margin: 15px 0;
+  margin: 15px auto;
   line-height: 1.6;
   color: #333;
   white-space: pre-line;
   font-size: 18px;
   width: 100%;
+  max-width: 800px;
+}
+
+/* All Steps Container */
+.all-steps-container {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Error Messages */
+.error-message {
+  color: #dc2626;
+  font-size: 14px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Character Counter */
+.char-counter {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+  margin-top: 2px;
+}
+
+.char-counter.warning {
+  color: #f59e0b;
+}
+
+.char-counter.error {
+  color: #dc2626;
+}
+
+/* Scrollable Feedback */
+.scrollable-feedback {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.scrollable-feedback::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-feedback::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.scrollable-feedback::-webkit-scrollbar-thumb {
+  background: #1C7C0F;
+  border-radius: 3px;
+}
+
+.scrollable-feedback::-webkit-scrollbar-thumb:hover {
+  background: #104C08;
 }
 
 /* ✅ Mobile responsiveness */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .medical-container {
+    padding: 16px;
+  }
+  
   .info-section {
-    padding: 12px;
+    padding: 16px;
+    margin: 15px auto;
   }
-
-  .info-section p {
-    font-size: 15px;
-    text-align: left;
+  
+  .info-section h3 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 1.2rem;
   }
-
-  .feedback-btn {
-    width: 100%;
-  }
-
-  h3 {
-    font-size: 18px;
-  }
-
+  
   .star-rating {
-    font-size: 24px;
+    font-size: 1.5rem;
+    gap: 5px;
+  }
+  
+  .video-container {
+    margin: 0 auto 15px;
   }
   
   .service-photo img {
     max-height: 250px;
+  }
+  
+  .service-description,
+  .service-description2 {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-section {
+    padding: 12px;
+    margin: 12px auto;
+  }
+  
+  .info-section h3 {
+    font-size: 1.1rem;
+  }
+  
+  .star-rating {
+    font-size: 1.3rem;
+    gap: 3px;
+  }
+  
+  .feedback-section textarea {
+    min-height: 80px;
+    font-size: 14px;
+    padding: 10px;
+  }
+  
+  .feedback-btn {
+    width: 100%;
+    padding: 10px;
+  }
+  
+  .service-photo img {
+    max-height: 200px;
   }
 }

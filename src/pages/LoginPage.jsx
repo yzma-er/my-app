@@ -42,9 +42,18 @@ function LoginPage() {
           return;
         }
 
+        // Store token
         localStorage.setItem("token", data.token);
         
-        // Show success message for 1 second before redirecting
+        // ✅ ADD THIS: Store email for welcome popup
+        localStorage.setItem("userEmail", email);
+        
+        // ✅ ADD THIS: Set flag for welcome popup (only for users, not admins)
+        if (decoded.role === "user") {
+          localStorage.setItem("justLoggedIn", "true");
+        }
+        
+        // Show success message
         setTimeout(() => {
           if (decoded.role === "admin") {
             navigate("/admin");
@@ -107,6 +116,12 @@ function LoginPage() {
               )}
             </button>
           </form>
+
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+            <Link to="/forgot-password" style={{ color: "#2563eb", textDecoration: "none" }}>
+              Forgot Password?
+            </Link>
+          </div>
 
           {role === "user" && (
             <p className="signup-link">
