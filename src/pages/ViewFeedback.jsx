@@ -179,7 +179,7 @@ function ViewFeedback() {
     };
   };
 
-  // Alternative: Portrait mode with optimized columns
+  // Generate PDF Report - IMPROVED VERSION with full email display AND average rating per service
 const generatePDFReport = async () => {
   // Check if data is loaded
   if (feedback.length === 0) {
@@ -193,8 +193,41 @@ const generatePDFReport = async () => {
     const reportFeedback = getDateFilteredFeedback();
     const stats = calculateStatistics(reportFeedback);
     
-    // Create new PDF document in portrait
-    const doc = new jsPDF();
+    // Calculate average rating per service for the report period
+    const calculateServiceAverages = (feedbackList) => {
+      const serviceStats = {};
+      
+      feedbackList.forEach((item) => {
+        const serviceName = item.service_name || "Unknown";
+        if (!serviceStats[serviceName]) {
+          serviceStats[serviceName] = {
+            totalRating: 0,
+            count: 0,
+            feedbacks: []
+          };
+        }
+        serviceStats[serviceName].totalRating += item.rating;
+        serviceStats[serviceName].count++;
+        serviceStats[serviceName].feedbacks.push(item);
+      });
+      
+      // Calculate averages
+      const averages = {};
+      Object.entries(serviceStats).forEach(([service, data]) => {
+        averages[service] = {
+          average: data.count > 0 ? (data.totalRating / data.count).toFixed(1) : "N/A",
+          count: data.count,
+          feedbacks: data.feedbacks
+        };
+      });
+      
+      return averages;
+    };
+    
+    const serviceAverages = calculateServiceAverages(reportFeedback);
+    
+    // Create new PDF document in landscape for more space
+    const doc = new jsPDF('landscape');
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     let yPos = 20;
@@ -218,17 +251,17 @@ const generatePDFReport = async () => {
     doc.setFont("helvetica", "bold");
     doc.text(`Report Period: ${getReportPeriodText()}`, 14, yPos);
     
-    // Statistics section
+    // Overall Statistics section
     yPos += 15;
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text("Summary Statistics", 14, yPos);
+    doc.text("Overall Statistics", 14, yPos);
     
     yPos += 10;
     doc.setFont("helvetica", "normal");
     doc.text(`Total Feedbacks: ${stats.totalFeedbacks}`, 20, yPos);
     yPos += 7;
-    doc.text(`Average Rating: ${stats.averageRating}/5`, 20, yPos);
+    doc.text(`Overall Average Rating: ${stats.averageRating}/5`, 20, yPos);
     
     // Rating distribution
     yPos += 12;
@@ -242,85 +275,177 @@ const generatePDFReport = async () => {
       yPos += 7;
     });
     
-    // Service breakdown
-    if (Object.keys(stats.serviceCounts).length > 0) {
+    // Service Breakdown with AVERAGE RATINGS
+    if (Object.keys(serviceAverages).length > 0) {
       yPos += 10;
       doc.setFont("helvetica", "bold");
-      doc.text("Service Breakdown:", 14, yPos);
+      doc.text("Service Performance (with Average Ratings):", 14, yPos);
       
       yPos += 7;
       doc.setFont("helvetica", "normal");
-      Object.entries(stats.serviceCounts).forEach(([service, count]) => {
-        if (yPos > 250) {
-          doc.addPage();
-          yPos = 20;
+      
+      // Create two columns for service breakdown
+      const col1X = 20;
+      const col2X = pageWidth / 2;
+      let col1Y = yPos;
+      let col2Y = yPos;
+      let useColumn2 = false;
+      
+      Object.entries(serviceAverages).forEach(([service, data], index) => {
+        const serviceText = `${service}: ${data.average}/5 (${data.count} feedbacks)`;
+        
+        if (useColumn2) {
+          // Check if we need new page
+          if (col2Y > 250) {
+            doc.addPage('landscape');
+            col2Y = 20;
+            col1Y = 20;
+          }
+          doc.text(serviceText, col2X, col2Y);
+          col2Y += 7;
+        } else {
+          // Check if we need new page
+          if (col1Y > 250) {
+            doc.addPage('landscape');
+            col1Y = 20;
+            col2Y = 20;
+          }
+          doc.text(serviceText, col1X, col1Y);
+          col1Y += 7;
         }
-        doc.text(`${service}: ${count} feedbacks`, 20, yPos);
-        yPos += 7;
+        
+        // Switch to second column after half of services
+        if (index === Math.floor(Object.keys(serviceAverages).length / 2) - 1) {
+          useColumn2 = true;
+        }
       });
+      
+      // Update yPos to the bottom of the longest column
+      yPos = Math.max(col1Y, col2Y) + 10;
+    } else {
+      yPos += 20;
+      doc.text("No service data available for this period.", 14, yPos);
+      yPos += 10;
     }
     
-    // Detailed feedback - OPTIMIZED FOR PORTRAIT
+    // Detailed feedback - IMPROVED TABLE WITH FULL EMAILS
     if (reportFeedback.length > 0) {
-      yPos += 10;
+      // Check if we need new page
+      if (yPos > 150) {
+        doc.addPage('landscape');
+        yPos = 20;
+      }
       
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
-      doc.text("Detailed Feedback", 14, yPos);
+      doc.text("Detailed Feedback Records", 14, yPos);
       yPos += 10;
       
-      // Table rows (simplified format without traditional columns)
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
+      // Table header with proper column widths for landscape
+      const colPositions = {
+        number: 14,
+        email: 24,
+        service: 70,
+        step: 120,
+        rating: 140,
+        comment: 160,
+        date: 240
+      };
       
-      reportFeedback.slice(0, 20).forEach((item, index) => {
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.text("#", colPositions.number, yPos);
+      doc.text("User Email", colPositions.email, yPos);
+      doc.text("Service", colPositions.service, yPos);
+      doc.text("Step", colPositions.step, yPos);
+      doc.text("Rating", colPositions.rating, yPos);
+      doc.text("Comment", colPositions.comment, yPos);
+      doc.text("Date", colPositions.date, yPos);
+      
+      // Draw header line
+      yPos += 3;
+      doc.line(14, yPos, pageWidth - 14, yPos);
+      yPos += 7;
+      
+      // Table rows with wrap functionality for long emails
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      
+      reportFeedback.slice(0, 30).forEach((item, index) => {
         // Check if we need new page
-        if (yPos > 250) {
-          doc.addPage();
+        if (yPos > 260) {
+          doc.addPage('landscape');
           yPos = 20;
+          // Draw headers on new page
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          doc.text("#", colPositions.number, yPos);
+          doc.text("User Email", colPositions.email, yPos);
+          doc.text("Service", colPositions.service, yPos);
+          doc.text("Step", colPositions.step, yPos);
+          doc.text("Rating", colPositions.rating, yPos);
+          doc.text("Comment", colPositions.comment, yPos);
+          doc.text("Date", colPositions.date, yPos);
+          yPos += 10;
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
         }
         
-        // Entry number
-        doc.setFont("helvetica", "bold");
-        doc.text(`Feedback ${index + 1}:`, 14, yPos);
+        // Row data
+        doc.text(`${index + 1}`, colPositions.number, yPos);
         
-        // Email (full display)
-        doc.setFont("helvetica", "normal");
-        doc.text(`Email: ${item.user_email || "Anonymous"}`, 30, yPos + 6);
-        
-        // Service and Rating on same line
-        doc.text(`Service: ${item.service_name || "—"}`, 30, yPos + 12);
-        doc.text(`Rating: ${item.rating}/5`, 120, yPos + 12);
-        
-        // Step and Date
-        doc.text(`Step: ${item.step_number ? `Step ${item.step_number}` : "—"}`, 30, yPos + 18);
-        doc.text(`Date: ${new Date(item.created_at).toLocaleDateString('en-US')}`, 120, yPos + 18);
-        
-        // Comment (with word wrap)
-        const comment = item.comment || "No comment";
-        if (comment.length > 50) {
-          // Split long comments
-          const firstLine = comment.substring(0, 50);
-          const secondLine = comment.substring(50, 100);
-          doc.text(`Comment: ${firstLine}`, 30, yPos + 24);
-          doc.text(secondLine || "", 38, yPos + 30);
-          yPos += 36; // Extra space for second line
+        // Email - split if too long
+        const email = item.user_email || "Anonymous";
+        if (email.length > 30) {
+          // Split long email into two lines
+          const firstPart = email.substring(0, 30);
+          const secondPart = email.substring(30, 60);
+          doc.text(firstPart, colPositions.email, yPos);
+          doc.text(secondPart || "", colPositions.email, yPos + 4);
         } else {
-          doc.text(`Comment: ${comment}`, 30, yPos + 24);
-          yPos += 30;
+          doc.text(email, colPositions.email, yPos);
         }
         
-        // Separator line
-        doc.line(14, yPos, pageWidth - 14, yPos);
-        yPos += 10;
+        // Service - split if too long
+        const service = item.service_name || "—";
+        if (service.length > 20) {
+          doc.text(service.substring(0, 20), colPositions.service, yPos);
+          doc.text(service.substring(20, 40) || "", colPositions.service, yPos + 4);
+        } else {
+          doc.text(service, colPositions.service, yPos);
+        }
+        
+        // Step
+        doc.text(item.step_number ? `S${item.step_number}` : "—", colPositions.step, yPos);
+        
+        // Rating
+        doc.text(`${item.rating}/5`, colPositions.rating, yPos);
+        
+        // Comment - truncated if too long
+        const comment = item.comment || "No comment";
+        if (comment.length > 30) {
+          doc.text(comment.substring(0, 30) + "...", colPositions.comment, yPos);
+        } else {
+          doc.text(comment, colPositions.comment, yPos);
+        }
+        
+        // Date
+        doc.text(new Date(item.created_at).toLocaleDateString('en-US'), colPositions.date, yPos);
+        
+        // Move to next row (add extra space if email was split)
+        yPos += (email.length > 30 || service.length > 20) ? 12 : 7;
       });
       
-      if (reportFeedback.length > 20) {
+      if (reportFeedback.length > 30) {
         yPos += 5;
         doc.setFont("helvetica", "italic");
-        doc.text(`... and ${reportFeedback.length - 20} more feedback records`, 14, yPos);
+        doc.text(`... and ${reportFeedback.length - 30} more records`, 14, yPos);
       }
     } else {
+      if (yPos > 200) {
+        doc.addPage('landscape');
+        yPos = 20;
+      }
       yPos += 20;
       doc.text("No feedback available for selected period.", 14, yPos);
     }
@@ -348,7 +473,6 @@ const generatePDFReport = async () => {
     setLoadingReport(false);
   }
 };
-
   // Helper function to get report period text
   const getReportPeriodText = () => {
     const monthNames = [
