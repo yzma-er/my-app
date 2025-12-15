@@ -7,7 +7,7 @@ import StepRatingsModal from "../components/StepRatingsModal";
 
 // Import jspdf - Make sure these are installed
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from 'jspdf-autotable';
 
 function ViewFeedback() {
   const [feedback, setFeedback] = useState([]);
