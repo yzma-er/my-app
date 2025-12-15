@@ -74,84 +74,35 @@ function ViewFeedback() {
             f.service_name?.trim().toLowerCase() === filter.trim().toLowerCase()
         );
 
-  // Get feedback filtered by date range for reports - FIXED VERSION
-const getDateFilteredFeedback = () => {
-  let startDate, endDate;
+  // Get feedback filtered by date range for reports
+  const getDateFilteredFeedback = () => {
+    const now = new Date();
+    let startDate, endDate;
 
-  switch (reportType) {
-    case "monthly":
-      startDate = new Date(selectedYear, selectedMonth - 1, 1);
-      endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59, 999);
-      break;
-    case "semi-annually":
-      const isFirstHalf = selectedMonth <= 6;
-      startDate = new Date(selectedYear, isFirstHalf ? 0 : 6, 1);
-      endDate = new Date(selectedYear, isFirstHalf ? 5 : 11, 31, 23, 59, 59, 999);
-      break;
-    case "annually":
-      startDate = new Date(selectedYear, 0, 1);
-      endDate = new Date(selectedYear, 11, 31, 23, 59, 59, 999);
-      break;
-    default:
-      return filteredFeedback;
-  }
-
-  // Helper function to parse dates correctly
-  const parseFeedbackDate = (dateString) => {
-    if (!dateString) return null;
-    
-    // If it's already a Date object or timestamp
-    if (dateString instanceof Date) return dateString;
-    if (typeof dateString === 'number') return new Date(dateString);
-    
-    // Handle "MM/DD/YY, HH:MM:SS AM/PM" format
-    if (typeof dateString === 'string' && dateString.includes('/')) {
-      try {
-        // Extract date part only (before the comma)
-        const datePart = dateString.split(',')[0].trim(); // "12/14/25"
-        const [month, day, yearShort] = datePart.split('/').map(Number);
-        
-        // Convert 2-digit year to 4-digit (assuming 2000s)
-        const year = yearShort < 100 ? yearShort + 2000 : yearShort;
-        
-        // Get time part if available
-        let hour = 0, minute = 0, second = 0;
-        if (dateString.includes(',')) {
-          const timePart = dateString.split(',')[1].trim(); // "6:26:38 AM"
-          const [time, period] = timePart.split(' ');
-          const [h, m, s] = time.split(':').map(Number);
-          
-          hour = period?.toUpperCase() === 'PM' && h < 12 ? h + 12 : h;
-          minute = m || 0;
-          second = s || 0;
-        }
-        
-        return new Date(year, month - 1, day, hour, minute, second);
-      } catch (error) {
-        console.error("Error parsing date string:", dateString, error);
-      }
+    switch (reportType) {
+      case "monthly":
+        startDate = new Date(selectedYear, selectedMonth - 1, 1);
+        endDate = new Date(selectedYear, selectedMonth, 0);
+        break;
+      case "semi-annually":
+        const isFirstHalf = selectedMonth <= 6;
+        startDate = new Date(selectedYear, isFirstHalf ? 0 : 6, 1);
+        endDate = new Date(selectedYear, isFirstHalf ? 5 : 11, 31);
+        break;
+      case "annually":
+        startDate = new Date(selectedYear, 0, 1);
+        endDate = new Date(selectedYear, 11, 31);
+        break;
+      default:
+        return filteredFeedback;
     }
-    
-    // Fallback to default Date parsing
-    return new Date(dateString);
+
+    return filteredFeedback.filter((item) => {
+      const itemDate = new Date(item.created_at);
+      return itemDate >= startDate && itemDate <= endDate;
+    });
   };
 
-  return filteredFeedback.filter((item) => {
-    try {
-      const itemDate = parseFeedbackDate(item.created_at);
-      
-      if (!itemDate || isNaN(itemDate.getTime())) {
-        return false;
-      }
-      
-      // Check if date is within range
-      return itemDate >= startDate && itemDate <= endDate;
-    } catch (error) {
-      console.error("Error filtering date:", error);
-      return false;
-    }
-  });
-};
   // Calculate statistics for report
   const calculateStatistics = (feedbackList) => {
     if (feedbackList.length === 0) {
