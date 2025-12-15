@@ -1,10 +1,12 @@
-// src/pages/ViewFeedback.jsx - UPDATED with Report Generation Feature
+// src/pages/ViewFeedback.jsx - COMPLETE with jspdf
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ViewFeedback.css";
 import StepRatingsModal from "../components/StepRatingsModal";
-import { jsPDF } from "jspdf";
+
+// Import jspdf - Make sure these are installed
+import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 function ViewFeedback() {
@@ -143,8 +145,10 @@ function ViewFeedback() {
       const reportFeedback = getDateFilteredFeedback();
       const stats = calculateStatistics(reportFeedback);
       
+      // Create new PDF document
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
+      let yPos = 20;
       
       // Add header with logo and title
       doc.setFillColor(28, 124, 15);
@@ -153,31 +157,37 @@ function ViewFeedback() {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.setFont("helvetica", "bold");
-      doc.text("Feedback Report", pageWidth / 2, 20, { align: "center" });
+      doc.text("Feedback Report", pageWidth / 2, 25, { align: "center" });
       
       doc.setFontSize(12);
-      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 30, { align: "center" });
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 35, { align: "center" });
       
       // Report period info
+      yPos = 50;
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(14);
       doc.setFont("helvetica", "bold");
-      doc.text(`Report Period: ${getReportPeriodText()}`, 14, 50);
+      doc.text(`Report Period: ${getReportPeriodText()}`, 14, yPos);
       
       // Statistics section
+      yPos += 15;
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
-      doc.text("Summary Statistics", 14, 65);
+      doc.text("Summary Statistics", 14, yPos);
       
+      yPos += 10;
       doc.setFont("helvetica", "normal");
-      doc.text(`Total Feedbacks: ${stats.totalFeedbacks}`, 14, 75);
-      doc.text(`Average Rating: ${stats.averageRating}/5`, 14, 82);
+      doc.text(`Total Feedbacks: ${stats.totalFeedbacks}`, 20, yPos);
+      yPos += 7;
+      doc.text(`Average Rating: ${stats.averageRating}/5`, 20, yPos);
       
       // Rating distribution
+      yPos += 12;
       doc.setFont("helvetica", "bold");
-      doc.text("Rating Distribution:", 14, 95);
+      doc.text("Rating Distribution:", 14, yPos);
       
-      let yPos = 102;
+      yPos += 7;
+      doc.setFont("helvetica", "normal");
       Object.entries(stats.ratingDistribution).forEach(([rating, count]) => {
         const stars = "★".repeat(parseInt(rating)) + "☆".repeat(5 - parseInt(rating));
         doc.text(`${stars} (${rating}/5): ${count} feedbacks`, 20, yPos);
@@ -188,8 +198,8 @@ function ViewFeedback() {
       yPos += 10;
       doc.setFont("helvetica", "bold");
       doc.text("Service Breakdown:", 14, yPos);
-      yPos += 8;
       
+      yPos += 7;
       doc.setFont("helvetica", "normal");
       Object.entries(stats.serviceCounts).forEach(([service, count]) => {
         if (yPos > 250) {
@@ -247,7 +257,7 @@ function ViewFeedback() {
       }
       
       // Save PDF
-      doc.save(`Feedback_Report_${getReportPeriodText()}_${new Date().getTime()}.pdf`);
+      doc.save(`Feedback_Report_${getReportPeriodText().replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
       
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -299,6 +309,10 @@ function ViewFeedback() {
   // Generate years array (last 5 years)
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  // Get current report data
+  const reportData = getDateFilteredFeedback();
+  const stats = calculateStatistics(reportData);
 
   return (
     <div className="feedback-container">
@@ -378,7 +392,7 @@ function ViewFeedback() {
               className="generate-report-btn"
               disabled={loadingReport}
             >
-              {loadingReport ? "Generating..." : "📥 Download PDF Report"}
+              {loadingReport ? "⏳ Generating..." : "📥 Download PDF Report"}
             </button>
           </div>
         </div>
@@ -388,7 +402,8 @@ function ViewFeedback() {
             Selected Period: <strong>{getReportPeriodText()}</strong>
           </p>
           <p className="report-stats">
-            Feedbacks in period: <strong>{getDateFilteredFeedback().length}</strong>
+            Feedbacks in period: <strong>{reportData.length}</strong> | 
+            Average Rating: <strong>{stats.averageRating}/5</strong>
           </p>
         </div>
       </div>
