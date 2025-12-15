@@ -1,4 +1,4 @@
-// SignupPage.jsx - COMPLETE UPDATED VERSION WITH BACKEND-GENERATED OTP
+// SignupPage.jsx - COMPLETE UPDATED VERSIONs WITH BACKEND-GENERATED OTP
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
