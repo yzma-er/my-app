@@ -1,9 +1,11 @@
-// src/pages/ViewFeedback.jsx - UPDATED to show user emails
+// src/pages/ViewFeedback.jsx - UPDATED with Report Generation Feature
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ViewFeedback.css";
 import StepRatingsModal from "../components/StepRatingsModal";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 function ViewFeedback() {
   const [feedback, setFeedback] = useState([]);
@@ -16,12 +18,18 @@ function ViewFeedback() {
   const [selectedService, setSelectedService] = useState(null);
   const [stepRatings, setStepRatings] = useState([]);
 
+  // Report generation states
+  const [reportType, setReportType] = useState("monthly");
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [loadingReport, setLoadingReport] = useState(false);
+
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
 
-  // memoized fetch functions to satisfy eslint rules
+  // memoized fetch functions
   const fetchFeedback = useCallback(async () => {
     try {
       const res = await axios.get(`${backendURL}/api/feedback`);
@@ -55,7 +63,7 @@ function ViewFeedback() {
     }
   };
 
-  // Filtered feedback
+  // Filtered feedback based on service filter
   const filteredFeedback =
     filter === "All Services"
       ? feedback
@@ -64,32 +72,214 @@ function ViewFeedback() {
             f.service_name?.trim().toLowerCase() === filter.trim().toLowerCase()
         );
 
-  // Average rating per service (summary)
-  const serviceSummary = services.map((s) => {
-    const serviceFeedback = feedback.filter(
-      (f) =>
-        f.service_name?.trim().toLowerCase() === s.name.trim().toLowerCase()
-    );
+  // Get feedback filtered by date range for reports
+  const getDateFilteredFeedback = () => {
+    const now = new Date();
+    let startDate, endDate;
 
-    const avg =
-      serviceFeedback.length > 0
-        ? (
-            serviceFeedback.reduce((sum, f) => sum + f.rating, 0) /
-            serviceFeedback.length
-          ).toFixed(1)
-        : "N/A";
+    switch (reportType) {
+      case "monthly":
+        startDate = new Date(selectedYear, selectedMonth - 1, 1);
+        endDate = new Date(selectedYear, selectedMonth, 0);
+        break;
+      case "semi-annually":
+        const isFirstHalf = selectedMonth <= 6;
+        startDate = new Date(selectedYear, isFirstHalf ? 0 : 6, 1);
+        endDate = new Date(selectedYear, isFirstHalf ? 5 : 11, 31);
+        break;
+      case "annually":
+        startDate = new Date(selectedYear, 0, 1);
+        endDate = new Date(selectedYear, 11, 31);
+        break;
+      default:
+        return filteredFeedback;
+    }
+
+    return filteredFeedback.filter((item) => {
+      const itemDate = new Date(item.created_at);
+      return itemDate >= startDate && itemDate <= endDate;
+    });
+  };
+
+  // Calculate statistics for report
+  const calculateStatistics = (feedbackList) => {
+    if (feedbackList.length === 0) {
+      return {
+        totalFeedbacks: 0,
+        averageRating: 0,
+        serviceCounts: {},
+        ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      };
+    }
+
+    const totalRating = feedbackList.reduce((sum, item) => sum + item.rating, 0);
+    const averageRating = totalRating / feedbackList.length;
+    
+    const serviceCounts = {};
+    const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+    feedbackList.forEach((item) => {
+      // Count by service
+      const serviceName = item.service_name || "Unknown";
+      serviceCounts[serviceName] = (serviceCounts[serviceName] || 0) + 1;
+      
+      // Count by rating
+      ratingDistribution[item.rating]++;
+    });
 
     return {
-      ...s,
-      avg,
-      count: serviceFeedback.length,
+      totalFeedbacks: feedbackList.length,
+      averageRating: averageRating.toFixed(2),
+      serviceCounts,
+      ratingDistribution,
     };
-  });
+  };
+
+  // Generate PDF Report
+  const generatePDFReport = async () => {
+    setLoadingReport(true);
+    
+    try {
+      const reportFeedback = getDateFilteredFeedback();
+      const stats = calculateStatistics(reportFeedback);
+      
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+      
+      // Add header with logo and title
+      doc.setFillColor(28, 124, 15);
+      doc.rect(0, 0, pageWidth, 40, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.setFont("helvetica", "bold");
+      doc.text("Feedback Report", pageWidth / 2, 20, { align: "center" });
+      
+      doc.setFontSize(12);
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 30, { align: "center" });
+      
+      // Report period info
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Report Period: ${getReportPeriodText()}`, 14, 50);
+      
+      // Statistics section
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Summary Statistics", 14, 65);
+      
+      doc.setFont("helvetica", "normal");
+      doc.text(`Total Feedbacks: ${stats.totalFeedbacks}`, 14, 75);
+      doc.text(`Average Rating: ${stats.averageRating}/5`, 14, 82);
+      
+      // Rating distribution
+      doc.setFont("helvetica", "bold");
+      doc.text("Rating Distribution:", 14, 95);
+      
+      let yPos = 102;
+      Object.entries(stats.ratingDistribution).forEach(([rating, count]) => {
+        const stars = "★".repeat(parseInt(rating)) + "☆".repeat(5 - parseInt(rating));
+        doc.text(`${stars} (${rating}/5): ${count} feedbacks`, 20, yPos);
+        yPos += 7;
+      });
+      
+      // Service breakdown
+      yPos += 10;
+      doc.setFont("helvetica", "bold");
+      doc.text("Service Breakdown:", 14, yPos);
+      yPos += 8;
+      
+      doc.setFont("helvetica", "normal");
+      Object.entries(stats.serviceCounts).forEach(([service, count]) => {
+        if (yPos > 250) {
+          doc.addPage();
+          yPos = 20;
+        }
+        doc.text(`${service}: ${count} feedbacks`, 20, yPos);
+        yPos += 7;
+      });
+      
+      // Detailed feedback table
+      if (reportFeedback.length > 0) {
+        yPos += 10;
+        if (yPos > 200) {
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("Detailed Feedback", 14, yPos);
+        yPos += 10;
+        
+        const tableData = reportFeedback.map((item, index) => [
+          index + 1,
+          item.user_email || "Anonymous",
+          item.service_name || "—",
+          item.step_number ? `Step ${item.step_number}` : "—",
+          "★".repeat(item.rating) + "☆".repeat(5 - item.rating),
+          item.comment ? item.comment.substring(0, 50) + (item.comment.length > 50 ? "..." : "") : "No comment",
+          new Date(item.created_at).toLocaleDateString(),
+        ]);
+        
+        doc.autoTable({
+          startY: yPos,
+          head: [["#", "User Email", "Service", "Step", "Rating", "Comment", "Date"]],
+          body: tableData,
+          theme: 'grid',
+          headStyles: { fillColor: [28, 124, 15] },
+          styles: { fontSize: 8, cellPadding: 2 },
+          margin: { left: 14, right: 14 },
+        });
+      } else {
+        yPos += 20;
+        doc.text("No feedback available for selected period.", 14, yPos);
+      }
+      
+      // Footer
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, doc.internal.pageSize.height - 10);
+        doc.text("Digital Guidance System", 20, doc.internal.pageSize.height - 10);
+      }
+      
+      // Save PDF
+      doc.save(`Feedback_Report_${getReportPeriodText()}_${new Date().getTime()}.pdf`);
+      
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Failed to generate PDF report. Please try again.");
+    } finally {
+      setLoadingReport(false);
+    }
+  };
+
+  // Helper function to get report period text
+  const getReportPeriodText = () => {
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    switch (reportType) {
+      case "monthly":
+        return `${monthNames[selectedMonth - 1]} ${selectedYear}`;
+      case "semi-annually":
+        const half = selectedMonth <= 6 ? "First Half" : "Second Half";
+        return `${half} ${selectedYear}`;
+      case "annually":
+        return `Year ${selectedYear}`;
+      default:
+        return "Custom Period";
+    }
+  };
 
   // Open modal and load step ratings
   const openStepRatings = async (service) => {
     setSelectedService(service);
-
     try {
       const res = await axios.get(`${backendURL}/api/feedback/step-ratings/${encodeURIComponent(service.name)}`);
       setStepRatings(res.data);
@@ -97,9 +287,18 @@ function ViewFeedback() {
       console.error("❌ Error loading step ratings:", err);
       setStepRatings([]);
     }
-
     setModalOpen(true);
   };
+
+  // Generate months array for dropdown
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  // Generate years array (last 5 years)
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
   return (
     <div className="feedback-container">
@@ -130,26 +329,105 @@ function ViewFeedback() {
 
       <h2>📋 Feedback Records</h2>
 
+      {/* Report Generation Section */}
+      <div className="report-section">
+        <h3>📊 Generate Report</h3>
+        <div className="report-controls">
+          <div className="control-group">
+            <label>Report Type:</label>
+            <select 
+              value={reportType} 
+              onChange={(e) => setReportType(e.target.value)}
+              className="report-select"
+            >
+              <option value="monthly">Monthly Report</option>
+              <option value="semi-annually">Semi-Annual Report</option>
+              <option value="annually">Annual Report</option>
+            </select>
+          </div>
+          
+          <div className="control-group">
+            <label>Month:</label>
+            <select 
+              value={selectedMonth} 
+              onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+              className="report-select"
+            >
+              {months.map((month, index) => (
+                <option key={index} value={index + 1}>{month}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="control-group">
+            <label>Year:</label>
+            <select 
+              value={selectedYear} 
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              className="report-select"
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="control-group">
+            <button 
+              onClick={generatePDFReport} 
+              className="generate-report-btn"
+              disabled={loadingReport}
+            >
+              {loadingReport ? "Generating..." : "📥 Download PDF Report"}
+            </button>
+          </div>
+        </div>
+        
+        <div className="report-preview">
+          <p className="report-period">
+            Selected Period: <strong>{getReportPeriodText()}</strong>
+          </p>
+          <p className="report-stats">
+            Feedbacks in period: <strong>{getDateFilteredFeedback().length}</strong>
+          </p>
+        </div>
+      </div>
+
       {/* Summary Section */}
       <div className="summary-section">
         <h3>Average Ratings per Service</h3>
         <div className="summary-grid">
-          {serviceSummary.map((s) => (
-            <div
-              key={s.service_id}
-              className="summary-card"
-              onClick={() => openStepRatings(s)}
-              style={{ cursor: "pointer" }}
-            >
-              <strong>{s.name}</strong>
-              <p>
-                ⭐ {s.avg}{" "}
-                <span style={{ fontSize: "13px", color: "#555" }}>
-                  ({s.count} feedbacks)
-                </span>
-              </p>
-            </div>
-          ))}
+          {services.map((s) => {
+            const serviceFeedback = feedback.filter(
+              (f) =>
+                f.service_name?.trim().toLowerCase() === s.name.trim().toLowerCase()
+            );
+            const avg =
+              serviceFeedback.length > 0
+                ? (
+                    serviceFeedback.reduce((sum, f) => sum + f.rating, 0) /
+                    serviceFeedback.length
+                  ).toFixed(1)
+                : "N/A";
+            const count = serviceFeedback.length;
+            
+            return (
+              <div
+                key={s.service_id}
+                className="summary-card"
+                onClick={() => openStepRatings(s)}
+                style={{ cursor: "pointer" }}
+              >
+                <strong>{s.name}</strong>
+                <p>
+                  ⭐ {avg}{" "}
+                  <span style={{ fontSize: "13px", color: "#555" }}>
+                    ({count} feedbacks)
+                  </span>
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -231,7 +509,6 @@ function ViewFeedback() {
           )}
         </tbody>
       </table>
-
 
       {/* Step Ratings Modal */}
       <StepRatingsModal
