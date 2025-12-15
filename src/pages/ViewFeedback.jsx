@@ -179,7 +179,7 @@ function ViewFeedback() {
     };
   };
 
-  // Generate PDF Report - IMPROVED VERSION with full email display
+  // Alternative: Portrait mode with optimized columns
 const generatePDFReport = async () => {
   // Check if data is loaded
   if (feedback.length === 0) {
@@ -193,8 +193,8 @@ const generatePDFReport = async () => {
     const reportFeedback = getDateFilteredFeedback();
     const stats = calculateStatistics(reportFeedback);
     
-    // Create new PDF document in landscape for more space
-    const doc = new jsPDF('landscape');
+    // Create new PDF document in portrait
+    const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     let yPos = 20;
@@ -260,120 +260,65 @@ const generatePDFReport = async () => {
       });
     }
     
-    // Detailed feedback - IMPROVED TABLE WITH FULL EMAILS
+    // Detailed feedback - OPTIMIZED FOR PORTRAIT
     if (reportFeedback.length > 0) {
       yPos += 10;
-      
-      // Check if we need new page
-      if (yPos > 150) {
-        doc.addPage('landscape');
-        yPos = 20;
-      }
       
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
       doc.text("Detailed Feedback", 14, yPos);
       yPos += 10;
       
-      // Table header with proper column widths for landscape
-      const colPositions = {
-        number: 14,
-        email: 24,
-        service: 70,
-        step: 120,
-        rating: 140,
-        comment: 160,
-        date: 240
-      };
-      
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "bold");
-      doc.text("#", colPositions.number, yPos);
-      doc.text("User Email", colPositions.email, yPos);
-      doc.text("Service", colPositions.service, yPos);
-      doc.text("Step", colPositions.step, yPos);
-      doc.text("Rating", colPositions.rating, yPos);
-      doc.text("Comment", colPositions.comment, yPos);
-      doc.text("Date", colPositions.date, yPos);
-      
-      // Draw header line
-      yPos += 3;
-      doc.line(14, yPos, pageWidth - 14, yPos);
-      yPos += 7;
-      
-      // Table rows with wrap functionality for long emails
+      // Table rows (simplified format without traditional columns)
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
+      doc.setFontSize(10);
       
-      reportFeedback.slice(0, 30).forEach((item, index) => {
+      reportFeedback.slice(0, 20).forEach((item, index) => {
         // Check if we need new page
-        if (yPos > 260) {
-          doc.addPage('landscape');
+        if (yPos > 250) {
+          doc.addPage();
           yPos = 20;
-          // Draw headers on new page
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(10);
-          doc.text("#", colPositions.number, yPos);
-          doc.text("User Email", colPositions.email, yPos);
-          doc.text("Service", colPositions.service, yPos);
-          doc.text("Step", colPositions.step, yPos);
-          doc.text("Rating", colPositions.rating, yPos);
-          doc.text("Comment", colPositions.comment, yPos);
-          doc.text("Date", colPositions.date, yPos);
-          yPos += 10;
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(9);
         }
         
-        // Row data
-        doc.text(`${index + 1}`, colPositions.number, yPos);
+        // Entry number
+        doc.setFont("helvetica", "bold");
+        doc.text(`Feedback ${index + 1}:`, 14, yPos);
         
-        // Email - split if too long
-        const email = item.user_email || "Anonymous";
-        if (email.length > 30) {
-          // Split long email into two lines
-          const firstPart = email.substring(0, 30);
-          const secondPart = email.substring(30, 60);
-          doc.text(firstPart, colPositions.email, yPos);
-          doc.text(secondPart || "", colPositions.email, yPos + 4);
-        } else {
-          doc.text(email, colPositions.email, yPos);
-        }
+        // Email (full display)
+        doc.setFont("helvetica", "normal");
+        doc.text(`Email: ${item.user_email || "Anonymous"}`, 30, yPos + 6);
         
-        // Service - split if too long
-        const service = item.service_name || "—";
-        if (service.length > 20) {
-          doc.text(service.substring(0, 20), colPositions.service, yPos);
-          doc.text(service.substring(20, 40) || "", colPositions.service, yPos + 4);
-        } else {
-          doc.text(service, colPositions.service, yPos);
-        }
+        // Service and Rating on same line
+        doc.text(`Service: ${item.service_name || "—"}`, 30, yPos + 12);
+        doc.text(`Rating: ${item.rating}/5`, 120, yPos + 12);
         
-        // Step
-        doc.text(item.step_number ? `S${item.step_number}` : "—", colPositions.step, yPos);
+        // Step and Date
+        doc.text(`Step: ${item.step_number ? `Step ${item.step_number}` : "—"}`, 30, yPos + 18);
+        doc.text(`Date: ${new Date(item.created_at).toLocaleDateString('en-US')}`, 120, yPos + 18);
         
-        // Rating
-        doc.text(`${item.rating}/5`, colPositions.rating, yPos);
-        
-        // Comment - truncated if too long
+        // Comment (with word wrap)
         const comment = item.comment || "No comment";
-        if (comment.length > 30) {
-          doc.text(comment.substring(0, 30) + "...", colPositions.comment, yPos);
+        if (comment.length > 50) {
+          // Split long comments
+          const firstLine = comment.substring(0, 50);
+          const secondLine = comment.substring(50, 100);
+          doc.text(`Comment: ${firstLine}`, 30, yPos + 24);
+          doc.text(secondLine || "", 38, yPos + 30);
+          yPos += 36; // Extra space for second line
         } else {
-          doc.text(comment, colPositions.comment, yPos);
+          doc.text(`Comment: ${comment}`, 30, yPos + 24);
+          yPos += 30;
         }
         
-        // Date
-        doc.text(new Date(item.created_at).toLocaleDateString('en-US'), colPositions.date, yPos);
-        
-        // Move to next row (add extra space if email was split)
-        yPos += (email.length > 30 || service.length > 20) ? 12 : 7;
+        // Separator line
+        doc.line(14, yPos, pageWidth - 14, yPos);
+        yPos += 10;
       });
       
-      if (reportFeedback.length > 30) {
+      if (reportFeedback.length > 20) {
         yPos += 5;
         doc.setFont("helvetica", "italic");
-        doc.text(`... and ${reportFeedback.length - 30} more records`, 14, yPos);
+        doc.text(`... and ${reportFeedback.length - 20} more feedback records`, 14, yPos);
       }
     } else {
       yPos += 20;
