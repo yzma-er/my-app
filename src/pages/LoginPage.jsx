@@ -7,7 +7,6 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [hoverField, setHoverField] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -48,7 +47,6 @@ function LoginPage() {
           localStorage.setItem("justLoggedIn", "true");
         }
         
-        // Success animation
         setTimeout(() => {
           if (decoded.role === "admin") {
             navigate("/admin");
@@ -71,236 +69,222 @@ function LoginPage() {
 
   return (
     <div className="login-wrapper">
-      {/* Floating Leaves Animation */}
-      <div className="leaves-container">
-        {[...Array(15)].map((_, i) => (
-          <div 
-            key={i} 
-            className="leaf"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${Math.random() * 10 + 10}s`,
-              transform: `rotate(${Math.random() * 360}deg)`,
-              fontSize: `${Math.random() * 20 + 10}px`,
-              color: `rgba(34, 197, 94, ${Math.random() * 0.3 + 0.1})`
-            }}
-          >
-            <i className="fas fa-leaf"></i>
-          </div>
-        ))}
+      {/* University-style background */}
+      <div className="university-background">
+        <div className="accent-bar"></div>
+        <div className="grid-pattern"></div>
       </div>
 
-      {/* Green Gradient Background */}
-      <div className="green-gradient">
-        <div className="gradient-circle circle-1"></div>
-        <div className="gradient-circle circle-2"></div>
-        <div className="gradient-circle circle-3"></div>
-      </div>
-
-      {/* Main Login Container */}
-      <div className="login-container-aesthetic">
-        {/* Left Side - Visual */}
-        <div className="login-visual">
-          <div className="visual-content">
-            <div className="nature-icon">
-              <i className="fas fa-seedling"></i>
+      {/* Main container */}
+      <div className="login-container-semi">
+        {/* Left side - University Info */}
+        <div className="university-side">
+          <div className="university-header">
+            <div className="university-logo">
+              <div className="logo-icon">
+                <i className="fas fa-graduation-cap"></i>
+              </div>
+              <div className="logo-text">
+                <h3>Nueva Vizcaya State University</h3>
+                <p>Digital Guidance System</p>
+              </div>
             </div>
-            <h2 className="visual-title">
-              {role === "admin" ? "Digital Garden" : "Welcome Back"}
-            </h2>
-            <p className="visual-text">
-              {role === "admin" 
-                ? "Nurture your digital ecosystem"
-                : "Grow with us in your digital journey"}
-            </p>
-            <div className="plant-progress">
-              <div className="plant">
-                <i className="fas fa-spa"></i>
-                <div className="growth">
-                  <div className="growth-bar" style={{ width: '75%' }}></div>
-                </div>
+          </div>
+
+          <div className="university-info">
+            <div className="info-card">
+              <div className="info-icon">
+                <i className="fas fa-university"></i>
               </div>
-              <div className="plant">
-                <i className="fas fa-tree"></i>
-                <div className="growth">
-                  <div className="growth-bar" style={{ width: '90%' }}></div>
-                </div>
+              <h4>University Portal</h4>
+              <p>Secure access to NVSU's digital services and resources</p>
+            </div>
+
+            <div className="info-card">
+              <div className="info-icon">
+                <i className="fas fa-shield-alt"></i>
               </div>
-              <div className="plant">
-                <i className="fas fa-leaf"></i>
-                <div className="growth">
-                  <div className="growth-bar" style={{ width: '60%' }}></div>
-                </div>
+              <h4>Secure Authentication</h4>
+              <p>Protected by enterprise-grade security protocols</p>
+            </div>
+
+            <div className="info-card">
+              <div className="info-icon">
+                <i className="fas fa-users"></i>
               </div>
+              <h4>{role === "admin" ? "Administrative Access" : "Student/Faculty Access"}</h4>
+              <p>Role-based access to appropriate services</p>
+            </div>
+          </div>
+
+          <div className="university-footer">
+            <div className="contact-info">
+              <p><i className="fas fa-phone"></i> IT Help Desk: (078) 123-4567</p>
+              <p><i className="fas fa-envelope"></i> support@nvsu.edu.ph</p>
             </div>
           </div>
         </div>
 
-        {/* Right Side - Login Form */}
-        <div className="login-form-aesthetic">
-          <div className="form-header">
-            <div className="form-logo">
-              <i className="fas fa-leaf"></i>
-              <span>DigitalGuidance</span>
-            </div>
-            <div className="role-tag">
-              {role === "admin" ? "🌿 Admin" : "🌱 User"}
-            </div>
-          </div>
-
-          <div className="welcome-message">
-            <h1>
-              {role === "admin" 
-                ? "Tend to Your Garden"
-                : "Continue Growing"}
-            </h1>
-            <p>Enter your credentials to blossom</p>
-          </div>
-
-          <form onSubmit={handleLogin} className="login-form-content">
-            {/* Email Field */}
-            <div 
-              className={`form-field ${hoverField === 'email' ? 'field-hover' : ''}`}
-              onMouseEnter={() => setHoverField('email')}
-              onMouseLeave={() => setHoverField(null)}
-            >
-              <div className="field-icon">
-                <i className="fas fa-envelope"></i>
+        {/* Right side - Login Form */}
+        <div className="login-side">
+          <div className="login-header">
+            <h2>Welcome to NVSU Portal</h2>
+            <div className="role-indicator">
+              <span className="role-badge">
+                {role === "admin" ? "Administrator Login" : "Student/Faculty Login"}
+              </span>
+              <div className="secure-indicator">
+                <i className="fas fa-lock"></i>
+                <span>Secure Connection</span>
               </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleLogin} className="login-form-semi">
+            <div className="form-group">
+              <label htmlFor="email">
+                <i className="fas fa-user-circle"></i>
+                University Email
+              </label>
               <input
+                id="email"
                 type="email"
-                placeholder="Your email"
+                placeholder="name@student.nvsu.edu.ph"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="field-input"
+                className="form-input"
               />
-              <div className="field-decoration">
-                <div className="field-dot"></div>
-                <div className="field-dot"></div>
-                <div className="field-dot"></div>
-              </div>
             </div>
 
-            {/* Password Field */}
-            <div 
-              className={`form-field ${hoverField === 'password' ? 'field-hover' : ''}`}
-              onMouseEnter={() => setHoverField('password')}
-              onMouseLeave={() => setHoverField(null)}
-            >
-              <div className="field-icon">
-                <i className="fas fa-lock"></i>
-              </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-                className="field-input"
-              />
-              <button
-                type="button"
-                className="password-toggle-aesthetic"
-                onClick={() => !loading && setShowPassword(!showPassword)}
-                disabled={loading}
-              >
-                <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
-              </button>
-              <div className="field-decoration">
-                <div className="field-dot"></div>
-                <div className="field-dot"></div>
-                <div className="field-dot"></div>
-              </div>
-            </div>
-
-            {/* Options */}
-            <div className="form-options-aesthetic">
-              <label className="remember-check">
-                <input type="checkbox" />
-                <span className="check-box">
-                  <i className="fas fa-check"></i>
-                </span>
-                Remember me
+            <div className="form-group">
+              <label htmlFor="password">
+                <i className="fas fa-key"></i>
+                Password
               </label>
-              <Link to="/forgot-password" className="forgot-link">
-                Forgot password?
+              <div className="password-wrapper">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="form-input"
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => !loading && setShowPassword(!showPassword)}
+                  disabled={loading}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                </button>
+              </div>
+            </div>
+
+            <div className="form-options">
+              <div className="remember-me">
+                <input 
+                  type="checkbox" 
+                  id="remember"
+                  disabled={loading}
+                />
+                <label htmlFor="remember">Keep me signed in</label>
+              </div>
+              <Link to="/forgot-password" className="forgot-password-link">
+                Forgot Password?
               </Link>
             </div>
 
-            {/* Submit Button */}
             <button 
               type="submit" 
               disabled={loading} 
-              className={`login-btn-aesthetic ${loading ? 'btn-loading' : ''}`}
+              className={`login-btn ${loading ? 'loading' : ''}`}
             >
               {loading ? (
                 <>
-                  <div className="btn-loader">
-                    <i className="fas fa-spinner"></i>
-                  </div>
-                  <span>Growing...</span>
+                  <span className="spinner"></span>
+                  <span>Authenticating...</span>
                 </>
               ) : (
                 <>
                   <i className="fas fa-sign-in-alt"></i>
-                  <span>Let's Grow</span>
+                  <span>Sign In to Portal</span>
                 </>
               )}
             </button>
 
-            {/* Divider */}
-            <div className="divider-aesthetic">
-              <div className="divider-line"></div>
-              <span>or continue with</span>
-              <div className="divider-line"></div>
+            <div className="divider">
+              <span>New to NVSU Portal?</span>
             </div>
 
-            {/* Alternative Login */}
-            <div className="alt-login">
-              <button type="button" className="alt-btn">
-                <i className="fab fa-google"></i>
-              </button>
-              <button type="button" className="alt-btn">
-                <i className="fab fa-github"></i>
-              </button>
-              <button type="button" className="alt-btn">
-                <i className="fab fa-apple"></i>
-              </button>
+            {role === "user" && (
+              <div className="signup-section">
+                <p>Don't have an account yet?</p>
+                <Link to="/signup" className="signup-btn">
+                  <i className="fas fa-user-plus"></i>
+                  Create Student Account
+                </Link>
+              </div>
+            )}
+
+            <div className="quick-links">
+              <h4>Quick Access:</h4>
+              <div className="links-grid">
+                <a href="#" className="quick-link">
+                  <i className="fas fa-book"></i>
+                  Student Handbook
+                </a>
+                <a href="#" className="quick-link">
+                  <i className="fas fa-calendar-alt"></i>
+                  Academic Calendar
+                </a>
+                <a href="#" className="quick-link">
+                  <i className="fas fa-question-circle"></i>
+                  Help & Support
+                </a>
+                <a href="#" className="quick-link">
+                  <i className="fas fa-download"></i>
+                  Download Forms
+                </a>
+              </div>
             </div>
           </form>
 
-          {/* Footer */}
-          <div className="form-footer">
-            {role === "user" && (
-              <p className="signup-text">
-                New here? <Link to="/signup" className="signup-link-aesthetic">Plant your seed</Link>
-              </p>
-            )}
-            <div className="footer-links-aesthetic">
-              <a href="#privacy">Privacy</a>
-              <span>•</span>
-              <a href="#terms">Terms</a>
-              <span>•</span>
-              <a href="#help">Help</a>
+          <div className="login-footer">
+            <p className="disclaimer">
+              <i className="fas fa-info-circle"></i>
+              By signing in, you agree to comply with NVSU's Acceptable Use Policy.
+            </p>
+            <div className="footer-links">
+              <a href="#">Privacy Policy</a>
+              <span className="separator">|</span>
+              <a href="#">Terms of Service</a>
+              <span className="separator">|</span>
+              <a href="#">Accessibility</a>
+              <span className="separator">|</span>
+              <a href="#">Contact IT</a>
             </div>
-            <p className="copyright-aesthetic">
-              © 2024 Digital Garden • Nurturing growth
+            <p className="copyright">
+              © {new Date().getFullYear()} Nueva Vizcaya State University. All rights reserved.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Decorative Birds */}
-      <div className="birds">
-        <div className="bird bird-1">
-          <i className="fas fa-dove"></i>
+      {/* System Status */}
+      <div className="system-status">
+        <div className="status-indicator">
+          <div className="status-dot active"></div>
+          <span>System Status: Operational</span>
         </div>
-        <div className="bird bird-2">
-          <i className="fas fa-dove"></i>
+        <div className="last-updated">
+          <i className="fas fa-sync-alt"></i>
+          Last updated: Just now
         </div>
       </div>
     </div>
