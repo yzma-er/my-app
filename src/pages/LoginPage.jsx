@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./LoginPage.css";
 
 function LoginPage() {
@@ -7,40 +7,19 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [shake, setShake] = useState(false);
-  const [particles, setParticles] = useState([]);
+  const [hoverField, setHoverField] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 🔥 FIX: Correct backend URL (local = localhost, deployed = render)
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
 
-  // Detect role (user or admin)
   const role = new URLSearchParams(location.search).get("role") || "user";
-
-  // Create floating particles
-  useEffect(() => {
-    const newParticles = [];
-    for (let i = 0; i < 20; i++) {
-      newParticles.push({
-        id: i,
-        size: Math.random() * 4 + 2,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        duration: Math.random() * 20 + 10,
-        delay: Math.random() * 5,
-      });
-    }
-    setParticles(newParticles);
-  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (loading) return;
-    
     setLoading(true);
 
     try {
@@ -57,25 +36,19 @@ function LoginPage() {
         const decoded = JSON.parse(atob(payload));
 
         if (decoded.role !== role) {
-          setShake(true);
-          setTimeout(() => setShake(false), 500);
           alert("⚠️ Invalid role for this account!");
           setLoading(false);
           return;
         }
 
-        // Store token
         localStorage.setItem("token", data.token);
-        
-        // Store email for welcome popup
         localStorage.setItem("userEmail", email);
         
-        // Set flag for welcome popup (only for users, not admins)
         if (decoded.role === "user") {
           localStorage.setItem("justLoggedIn", "true");
         }
         
-        // Success animation before redirect
+        // Success animation
         setTimeout(() => {
           if (decoded.role === "admin") {
             navigate("/admin");
@@ -83,18 +56,14 @@ function LoginPage() {
             navigate("/services");
           }
           setLoading(false);
-        }, 1500);
+        }, 1000);
         
       } else {
-        setShake(true);
-        setTimeout(() => setShake(false), 500);
         alert(data.message || "❌ Login failed.");
         setLoading(false);
       }
     } catch (err) {
       console.error("❌ Login error:", err);
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
       alert("Connection error. Please try again.");
       setLoading(false);
     }
@@ -102,119 +71,163 @@ function LoginPage() {
 
   return (
     <div className="login-wrapper">
-      {/* Floating particles background */}
-      <div className="particles-container">
-        {particles.map((particle) => (
-          <div
-            key={particle.id}
-            className="particle"
+      {/* Floating Leaves Animation */}
+      <div className="leaves-container">
+        {[...Array(15)].map((_, i) => (
+          <div 
+            key={i} 
+            className="leaf"
             style={{
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              animationDuration: `${particle.duration}s`,
-              animationDelay: `${particle.delay}s`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${Math.random() * 10 + 10}s`,
+              transform: `rotate(${Math.random() * 360}deg)`,
+              fontSize: `${Math.random() * 20 + 10}px`,
+              color: `rgba(34, 197, 94, ${Math.random() * 0.3 + 0.1})`
             }}
-          />
+          >
+            <i className="fas fa-leaf"></i>
+          </div>
         ))}
       </div>
 
-      {/* Animated gradient background */}
-      <div className="gradient-background">
-        <div className="gradient-1"></div>
-        <div className="gradient-2"></div>
-        <div className="gradient-3"></div>
+      {/* Green Gradient Background */}
+      <div className="green-gradient">
+        <div className="gradient-circle circle-1"></div>
+        <div className="gradient-circle circle-2"></div>
+        <div className="gradient-circle circle-3"></div>
       </div>
 
-      <div className={`login-container ${shake ? 'shake' : ''}`}>
-        {/* Decorative elements */}
-        <div className="decorative-circle circle-1"></div>
-        <div className="decorative-circle circle-2"></div>
-        <div className="decorative-circle circle-3"></div>
-        
-        {/* Login Card with glassmorphism effect */}
-        <div className="login-card">
-          {/* Card Header */}
-          <div className="card-header">
-            <div className="logo-container">
-              <div className="logo-icon">
-                <i className="fas fa-shield-alt"></i>
-              </div>
-              <h2 className="logo-text">DigitalGuidance</h2>
+      {/* Main Login Container */}
+      <div className="login-container-aesthetic">
+        {/* Left Side - Visual */}
+        <div className="login-visual">
+          <div className="visual-content">
+            <div className="nature-icon">
+              <i className="fas fa-seedling"></i>
             </div>
-            <div className={`role-badge ${role}`}>
-              {role === "admin" ? "🔐 Admin Access" : "👤 User Portal"}
+            <h2 className="visual-title">
+              {role === "admin" ? "Digital Garden" : "Welcome Back"}
+            </h2>
+            <p className="visual-text">
+              {role === "admin" 
+                ? "Nurture your digital ecosystem"
+                : "Grow with us in your digital journey"}
+            </p>
+            <div className="plant-progress">
+              <div className="plant">
+                <i className="fas fa-spa"></i>
+                <div className="growth">
+                  <div className="growth-bar" style={{ width: '75%' }}></div>
+                </div>
+              </div>
+              <div className="plant">
+                <i className="fas fa-tree"></i>
+                <div className="growth">
+                  <div className="growth-bar" style={{ width: '90%' }}></div>
+                </div>
+              </div>
+              <div className="plant">
+                <i className="fas fa-leaf"></i>
+                <div className="growth">
+                  <div className="growth-bar" style={{ width: '60%' }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side - Login Form */}
+        <div className="login-form-aesthetic">
+          <div className="form-header">
+            <div className="form-logo">
+              <i className="fas fa-leaf"></i>
+              <span>DigitalGuidance</span>
+            </div>
+            <div className="role-tag">
+              {role === "admin" ? "🌿 Admin" : "🌱 User"}
             </div>
           </div>
 
-          {/* Welcome Section */}
-          <div className="welcome-section">
+          <div className="welcome-message">
             <h1>
               {role === "admin" 
-                ? "Welcome Back, Administrator" 
-                : "Welcome to Digital Guidance"}
+                ? "Tend to Your Garden"
+                : "Continue Growing"}
             </h1>
-            <p className="welcome-subtitle">
-              {role === "admin" 
-                ? "Manage your system with precision and insight"
-                : "Access personalized services and resources"}
-            </p>
+            <p>Enter your credentials to blossom</p>
           </div>
 
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="login-form-enhanced">
-            {/* Email Input with icon */}
-            <div className="input-group">
-              <div className="input-icon">
+          <form onSubmit={handleLogin} className="login-form-content">
+            {/* Email Field */}
+            <div 
+              className={`form-field ${hoverField === 'email' ? 'field-hover' : ''}`}
+              onMouseEnter={() => setHoverField('email')}
+              onMouseLeave={() => setHoverField(null)}
+            >
+              <div className="field-icon">
                 <i className="fas fa-envelope"></i>
               </div>
               <input
                 type="email"
-                placeholder="Enter your email address"
+                placeholder="Your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="input-field"
+                className="field-input"
               />
-              <div className="input-underline"></div>
+              <div className="field-decoration">
+                <div className="field-dot"></div>
+                <div className="field-dot"></div>
+                <div className="field-dot"></div>
+              </div>
             </div>
 
-            {/* Password Input with icon and toggle */}
-            <div className="input-group">
-              <div className="input-icon">
+            {/* Password Field */}
+            <div 
+              className={`form-field ${hoverField === 'password' ? 'field-hover' : ''}`}
+              onMouseEnter={() => setHoverField('password')}
+              onMouseLeave={() => setHoverField(null)}
+            >
+              <div className="field-icon">
                 <i className="fas fa-lock"></i>
               </div>
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder="Your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
-                className="input-field"
+                className="field-input"
               />
               <button
                 type="button"
-                className="password-toggle"
+                className="password-toggle-aesthetic"
                 onClick={() => !loading && setShowPassword(!showPassword)}
                 disabled={loading}
               >
                 <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
               </button>
-              <div className="input-underline"></div>
+              <div className="field-decoration">
+                <div className="field-dot"></div>
+                <div className="field-dot"></div>
+                <div className="field-dot"></div>
+              </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="form-options">
-              <label className="checkbox-container">
+            {/* Options */}
+            <div className="form-options-aesthetic">
+              <label className="remember-check">
                 <input type="checkbox" />
-                <span className="checkmark"></span>
+                <span className="check-box">
+                  <i className="fas fa-check"></i>
+                </span>
                 Remember me
               </label>
-              <Link to="/forgot-password" className="forgot-password">
-                Forgot Password?
+              <Link to="/forgot-password" className="forgot-link">
+                Forgot password?
               </Link>
             </div>
 
@@ -222,114 +235,72 @@ function LoginPage() {
             <button 
               type="submit" 
               disabled={loading} 
-              className={`login-button ${loading ? 'loading' : ''}`}
+              className={`login-btn-aesthetic ${loading ? 'btn-loading' : ''}`}
             >
               {loading ? (
                 <>
-                  <span className="button-loader"></span>
-                  <span className="button-text">Authenticating...</span>
+                  <div className="btn-loader">
+                    <i className="fas fa-spinner"></i>
+                  </div>
+                  <span>Growing...</span>
                 </>
               ) : (
                 <>
                   <i className="fas fa-sign-in-alt"></i>
-                  <span>Sign In</span>
+                  <span>Let's Grow</span>
                 </>
               )}
             </button>
 
-            {/* Social Login Divider */}
-            <div className="social-divider">
-              <span>Or continue with</span>
+            {/* Divider */}
+            <div className="divider-aesthetic">
+              <div className="divider-line"></div>
+              <span>or continue with</span>
+              <div className="divider-line"></div>
             </div>
 
-            {/* Social Login Buttons */}
-            <div className="social-login">
-              <button type="button" className="social-button google">
+            {/* Alternative Login */}
+            <div className="alt-login">
+              <button type="button" className="alt-btn">
                 <i className="fab fa-google"></i>
-                Google
               </button>
-              <button type="button" className="social-button microsoft">
-                <i className="fab fa-microsoft"></i>
-                Microsoft
+              <button type="button" className="alt-btn">
+                <i className="fab fa-github"></i>
+              </button>
+              <button type="button" className="alt-btn">
+                <i className="fab fa-apple"></i>
               </button>
             </div>
           </form>
 
-          {/* Footer Links */}
-          <div className="login-footer">
+          {/* Footer */}
+          <div className="form-footer">
             {role === "user" && (
-              <p className="signup-prompt">
-                New to Digital Guidance?{" "}
-                <Link to="/signup" className="signup-link">
-                  Create an account
-                </Link>
+              <p className="signup-text">
+                New here? <Link to="/signup" className="signup-link-aesthetic">Plant your seed</Link>
               </p>
             )}
-            
-            <div className="footer-links">
-              <Link to="/privacy">Privacy Policy</Link>
-              <span className="separator">•</span>
-              <Link to="/terms">Terms of Service</Link>
-              <span className="separator">•</span>
-              <Link to="/support">Help Center</Link>
+            <div className="footer-links-aesthetic">
+              <a href="#privacy">Privacy</a>
+              <span>•</span>
+              <a href="#terms">Terms</a>
+              <span>•</span>
+              <a href="#help">Help</a>
             </div>
-            
-            <p className="copyright">
-              © 2024 Digital Guidance System. All rights reserved.
+            <p className="copyright-aesthetic">
+              © 2024 Digital Garden • Nurturing growth
             </p>
-          </div>
-        </div>
-
-        {/* Side Illustration/Info Panel */}
-        <div className="info-panel">
-          <div className="info-content">
-            <div className="info-icon">
-              <i className="fas fa-rocket"></i>
-            </div>
-            <h3>Secure & Reliable</h3>
-            <p>
-              Enterprise-grade security with end-to-end encryption and 
-              multi-factor authentication.
-            </p>
-            
-            <div className="features-list">
-              <div className="feature">
-                <i className="fas fa-check-circle"></i>
-                <span>256-bit SSL Encryption</span>
-              </div>
-              <div className="feature">
-                <i className="fas fa-check-circle"></i>
-                <span>Real-time Activity Monitoring</span>
-              </div>
-              <div className="feature">
-                <i className="fas fa-check-circle"></i>
-                <span>GDPR Compliant</span>
-              </div>
-            </div>
-            
-            <div className="stats">
-              <div className="stat">
-                <strong>99.9%</strong>
-                <span>Uptime</span>
-              </div>
-              <div className="stat">
-                <strong>10K+</strong>
-                <span>Users</span>
-              </div>
-              <div className="stat">
-                <strong>24/7</strong>
-                <span>Support</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Notification Toast for errors/success */}
-      <div className="notification-toast">
-        <div className="toast-content">
-          <i className="fas fa-info-circle"></i>
-          <span>Enter your credentials to access the system</span>
+      {/* Decorative Birds */}
+      <div className="birds">
+        <div className="bird bird-1">
+          <i className="fas fa-dove"></i>
+        </div>
+        <div className="bird bird-2">
+          <i className="fas fa-dove"></i>
         </div>
       </div>
     </div>
