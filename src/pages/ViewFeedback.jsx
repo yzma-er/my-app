@@ -179,182 +179,230 @@ function ViewFeedback() {
     };
   };
 
-  // Generate PDF Report - SIMPLE WORKING VERSION WITHOUT AUTOTABLE
-  const generatePDFReport = async () => {
-    // Check if data is loaded
-    if (feedback.length === 0) {
-      alert("⚠️ Please wait for feedback data to load before generating report.");
-      return;
-    }
+  // Generate PDF Report - IMPROVED VERSION with full email display
+const generatePDFReport = async () => {
+  // Check if data is loaded
+  if (feedback.length === 0) {
+    alert("⚠️ Please wait for feedback data to load before generating report.");
+    return;
+  }
+  
+  setLoadingReport(true);
+  
+  try {
+    const reportFeedback = getDateFilteredFeedback();
+    const stats = calculateStatistics(reportFeedback);
     
-    setLoadingReport(true);
+    // Create new PDF document in landscape for more space
+    const doc = new jsPDF('landscape');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPos = 20;
     
-    try {
-      const reportFeedback = getDateFilteredFeedback();
-      const stats = calculateStatistics(reportFeedback);
-      
-      // Create new PDF document
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      let yPos = 20;
-      
-      // Add header
-      doc.setFillColor(28, 124, 15);
-      doc.rect(0, 0, pageWidth, 40, 'F');
-      
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(24);
-      doc.setFont("helvetica", "bold");
-      doc.text("Feedback Report", pageWidth / 2, 25, { align: "center" });
-      
-      doc.setFontSize(12);
-      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 35, { align: "center" });
-      
-      // Report period info
-      yPos = 50;
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text(`Report Period: ${getReportPeriodText()}`, 14, yPos);
-      
-      // Statistics section
-      yPos += 15;
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("Summary Statistics", 14, yPos);
-      
+    // Add header
+    doc.setFillColor(28, 124, 15);
+    doc.rect(0, 0, pageWidth, 40, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont("helvetica", "bold");
+    doc.text("Feedback Report", pageWidth / 2, 25, { align: "center" });
+    
+    doc.setFontSize(12);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 35, { align: "center" });
+    
+    // Report period info
+    yPos = 50;
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Report Period: ${getReportPeriodText()}`, 14, yPos);
+    
+    // Statistics section
+    yPos += 15;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Summary Statistics", 14, yPos);
+    
+    yPos += 10;
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total Feedbacks: ${stats.totalFeedbacks}`, 20, yPos);
+    yPos += 7;
+    doc.text(`Average Rating: ${stats.averageRating}/5`, 20, yPos);
+    
+    // Rating distribution
+    yPos += 12;
+    doc.setFont("helvetica", "bold");
+    doc.text("Rating Distribution:", 14, yPos);
+    
+    yPos += 7;
+    doc.setFont("helvetica", "normal");
+    Object.entries(stats.ratingDistribution).forEach(([rating, count]) => {
+      doc.text(`Rating ${rating}/5: ${count} feedbacks`, 20, yPos);
+      yPos += 7;
+    });
+    
+    // Service breakdown
+    if (Object.keys(stats.serviceCounts).length > 0) {
       yPos += 10;
-      doc.setFont("helvetica", "normal");
-      doc.text(`Total Feedbacks: ${stats.totalFeedbacks}`, 20, yPos);
-      yPos += 7;
-      doc.text(`Average Rating: ${stats.averageRating}/5`, 20, yPos);
-      
-      // Rating distribution
-      yPos += 12;
       doc.setFont("helvetica", "bold");
-      doc.text("Rating Distribution:", 14, yPos);
+      doc.text("Service Breakdown:", 14, yPos);
       
       yPos += 7;
       doc.setFont("helvetica", "normal");
-      Object.entries(stats.ratingDistribution).forEach(([rating, count]) => {
-        doc.text(`Rating ${rating}/5: ${count} feedbacks`, 20, yPos);
-        yPos += 7;
-      });
-      
-      // Service breakdown
-      if (Object.keys(stats.serviceCounts).length > 0) {
-        yPos += 10;
-        doc.setFont("helvetica", "bold");
-        doc.text("Service Breakdown:", 14, yPos);
-        
-        yPos += 7;
-        doc.setFont("helvetica", "normal");
-        Object.entries(stats.serviceCounts).forEach(([service, count]) => {
-          if (yPos > 250) {
-            doc.addPage();
-            yPos = 20;
-          }
-          doc.text(`${service}: ${count} feedbacks`, 20, yPos);
-          yPos += 7;
-        });
-      }
-      
-      // Detailed feedback - SIMPLE TABLE WITHOUT AUTOTABLE
-      if (reportFeedback.length > 0) {
-        yPos += 10;
-        
-        // Check if we need new page
-        if (yPos > 180) {
+      Object.entries(stats.serviceCounts).forEach(([service, count]) => {
+        if (yPos > 250) {
           doc.addPage();
           yPos = 20;
         }
-        
-        doc.setFont("helvetica", "bold");
-        doc.text("Detailed Feedback", 14, yPos);
-        yPos += 10;
-        
-        // Simple table header
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
-        doc.text("#", 14, yPos);
-        doc.text("User", 24, yPos);
-        doc.text("Service", 70, yPos);
-        doc.text("Step", 120, yPos);
-        doc.text("Rating", 140, yPos);
-        doc.text("Date", 160, yPos);
-        
-        // Draw header line
-        yPos += 3;
-        doc.line(14, yPos, pageWidth - 14, yPos);
+        doc.text(`${service}: ${count} feedbacks`, 20, yPos);
         yPos += 7;
-        
-        // Table rows
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        
-        reportFeedback.slice(0, 30).forEach((item, index) => {
-          // Check if we need new page
-          if (yPos > 260) {
-            doc.addPage();
-            yPos = 20;
-            // Draw headers on new page
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(10);
-            doc.text("#", 14, yPos);
-            doc.text("User", 24, yPos);
-            doc.text("Service", 70, yPos);
-            doc.text("Step", 120, yPos);
-            doc.text("Rating", 140, yPos);
-            doc.text("Date", 160, yPos);
-            yPos += 10;
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-          }
-          
-          doc.text(`${index + 1}`, 14, yPos);
-          doc.text(item.user_email?.substring(0, 15) || "Anonymous", 24, yPos);
-          doc.text(item.service_name?.substring(0, 20) || "—", 70, yPos);
-          doc.text(item.step_number ? `S${item.step_number}` : "—", 120, yPos);
-          doc.text(`${item.rating}/5`, 140, yPos);
-          doc.text(new Date(item.created_at).toLocaleDateString('en-US'), 160, yPos);
-          
-          yPos += 7;
-        });
-        
-        if (reportFeedback.length > 30) {
-          yPos += 5;
-          doc.setFont("helvetica", "italic");
-          doc.text(`... and ${reportFeedback.length - 30} more records`, 14, yPos);
-        }
-      } else {
-        yPos += 20;
-        doc.text("No feedback available for selected period.", 14, yPos);
-      }
-      
-      // Footer
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setFontSize(10);
-        doc.setTextColor(128, 128, 128);
-        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, pageHeight - 10);
-        doc.text("Digital Guidance System", 20, pageHeight - 10);
-      }
-      
-      // Save PDF
-      const fileName = `Feedback_Report_${getReportPeriodText().replace(/\s+/g, '_')}.pdf`;
-      doc.save(fileName);
-      
-      console.log("PDF generated successfully!");
-      
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Failed to generate PDF report. Please try again.");
-    } finally {
-      setLoadingReport(false);
+      });
     }
-  };
+    
+    // Detailed feedback - IMPROVED TABLE WITH FULL EMAILS
+    if (reportFeedback.length > 0) {
+      yPos += 10;
+      
+      // Check if we need new page
+      if (yPos > 150) {
+        doc.addPage('landscape');
+        yPos = 20;
+      }
+      
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("Detailed Feedback", 14, yPos);
+      yPos += 10;
+      
+      // Table header with proper column widths for landscape
+      const colPositions = {
+        number: 14,
+        email: 24,
+        service: 70,
+        step: 120,
+        rating: 140,
+        comment: 160,
+        date: 240
+      };
+      
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.text("#", colPositions.number, yPos);
+      doc.text("User Email", colPositions.email, yPos);
+      doc.text("Service", colPositions.service, yPos);
+      doc.text("Step", colPositions.step, yPos);
+      doc.text("Rating", colPositions.rating, yPos);
+      doc.text("Comment", colPositions.comment, yPos);
+      doc.text("Date", colPositions.date, yPos);
+      
+      // Draw header line
+      yPos += 3;
+      doc.line(14, yPos, pageWidth - 14, yPos);
+      yPos += 7;
+      
+      // Table rows with wrap functionality for long emails
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      
+      reportFeedback.slice(0, 30).forEach((item, index) => {
+        // Check if we need new page
+        if (yPos > 260) {
+          doc.addPage('landscape');
+          yPos = 20;
+          // Draw headers on new page
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          doc.text("#", colPositions.number, yPos);
+          doc.text("User Email", colPositions.email, yPos);
+          doc.text("Service", colPositions.service, yPos);
+          doc.text("Step", colPositions.step, yPos);
+          doc.text("Rating", colPositions.rating, yPos);
+          doc.text("Comment", colPositions.comment, yPos);
+          doc.text("Date", colPositions.date, yPos);
+          yPos += 10;
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+        }
+        
+        // Row data
+        doc.text(`${index + 1}`, colPositions.number, yPos);
+        
+        // Email - split if too long
+        const email = item.user_email || "Anonymous";
+        if (email.length > 30) {
+          // Split long email into two lines
+          const firstPart = email.substring(0, 30);
+          const secondPart = email.substring(30, 60);
+          doc.text(firstPart, colPositions.email, yPos);
+          doc.text(secondPart || "", colPositions.email, yPos + 4);
+        } else {
+          doc.text(email, colPositions.email, yPos);
+        }
+        
+        // Service - split if too long
+        const service = item.service_name || "—";
+        if (service.length > 20) {
+          doc.text(service.substring(0, 20), colPositions.service, yPos);
+          doc.text(service.substring(20, 40) || "", colPositions.service, yPos + 4);
+        } else {
+          doc.text(service, colPositions.service, yPos);
+        }
+        
+        // Step
+        doc.text(item.step_number ? `S${item.step_number}` : "—", colPositions.step, yPos);
+        
+        // Rating
+        doc.text(`${item.rating}/5`, colPositions.rating, yPos);
+        
+        // Comment - truncated if too long
+        const comment = item.comment || "No comment";
+        if (comment.length > 30) {
+          doc.text(comment.substring(0, 30) + "...", colPositions.comment, yPos);
+        } else {
+          doc.text(comment, colPositions.comment, yPos);
+        }
+        
+        // Date
+        doc.text(new Date(item.created_at).toLocaleDateString('en-US'), colPositions.date, yPos);
+        
+        // Move to next row (add extra space if email was split)
+        yPos += (email.length > 30 || service.length > 20) ? 12 : 7;
+      });
+      
+      if (reportFeedback.length > 30) {
+        yPos += 5;
+        doc.setFont("helvetica", "italic");
+        doc.text(`... and ${reportFeedback.length - 30} more records`, 14, yPos);
+      }
+    } else {
+      yPos += 20;
+      doc.text("No feedback available for selected period.", 14, yPos);
+    }
+    
+    // Footer
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.setTextColor(128, 128, 128);
+      doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, pageHeight - 10);
+      doc.text("Digital Guidance System", 20, pageHeight - 10);
+    }
+    
+    // Save PDF
+    const fileName = `Feedback_Report_${getReportPeriodText().replace(/\s+/g, '_')}.pdf`;
+    doc.save(fileName);
+    
+    console.log("PDF generated successfully!");
+    
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    alert("Failed to generate PDF report. Please try again.");
+  } finally {
+    setLoadingReport(false);
+  }
+};
 
   // Helper function to get report period text
   const getReportPeriodText = () => {
