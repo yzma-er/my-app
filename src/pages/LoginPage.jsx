@@ -100,16 +100,37 @@ function LoginPage() {
       <div className="auth-right-side">
         <div className="auth-container">
           <div className="auth-content">
-            {/* Back Button */}
-            <div className="back-button-container">
-              <button 
-                className="back-button"
-                onClick={() => navigate("/")}
-                disabled={loading}
-              >
-                ← Back to Home
-              </button>
-            </div>
+
+            
+            {/* Back Button with force display */}
+<div className="back-button-container" style={{
+  display: 'block',
+  marginBottom: '30px',
+  position: 'relative',
+  zIndex: 10
+}}>
+  <button 
+    className="back-button"
+    onClick={() => navigate("/")}
+    disabled={loading}
+    style={{
+      background: 'none',
+      border: 'none',
+      color: '#666',
+      fontSize: '14px',
+      fontWeight: '500',
+      cursor: 'pointer',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      transition: 'all 0.2s ease',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px'
+    }}
+  >
+    ← Back to Home
+  </button>
+</div>
 
             <div className="auth-header">
               <div className="role-indicator">
