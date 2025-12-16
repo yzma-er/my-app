@@ -155,67 +155,6 @@ function ManageUsers() {
     }
   };
 
-  // ✅ Change password
-  const handlePasswordChange = async (id) => {
-    const newPassword = prompt("Enter new password (minimum 8 characters):");
-    if (!newPassword) return;
-    
-    if (newPassword.length < 8) {
-      alert("Password must be at least 8 characters long.");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${backendURL}/api/admin/users/${id}/password`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ newPassword }),
-      });
-
-      if (res.ok) {
-        alert("✅ Password updated successfully!");
-      } else {
-        alert("❌ Failed to update password");
-      }
-    } catch (err) {
-      console.error("❌ Error updating password:", err);
-    }
-  };
-
-  // ✅ Delete user
-  const handleDelete = async (id) => {
-    const userToDelete = users.find(u => u.user_id === id);
-    if (!userToDelete) return;
-    
-    if (!window.confirm(`Are you sure you want to delete ${userToDelete.email}? This action cannot be undone.`)) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${backendURL}/api/admin/users/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.ok) {
-        setUsers((prev) => prev.filter((u) => u.user_id !== id));
-        setStats(prev => ({
-          ...prev,
-          total: prev.total - 1,
-          [userToDelete.role === 'admin' ? 'admins' : 'users']: prev[userToDelete.role === 'admin' ? 'admins' : 'users'] - 1
-        }));
-        alert("🗑️ User deleted successfully!");
-      } else {
-        alert("❌ Failed to delete user");
-      }
-    } catch (err) {
-      console.error("❌ Error deleting user:", err);
-    }
-  };
-
   // ✅ Loading state with better UI
   if (loading) return (
     <div className="manage-users">
@@ -323,7 +262,7 @@ function ManageUsers() {
               <div className="table-cell">Email</div>
               <div className="table-cell">Role</div>
               <div className="table-cell">Joined</div>
-              <div className="table-cell actions-header">Actions</div>
+              <div className="table-cell">Status</div>
             </div>
 
             {filteredUsers.map((u) => (
@@ -349,23 +288,10 @@ function ManageUsers() {
                   })}
                 </div>
                 
-                <div className="table-cell actions-cell">
-                  <div className="action-buttons">
-                    <button
-                      className="action-btn edit-btn"
-                      onClick={() => handlePasswordChange(u.user_id)}
-                      title="Change Password"
-                    >
-                      🔑 Change Password
-                    </button>
-                    <button
-                      className="action-btn delete-btn"
-                      onClick={() => handleDelete(u.user_id)}
-                      title="Delete User"
-                    >
-                      🗑️ Delete
-                    </button>
-                  </div>
+                <div className="table-cell status-cell">
+                  <span className="status-badge active">
+                    ✅ Active
+                  </span>
                 </div>
               </div>
             ))}
