@@ -133,7 +133,7 @@ function LoginPage() {
                 <input
                   id="email"
                   type="email"
-                  placeholder={role === "admin" ? "admin@digitalguidance.com" : "andgmail.com"}
+                  placeholder={role === "admin" ? "admin@digitalguidance.com" : "user@gmail.com"}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
