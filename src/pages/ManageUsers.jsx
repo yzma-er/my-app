@@ -14,36 +14,47 @@ function ManageUsers() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [stats, setStats] = useState({ total: 0, admins: 0, users: 0 });
   const navigate = useNavigate();
 
-  // ✅ Auto-detect backend
+  // ✅ Auto-detect backend (Laptop vs. Phone)
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
+
+  // ✅ Stats calculation
+  const stats = {
+    total: users.length,
+    admins: users.filter(u => u.role === 'admin').length,
+    users: users.filter(u => u.role === 'user').length
+  };
 
   // ✅ Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       const token = localStorage.getItem("token");
       
+      // Better token validation
       if (!token) {
         alert("❌ No token found. Please log in again.");
         navigate("/login");
         return;
       }
 
+      // Check if token is expired or invalid
       try {
-        const [, payload] = token.split(".");
-        const decoded = JSON.parse(atob(payload));
-        if (decoded.exp * 1000 < Date.now()) {
+        // Decode token to check expiration
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const isExpired = payload.exp * 1000 < Date.now();
+        
+        if (isExpired) {
           alert("❌ Session expired. Please log in again.");
           localStorage.removeItem("token");
           navigate("/login");
           return;
         }
       } catch (error) {
+        console.error("Invalid token:", error);
         alert("❌ Invalid token. Please log in again.");
         localStorage.removeItem("token");
         navigate("/login");
@@ -52,10 +63,13 @@ function ManageUsers() {
 
       try {
         const res = await fetch(`${backendURL}/api/admin/users`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (res.status === 401) {
+          // Unauthorized - token is invalid or user is not admin
           alert("❌ Access denied. Please ensure you are logged in as admin.");
           localStorage.removeItem("token");
           navigate("/login");
@@ -66,17 +80,13 @@ function ManageUsers() {
 
         const data = await res.json();
         setUsers(data);
-        
-        // Calculate stats
-        const admins = data.filter(u => u.role === 'admin').length;
-        setStats({
-          total: data.length,
-          admins: admins,
-          users: data.length - admins
-        });
       } catch (err) {
         console.error("❌ Error fetching users:", err);
-        alert("Failed to load users. Please check your connection and try again.");
+        if (err.message.includes("401")) {
+          alert("Access denied. Please ensure you are logged in as admin.");
+        } else {
+          alert("Failed to load users. Please check your connection and try again.");
+        }
       } finally {
         setLoading(false);
       }
@@ -99,6 +109,7 @@ function ManageUsers() {
       return;
     }
 
+    // 🔐 Minimum 8 characters (matching SignupPage)
     if (newAdminData.password.length < 8) {
       alert("Password must be at least 8 characters long.");
       return;
@@ -137,14 +148,6 @@ function ManageUsers() {
         if (usersRes.ok) {
           const data = await usersRes.json();
           setUsers(data);
-          
-          // Update stats
-          const admins = data.filter(u => u.role === 'admin').length;
-          setStats({
-            total: data.length,
-            admins: admins,
-            users: data.length - admins
-          });
         }
       } else {
         alert(`❌ ${data.message || "Failed to create admin account"}`);
@@ -155,33 +158,41 @@ function ManageUsers() {
     }
   };
 
-  // ✅ Loading state with better UI
-  if (loading) return (
-    <div className="manage-users">
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading users...</p>
-      </div>
-    </div>
-  );
+  // ✅ Loading state
+  if (loading) return <p>Loading users...</p>;
 
   return (
     <div className="manage-users">
       
-      {/* Header with Back Button */}
-      <div className="manage-users-header">
+      {/* Back button */}
+      <div style={{ position: "relative", marginBottom: "20px", height: "40px" }}>
         <button
           className="back-admin-btn"
           onClick={() => navigate("/admin")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: "30px",
+            backgroundColor: "#1c7c0f",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "bold",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            position: "absolute",
+            left: 0,
+          }}
         >
-          ← Back to Dashboard
+          <span style={{ fontWeight: "bold", fontSize: "18px" }}>←</span>
         </button>
-        <h1>👥 User Management</h1>
       </div>
+
+      <h1>👥 Manage Users</h1>
 
       {/* Stats Cards */}
       <div className="stats-cards">
-        <div className="stat-card total">
+        <div className="stat-card">
           <div className="stat-icon">📊</div>
           <div className="stat-content">
             <h3>{stats.total}</h3>
@@ -189,7 +200,7 @@ function ManageUsers() {
           </div>
         </div>
         
-        <div className="stat-card admins">
+        <div className="stat-card">
           <div className="stat-icon">🔐</div>
           <div className="stat-content">
             <h3>{stats.admins}</h3>
@@ -197,7 +208,7 @@ function ManageUsers() {
           </div>
         </div>
         
-        <div className="stat-card users">
+        <div className="stat-card">
           <div className="stat-icon">👤</div>
           <div className="stat-content">
             <h3>{stats.users}</h3>
@@ -206,239 +217,163 @@ function ManageUsers() {
         </div>
       </div>
 
-      {/* Search and Actions Bar */}
-      <div className="search-actions-bar">
-        <div className="search-box">
-          <div className="search-icon">🔍</div>
+      {/* 🔍 Search Bar and Create Admin Button */}
+      <div className="search-create-container">
+        <div className="search-container">
           <input
             type="text"
-            placeholder="Search users by email or role..."
+            placeholder="Search by email or role..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="search-input"
           />
-          {search && (
-            <button 
-              className="clear-search"
-              onClick={() => setSearch("")}
-            >
-              ✕
-            </button>
-          )}
         </div>
 
-        <div className="action-buttons-bar">
-          <button 
-            className="create-admin-btn"
-            onClick={() => setShowCreateAdmin(true)}
-          >
-            <span className="btn-icon">➕</span>
-            Create New Admin
-          </button>
-          <button 
-            className="refresh-btn"
-            onClick={() => window.location.reload()}
-          >
-            <span className="btn-icon">🔄</span>
-            Refresh
-          </button>
-        </div>
-      </div>
-
-      {/* Users Table */}
-      <div className="users-table-container">
-        <div className="table-header">
-          <h3>All Users ({filteredUsers.length})</h3>
-          {search && (
-            <span className="search-results">
-              Showing {filteredUsers.length} of {users.length} users
-            </span>
-          )}
-        </div>
-
-        {filteredUsers.length > 0 ? (
-          <div className="users-table">
-            <div className="table-row header-row">
-              <div className="table-cell">Email</div>
-              <div className="table-cell">Role</div>
-              <div className="table-cell">Joined</div>
-              <div className="table-cell">Status</div>
-            </div>
-
-            {filteredUsers.map((u) => (
-              <div className="table-row user-row" key={u.user_id}>
-                <div className="table-cell email-cell">
-                  <div className="user-email">
-                    <span className="email-icon">📧</span>
-                    {u.email}
-                  </div>
-                </div>
-                
-                <div className="table-cell role-cell">
-                  <span className={`role-badge ${u.role}`}>
-                    {u.role === 'admin' ? '👑 Admin' : '👤 User'}
-                  </span>
-                </div>
-                
-                <div className="table-cell date-cell">
-                  {new Date(u.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                  })}
-                </div>
-                
-                <div className="table-cell status-cell">
-                  <span className="status-badge active">
-                    ✅ Active
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="no-users">
-            <div className="no-users-icon">📭</div>
-            <h3>No users found</h3>
-            <p>
-              {search 
-                ? `No users matching "${search}"`
-                : "No users in the system"}
-            </p>
-            {search && (
-              <button 
-                className="clear-search-btn"
-                onClick={() => setSearch("")}
-              >
-                Clear search
-              </button>
-            )}
-          </div>
-        )}
+        <button 
+          className="create-admin-btn"
+          onClick={() => setShowCreateAdmin(true)}
+        >
+          ➕ Create New Admin
+        </button>
       </div>
 
       {/* Create Admin Modal */}
       {showCreateAdmin && (
         <div className="modal-overlay">
           <div className="modal-large">
-            <div className="modal-header">
-              <h2>Create Admin Account</h2>
-              <button 
-                className="close-btn" 
-                onClick={() => {
-                  setShowCreateAdmin(false);
-                  setNewAdminData({ email: "", password: "", confirmPassword: "" });
-                  setShowPassword(false);
-                  setShowConfirm(false);
-                }}
-              >
-                ✖
-              </button>
-            </div>
+            <button 
+              className="close-btn" 
+              onClick={() => {
+                setShowCreateAdmin(false);
+                setNewAdminData({ email: "", password: "", confirmPassword: "" });
+                setShowPassword(false);
+                setShowConfirm(false);
+              }}
+            >
+              ✖
+            </button>
             
-            <div className="modal-content">
-              <form className="create-admin-form" onSubmit={handleCreateAdmin}>
-                <div className="form-group">
-                  <label htmlFor="adminEmail">Admin Email Address</label>
-                  <input
-                    id="adminEmail"
-                    type="email"
-                    placeholder="admin@example.com"
-                    value={newAdminData.email}
-                    onChange={(e) => setNewAdminData({...newAdminData, email: e.target.value})}
-                    required
-                  />
-                </div>
+            <h2>Create Admin Account</h2>
+            
+            <form className="create-admin-form" onSubmit={handleCreateAdmin}>
+              <input
+                type="email"
+                placeholder="Admin email"
+                value={newAdminData.email}
+                onChange={(e) => setNewAdminData({...newAdminData, email: e.target.value})}
+                required
+              />
 
-                <div className="form-group">
-                  <label htmlFor="adminPassword">Password</label>
-                  <div className="password-container">
-                    <input
-                      id="adminPassword"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Minimum 8 characters"
-                      value={newAdminData.password}
-                      onChange={(e) => setNewAdminData({...newAdminData, password: e.target.value})}
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? "🙈" : "👁️"}
-                    </button>
-                  </div>
-                  {newAdminData.password.length > 0 && newAdminData.password.length < 8 && (
-                    <p className="password-error">
-                      ⚠️ Password must be at least 8 characters long
-                    </p>
-                  )}
-                </div>
+              {/* PASSWORD FIELD */}
+              <div className="password-container">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter password"
+                  value={newAdminData.password}
+                  onChange={(e) => setNewAdminData({...newAdminData, password: e.target.value})}
+                  required
+                />
+                <i
+                  className={`fa-solid ${
+                    showPassword ? "fa-eye-slash" : "fa-eye"
+                  } toggle-icon`}
+                  onClick={() => setShowPassword(!showPassword)}
+                ></i>
+              </div>
 
-                <div className="form-group">
-                  <label htmlFor="confirmPassword">Confirm Password</label>
-                  <div className="password-container">
-                    <input
-                      id="confirmPassword"
-                      type={showConfirm ? "text" : "password"}
-                      placeholder="Re-enter password"
-                      value={newAdminData.confirmPassword}
-                      onChange={(e) => setNewAdminData({...newAdminData, confirmPassword: e.target.value})}
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle"
-                      onClick={() => setShowConfirm(!showConfirm)}
-                    >
-                      {showConfirm ? "🙈" : "👁️"}
-                    </button>
-                  </div>
-                  {newAdminData.confirmPassword.length > 0 &&
-                    newAdminData.confirmPassword !== newAdminData.password && (
-                    <p className="password-error">
-                      ⚠️ Passwords do not match
-                    </p>
-                  )}
-                </div>
+              {/* ⚠️ Real-time password requirement message */}
+              {newAdminData.password.length > 0 && newAdminData.password.length < 8 && (
+                <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
+                  Password must be at least 8 characters long.
+                </p>
+              )}
 
-                <div className="form-requirements">
-                  <p><strong>Requirements:</strong></p>
-                  <ul>
-                    <li>✓ Valid email address</li>
-                    <li>✓ Minimum 8 character password</li>
-                    <li>✓ Passwords must match</li>
-                    <li>✓ Admin will have full system access</li>
-                  </ul>
-                </div>
+              {/* CONFIRM PASSWORD FIELD */}
+              <div className="password-container">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  placeholder="Confirm password"
+                  value={newAdminData.confirmPassword}
+                  onChange={(e) => setNewAdminData({...newAdminData, confirmPassword: e.target.value})}
+                  required
+                />
+                <i
+                  className={`fa-solid ${
+                    showConfirm ? "fa-eye-slash" : "fa-eye"
+                  } toggle-icon`}
+                  onClick={() => setShowConfirm(!showConfirm)}
+                ></i>
+              </div>
 
-                <div className="modal-buttons">
-                  <button 
-                    className="cancel-btn" 
-                    type="button"
-                    onClick={() => {
-                      setShowCreateAdmin(false);
-                      setNewAdminData({ email: "", password: "", confirmPassword: "" });
-                      setShowPassword(false);
-                      setShowConfirm(false);
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    className="save-btn" 
-                    type="submit"
-                    disabled={!newAdminData.email || newAdminData.password.length < 8 || newAdminData.password !== newAdminData.confirmPassword}
-                  >
-                    Create Admin Account
-                  </button>
-                </div>
-              </form>
-            </div>
+              {/* ⚠️ Real-time confirm password mismatch */}
+              {newAdminData.confirmPassword.length > 0 &&
+                newAdminData.confirmPassword !== newAdminData.password && (
+                  <p style={{ color: "red", fontSize: "13px", marginBottom: "6px" }}>
+                    Passwords do not match.
+                  </p>
+                )}
+
+              <div className="modal-buttons">
+                <button 
+                  className="save-btn" 
+                  type="submit"
+                >
+                  Create Admin
+                </button>
+                <button 
+                  className="cancel-btn" 
+                  type="button"
+                  onClick={() => {
+                    setShowCreateAdmin(false);
+                    setNewAdminData({ email: "", password: "", confirmPassword: "" });
+                    setShowPassword(false);
+                    setShowConfirm(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
+
+      {/* 🧾 Users Table */}
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredUsers.length > 0 ? (
+            filteredUsers.map((u) => (
+              <tr key={u.user_id}>
+                <td>{u.email}</td>
+                <td style={{ textAlign: 'center' }}>
+                  <span className={`role-badge ${u.role}`}>
+                    {u.role}
+                  </span>
+                </td>
+                <td style={{ textAlign: 'center' }}>
+                  {new Date(u.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3" style={{ textAlign: "center" }}>
+                No users found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }
