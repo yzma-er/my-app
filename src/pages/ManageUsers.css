@@ -521,3 +521,196 @@
   border-color: #1a651a;
   outline: none;
 }
+
+
+/* ============================
+   OTP VERIFICATION STYLES
+============================ */
+
+/* Step indicator */
+.form-step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 20px 0;
+  gap: 8px;
+}
+
+.step {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ddd;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.step.active {
+  background: #1c7c0f;
+  color: white;
+}
+
+.step.completed {
+  background: #2e7d32;
+  color: white;
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: #ddd;
+  max-width: 50px;
+}
+
+.step-line.completed {
+  background: #2e7d32;
+}
+
+.step-description {
+  color: #666;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* OTP input */
+.otp-input-container {
+  margin: 15px 0;
+}
+
+.otp-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  text-align: center;
+  letter-spacing: 8px;
+  border: 2px solid #1c7c0f;
+  border-radius: 8px;
+  background: #f9fff9;
+  box-sizing: border-box;
+}
+
+.otp-info {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0 20px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.otp-timer {
+  color: #1c7c0f;
+  font-weight: bold;
+}
+
+.otp-timer-expired {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.resend-otp-btn {
+  width: 100%;
+  padding: 10px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  color: #555;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.resend-otp-btn:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.resend-otp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Password error messages */
+.password-error {
+  color: #d32f2f;
+  font-size: 13px;
+  margin: 5px 0 15px 0;
+  text-align: left;
+}
+
+/* Back button in modal */
+.back-btn {
+  padding: 10px 20px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #5a6268;
+}
+
+/* Modal buttons adjustments */
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-buttons .save-btn {
+  flex: 2;
+}
+
+.modal-buttons .back-btn,
+.modal-buttons .cancel-btn {
+  flex: 1;
+}
+
+/* Modal header adjustments */
+.modal-large h2 {
+  margin-bottom: 10px;
+}
+
+/* Responsive adjustments for OTP */
+@media (max-width: 480px) {
+  .otp-input {
+    font-size: 16px;
+    padding: 10px;
+    letter-spacing: 6px;
+  }
+  
+  .form-step-indicator {
+    gap: 4px;
+  }
+  
+  .step {
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+  }
+  
+  .step-line {
+    max-width: 30px;
+  }
+  
+  .modal-buttons {
+    flex-direction: column;
+  }
+  
+  .modal-buttons .save-btn,
+  .modal-buttons .back-btn,
+  .modal-buttons .cancel-btn {
+    flex: 1;
+    width: 100%;
+  }
+}
