@@ -151,6 +151,50 @@
   width: 100%;
 }
 
+/* ============================
+   BUTTONS - PERFECTLY ALIGNED
+============================ */
+.delete-btn,
+.edit-btn {
+  /* Common properties for perfect alignment */
+  min-width: 130px; /* Same minimum width for both */
+  height: 36px; /* Same height for both */
+  padding: 0 16px; /* Same padding for both */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box; /* Ensures padding doesn't affect width */
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* Prevents buttons from shrinking */
+}
+
+/* Delete Button specific */
+.delete-btn {
+  background: #e53935;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #c62828;
+  transform: translateY(-1px);
+}
+
+/* Edit/Change Password Button specific */
+.edit-btn {
+  background-color: #1976d2;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #1565c0;
+  transform: translateY(-1px);
+}
 
 
 /* ============================
