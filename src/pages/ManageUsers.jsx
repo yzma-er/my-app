@@ -230,7 +230,38 @@ useEffect(() => {
         </button>
       </div>
 
-      <h1>👥 Manage Users</h1>
+            <h1>👥 Manage Users</h1>
+      
+      {/* User Statistics */}
+      <div className="user-stats-container">
+        <div className="stat-card total-users">
+          <div className="stat-icon">👥</div>
+          <div className="stat-content">
+            <h3>Total Users</h3>
+            <p className="stat-number">{users.length}</p>
+          </div>
+        </div>
+        
+        <div className="stat-card admin-users">
+          <div className="stat-icon">👑</div>
+          <div className="stat-content">
+            <h3>Administrators</h3>
+            <p className="stat-number">
+              {users.filter(u => u.role === 'admin').length}
+            </p>
+          </div>
+        </div>
+        
+        <div className="stat-card regular-users">
+          <div className="stat-icon">👤</div>
+          <div className="stat-content">
+            <h3>Regular Users</h3>
+            <p className="stat-number">
+              {users.filter(u => u.role === 'user').length}
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* 🔍 Search Bar and Create Admin Button */}
       <div className="search-create-container">
