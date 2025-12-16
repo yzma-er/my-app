@@ -109,27 +109,46 @@ function LoginPage() {
   position: 'relative',
   zIndex: 10
 }}>
-  <button 
-    className="back-button"
-    onClick={() => navigate("/")}
-    disabled={loading}
-    style={{
-      background: 'none',
-      border: 'none',
-      color: '#666',
-      fontSize: '14px',
-      fontWeight: '500',
-      cursor: 'pointer',
-      padding: '8px 12px',
-      borderRadius: '6px',
-      transition: 'all 0.2s ease',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '6px'
-    }}
-  >
-    ← Back to Home
-  </button>
+  {/* Fixed Back Button - Always visible */}
+<button 
+  onClick={() => navigate("/")}
+  disabled={loading}
+  style={{
+    position: 'fixed',
+    top: '20px',
+    left: '20px',
+    background: 'linear-gradient(135deg, #1c7c0f 0%, #0f4d08 100%)',
+    color: 'white',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '30px',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: loading ? 'not-allowed' : 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    boxShadow: '0 4px 12px rgba(28, 124, 15, 0.3)',
+    transition: 'all 0.3s ease',
+    zIndex: 1000,
+    opacity: loading ? 0.7 : 1
+  }}
+  onMouseEnter={(e) => {
+    if (!loading) {
+      e.target.style.transform = 'translateY(-2px)';
+      e.target.style.boxShadow = '0 6px 16px rgba(28, 124, 15, 0.4)';
+    }
+  }}
+  onMouseLeave={(e) => {
+    if (!loading) {
+      e.target.style.transform = 'translateY(0)';
+      e.target.style.boxShadow = '0 4px 12px rgba(28, 124, 15, 0.3)';
+    }
+  }}
+>
+  <span style={{ fontSize: '18px', fontWeight: 'bold' }}>←</span>
+  Back to Home
+</button>
 </div>
 
             <div className="auth-header">
