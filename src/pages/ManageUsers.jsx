@@ -384,20 +384,7 @@ useEffect(() => {
 </td>
                 </td>
                 <td>
-                  <div className="action-buttons">
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDelete(u.user_id)}
-                    >
-                      Delete
-                    </button>
-                    <button
-                      className="edit-btn"
-                      onClick={() => handlePasswordChange(u.user_id)}
-                    >
-                      Change Password
-                    </button>
-                  </div>
+                  
                 </td>
               </tr>
             ))
