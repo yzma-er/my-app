@@ -111,19 +111,27 @@ function LoginPage() {
               </button>
             </div>
 
-            <div className="auth-header">
-              <div className="role-indicator">
-                <span className={`role-tag ${role}-tag`}>
-                  {role === "admin" ? "Administrator" : "User"} Login
-                </span>
-              </div>
-              <h1>{role === "admin" ? "Admin Login" : "Login"}</h1>
-              <p className="auth-welcome-text">
-                {role === "admin" 
-                  ? "Access administrative functions and system management" 
-                  : "Welcome back! Please login to your account."}
-              </p>
-            </div>
+            {/* Header with Role Indicator and Back Button INLINE */}
+<div className="auth-header">
+  <div className="role-indicator-inline">
+    <span className={`role-tag ${role}-tag`}>
+      {role === "admin" ? "Administrator" : "User"} Login
+    </span>
+    <button 
+      className="back-button-inline"
+      onClick={() => navigate("/")}
+      disabled={loading}
+    >
+      ← Back to Home
+    </button>
+  </div>
+  <h1>{role === "admin" ? "Admin Login" : "Login"}</h1>
+  <p className="auth-welcome-text">
+    {role === "admin" 
+      ? "Access administrative functions and system management" 
+      : "Welcome back! Please login to your account."}
+  </p>
+</div>
 
             {/* Login Form */}
             <form onSubmit={handleLogin} className="auth-form">
