@@ -1,15 +1,5 @@
 /* LoginPage.css - UNIFIED AUTH SYSTEM for login, signup, and forgotPass */
 
-/* --- Prevent scrolling --- */
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  
-}
-
 /* --- Split Layout Container --- */
 .auth-wrapper-split {
   display: flex;
@@ -134,7 +124,7 @@ html, body, #root {
 
 /* --- Back Button --- */
 .back-button-container {
-  margin-bottom: 30px;
+  margin-bottom: 50px;
 }
 
 .back-button {
