@@ -100,16 +100,7 @@ function LoginPage() {
       <div className="auth-right-side">
         <div className="auth-container">
           <div className="auth-content">
-            {/* Back Button */}
-            <div className="back-button-container">
-              <button 
-                className="back-button"
-                onClick={() => navigate("/")}
-                disabled={loading}
-              >
-                ← Back to Home
-              </button>
-            </div>
+            
 
             {/* Header with Role Indicator and Back Button INLINE */}
 <div className="auth-header">
