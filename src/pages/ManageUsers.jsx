@@ -1,3 +1,4 @@
+// src/pages/ManageUsers.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ManageUsers.css";
@@ -22,78 +23,71 @@ function ManageUsers() {
       ? "http://localhost:5000"
       : "https://digital-guidance-api.onrender.com";
 
-  // ✅ Stats calculation
-  const stats = {
-    total: users.length,
-    admins: users.filter(u => u.role === 'admin').length,
-    users: users.filter(u => u.role === 'user').length
-  };
-
   // ✅ Fetch users
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const token = localStorage.getItem("token");
+useEffect(() => {
+  const fetchUsers = async () => {
+    const token = localStorage.getItem("token");
+    
+    // Better token validation
+    if (!token) {
+      alert("❌ No token found. Please log in again.");
+      navigate("/login");
+      return;
+    }
+
+    // Check if token is expired or invalid
+    try {
+      // Decode token to check expiration
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const isExpired = payload.exp * 1000 < Date.now();
       
-      // Better token validation
-      if (!token) {
-        alert("❌ No token found. Please log in again.");
+      if (isExpired) {
+        alert("❌ Session expired. Please log in again.");
+        localStorage.removeItem("token");
         navigate("/login");
         return;
       }
+    } catch (error) {
+      console.error("Invalid token:", error);
+      alert("❌ Invalid token. Please log in again.");
+      localStorage.removeItem("token");
+      navigate("/login");
+      return;
+    }
 
-      // Check if token is expired or invalid
-      try {
-        // Decode token to check expiration
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const isExpired = payload.exp * 1000 < Date.now();
-        
-        if (isExpired) {
-          alert("❌ Session expired. Please log in again.");
-          localStorage.removeItem("token");
-          navigate("/login");
-          return;
-        }
-      } catch (error) {
-        console.error("Invalid token:", error);
-        alert("❌ Invalid token. Please log in again.");
+    try {
+      const res = await fetch(`${backendURL}/api/admin/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 401) {
+        // Unauthorized - token is invalid or user is not admin
+        alert("❌ Access denied. Please ensure you are logged in as admin.");
         localStorage.removeItem("token");
         navigate("/login");
         return;
       }
 
-      try {
-        const res = await fetch(`${backendURL}/api/admin/users`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
-        if (res.status === 401) {
-          // Unauthorized - token is invalid or user is not admin
-          alert("❌ Access denied. Please ensure you are logged in as admin.");
-          localStorage.removeItem("token");
-          navigate("/login");
-          return;
-        }
-
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
-        const data = await res.json();
-        setUsers(data);
-      } catch (err) {
-        console.error("❌ Error fetching users:", err);
-        if (err.message.includes("401")) {
-          alert("Access denied. Please ensure you are logged in as admin.");
-        } else {
-          alert("Failed to load users. Please check your connection and try again.");
-        }
-      } finally {
-        setLoading(false);
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      console.error("❌ Error fetching users:", err);
+      if (err.message.includes("401")) {
+        alert("Access denied. Please ensure you are logged in as admin.");
+      } else {
+        alert("Failed to load users. Please check your connection and try again.");
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchUsers();
-  }, [backendURL, navigate]);
+  fetchUsers();
+}, [backendURL, navigate]);
 
   // ✅ Filtered users based on search
   const filteredUsers = users.filter((u) =>
@@ -158,6 +152,54 @@ function ManageUsers() {
     }
   };
 
+  // ✅ Change password
+  const handlePasswordChange = async (id) => {
+    const newPassword = prompt("Enter new password:");
+    if (!newPassword) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${backendURL}/api/admin/users/${id}/password`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ newPassword }),
+      });
+
+      if (res.ok) {
+        alert("✅ Password updated successfully!");
+      } else {
+        alert("❌ Failed to update password");
+      }
+    } catch (err) {
+      console.error("❌ Error updating password:", err);
+    }
+  };
+
+  // ✅ Delete user
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${backendURL}/api/admin/users/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        setUsers((prev) => prev.filter((u) => u.user_id !== id));
+        alert("🗑️ User deleted successfully!");
+      } else {
+        alert("❌ Failed to delete user");
+      }
+    } catch (err) {
+      console.error("❌ Error deleting user:", err);
+    }
+  };
+
   // ✅ Loading state
   if (loading) return <p>Loading users...</p>;
 
@@ -189,33 +231,6 @@ function ManageUsers() {
       </div>
 
       <h1>👥 Manage Users</h1>
-
-      {/* Stats Cards */}
-      <div className="stats-cards">
-        <div className="stat-card">
-          <div className="stat-icon">📊</div>
-          <div className="stat-content">
-            <h3>{stats.total}</h3>
-            <p>Total Users</p>
-          </div>
-        </div>
-        
-        <div className="stat-card">
-          <div className="stat-icon">🔐</div>
-          <div className="stat-content">
-            <h3>{stats.admins}</h3>
-            <p>Administrators</p>
-          </div>
-        </div>
-        
-        <div className="stat-card">
-          <div className="stat-icon">👤</div>
-          <div className="stat-content">
-            <h3>{stats.users}</h3>
-            <p>Regular Users</p>
-          </div>
-        </div>
-      </div>
 
       {/* 🔍 Search Bar and Create Admin Button */}
       <div className="search-create-container">
@@ -343,7 +358,8 @@ function ManageUsers() {
           <tr>
             <th>Email</th>
             <th>Role</th>
-            <th>Joined</th>
+            <th></th>
+            
           </tr>
         </thead>
         <tbody>
@@ -351,17 +367,15 @@ function ManageUsers() {
             filteredUsers.map((u) => (
               <tr key={u.user_id}>
                 <td>{u.email}</td>
-                <td style={{ textAlign: 'center' }}>
-                  <span className={`role-badge ${u.role}`}>
-                    {u.role}
-                  </span>
+                <td>
+                  <td>
+                    <span className={`role-badge ${u.role}`}>
+                      {u.role}
+                    </span>
+                  </td>
                 </td>
-                <td style={{ textAlign: 'center' }}>
-                  {new Date(u.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                  })}
+                <td>
+                  
                 </td>
               </tr>
             ))
