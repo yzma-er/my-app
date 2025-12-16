@@ -268,7 +268,7 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 2fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 20px;
   padding: 18px 24px;
   align-items: center;
@@ -295,10 +295,6 @@
   padding: 8px 0;
 }
 
-.actions-header {
-  text-align: right;
-}
-
 .email-cell .user-email {
   display: flex;
   align-items: center;
@@ -312,7 +308,7 @@
   font-size: 14px;
 }
 
-.role-cell {
+.role-cell, .date-cell, .status-cell {
   text-align: center;
 }
 
@@ -355,50 +351,31 @@
   font-size: 14px;
 }
 
-.actions-cell {
-  text-align: right;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-.action-btn {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
+/* ============================
+   STATUS BADGE
+============================ */
+.status-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
+  letter-spacing: 0.5px;
+  min-width: 80px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.edit-btn {
-  background: linear-gradient(135deg, #339af0, #228be6);
+.status-badge.active {
+  background: linear-gradient(135deg, #51cf66, #37b24d);
   color: white;
+  border: 2px solid #51cf66;
 }
 
-.edit-btn:hover {
-  background: linear-gradient(135deg, #228be6, #1c7ed6);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(51, 154, 240, 0.3);
-}
-
-.delete-btn {
-  background: linear-gradient(135deg, #ff6b6b, #fa5252);
+.status-badge.inactive {
+  background: linear-gradient(135deg, #ffd43b, #fcc419);
   color: white;
-}
-
-.delete-btn:hover {
-  background: linear-gradient(135deg, #fa5252, #f03e3e);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  border: 2px solid #ffd43b;
 }
 
 /* ============================
@@ -590,7 +567,7 @@
   }
   
   .table-row {
-    grid-template-columns: 2fr 1fr 1fr 2fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
   }
 }
 
@@ -646,17 +623,7 @@
     flex-shrink: 0;
   }
   
-  .actions-cell {
-    justify-content: flex-start;
-  }
-  
-  .action-buttons {
-    width: 100%;
-    flex-direction: column;
-  }
-  
-  .action-btn {
-    width: 100%;
+  .status-cell, .role-cell, .date-cell {
     justify-content: center;
   }
 }
