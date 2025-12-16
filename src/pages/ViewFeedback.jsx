@@ -683,7 +683,7 @@ const generatePDFReport = async () => {
             <th>Rating</th>
             <th>Comment</th>
             <th>Date</th>
-            <th>Action</th>
+           
           </tr>
         </thead>
         <tbody>
@@ -719,14 +719,7 @@ const generatePDFReport = async () => {
                     timeStyle: "medium",
                   })}
                 </td>
-                <td>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(item.feedback_id)}
-                  >
-                    Delete
-                  </button>
-                </td>
+              
               </tr>
             ))
           ) : (
