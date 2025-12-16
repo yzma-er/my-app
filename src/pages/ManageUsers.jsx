@@ -367,7 +367,21 @@ useEffect(() => {
               <tr key={u.user_id}>
                 <td>{u.email}</td>
                 <td>
-                  <span className="role-badge">{u.role}</span>
+                  <td>
+  <span style={{
+    display: 'inline-block',
+    padding: '6px 14px',
+    borderRadius: '20px',
+    fontSize: '14px',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    backgroundColor: u.role === 'admin' ? '#ffebee' : '#e3f2fd',
+    color: u.role === 'admin' ? '#d32f2f' : '#1976d2',
+    border: u.role === 'admin' ? '1px solid #ffcdd2' : '1px solid #bbdefb'
+  }}>
+    {u.role}
+  </span>
+</td>
                 </td>
                 <td>
                   <div className="action-buttons">
