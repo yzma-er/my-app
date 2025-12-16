@@ -98,58 +98,42 @@ function LoginPage() {
 
       {/* Right Side - Login Form */}
       <div className="auth-right-side">
+        {/* BACK BUTTON - AT THE VERY TOP */}
+  <div style={{
+    position: 'absolute',
+    top: '40px',
+    left: '40px',
+    zIndex: 1000
+  }}>
+    <button
+      onClick={() => navigate("/")}
+      disabled={loading}
+      style={{
+        background: 'linear-gradient(135deg, #1c7c0f 0%, #0f4d08 100%)',
+        color: 'white',
+        border: 'none',
+        padding: '12px 24px',
+        borderRadius: '30px',
+        fontSize: '15px',
+        fontWeight: '600',
+        cursor: loading ? 'not-allowed' : 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        boxShadow: '0 4px 12px rgba(28, 124, 15, 0.3)',
+        transition: 'all 0.3s ease',
+        opacity: loading ? 0.7 : 1
+      }}
+    >
+      <span style={{ fontSize: '20px', fontWeight: 'bold' }}>←</span>
+      Back to Home
+    </button>
+  </div>
         <div className="auth-container">
           <div className="auth-content">
 
             
-            {/* Back Button with force display */}
-<div className="back-button-container" style={{
-  display: 'block',
-  marginBottom: '30px',
-  position: 'relative',
-  zIndex: 10
-}}>
-  {/* Fixed Back Button - Always visible */}
-<button 
-  onClick={() => navigate("/")}
-  disabled={loading}
-  style={{
-    position: 'fixed',
-    top: '20px',
-    left: '20px',
-    background: 'linear-gradient(135deg, #1c7c0f 0%, #0f4d08 100%)',
-    color: 'white',
-    border: 'none',
-    padding: '10px 20px',
-    borderRadius: '30px',
-    fontSize: '14px',
-    fontWeight: '600',
-    cursor: loading ? 'not-allowed' : 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    boxShadow: '0 4px 12px rgba(28, 124, 15, 0.3)',
-    transition: 'all 0.3s ease',
-    zIndex: 1000,
-    opacity: loading ? 0.7 : 1
-  }}
-  onMouseEnter={(e) => {
-    if (!loading) {
-      e.target.style.transform = 'translateY(-2px)';
-      e.target.style.boxShadow = '0 6px 16px rgba(28, 124, 15, 0.4)';
-    }
-  }}
-  onMouseLeave={(e) => {
-    if (!loading) {
-      e.target.style.transform = 'translateY(0)';
-      e.target.style.boxShadow = '0 4px 12px rgba(28, 124, 15, 0.3)';
-    }
-  }}
->
-  <span style={{ fontSize: '18px', fontWeight: 'bold' }}>←</span>
-  Back to Home
-</button>
-</div>
+            
 
             <div className="auth-header">
               <div className="role-indicator">
