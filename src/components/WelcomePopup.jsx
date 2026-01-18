@@ -1,9 +1,17 @@
 // src/components/WelcomePopup.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./WelcomePopup.css";
 
 function WelcomePopup({ userEmail, onClose }) {
   const [isVisible, setIsVisible] = useState(false);
+
+  // ✅ Define handleClose with useCallback
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 300); // Wait for slide-out animation
+  }, [onClose]);
 
   useEffect(() => {
     // Show popup after a short delay
@@ -20,14 +28,7 @@ function WelcomePopup({ userEmail, onClose }) {
       clearTimeout(timer);
       clearTimeout(autoCloseTimer);
     };
-  }, [handleClose]);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onClose();
-    }, 300); // Wait for slide-out animation
-  };
+  }, [handleClose]); // handleClose is stable due to useCallback
 
   // Extract name from email (before @)
   const getUserName = (email) => {
