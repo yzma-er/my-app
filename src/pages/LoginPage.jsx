@@ -85,7 +85,7 @@ function LoginPage() {
             <p>
               {role === "admin" 
                 ? "Access the administrative dashboard" 
-                : "Your journey to digital excellence starts here"}
+                : "Auxiliary Services"}
             </p>
             <div className="auth-image-decoration">
               <div className="auth-decoration-circle"></div>
