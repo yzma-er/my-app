@@ -350,16 +350,16 @@ function ManageUsers() {
         //headers: { Authorization: `Bearer ${token}` },
       //});
 
-      if (res.ok) {
-        setUsers((prev) => prev.filter((u) => u.user_id !== id));
-        alert("🗑️ User deleted successfully!");
-      } else {
-        alert("❌ Failed to delete user");
-      }
-    } catch (err) {
-      console.error("❌ Error deleting user:", err);
-    }
-  };
+      //if (res.ok) {
+        //setUsers((prev) => prev.filter((u) => u.user_id !== id));
+        //alert("🗑️ User deleted successfully!");
+      //} else {
+        //alert("❌ Failed to delete user");
+      //}
+    //} catch (err) {
+      //console.error("❌ Error deleting user:", err);
+    //}
+  //};
 
   // ✅ Loading state
   if (loading) return <p>Loading users...</p>;
