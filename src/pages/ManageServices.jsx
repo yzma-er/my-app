@@ -120,53 +120,54 @@ function ManageServices() {
   };
 
   // ✅ Add new service WITH EMAIL NOTIFICATION
-  const handleAddService = async () => {
-    if (newService.trim() === "") return alert("Please enter a service name.");
+const handleAddService = async () => {
+  if (newService.trim() === "") return alert("Please enter a service name.");
 
-    if (sendingEmails) {
-      alert("Please wait, emails are being sent...");
-      return;
-    }
+  if (sendingEmails) {
+    alert("Please wait, emails are being sent...");
+    return;
+  }
 
-    // First, add the service
-    const res = await fetch(`${backendURL}/api/admin/services`, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      },
-      body: JSON.stringify({ name: newService }),
-    });
+  // First, add the service
+  const res = await fetch(`${backendURL}/api/admin/services`, {
+    method: "POST",
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify({ name: newService }),
+  });
 
-    if (res.ok) {
-     const data = await res.json();
-// eslint-disable-next-line
-const affectedRows = result.affectedRows; // Add this comment to suppress warning
+  if (res.ok) {
+    await res.json(); // ← FIXED: No unused variable
       
-      // Ask admin if they want to send notifications
-      if (window.confirm("✅ Service added successfully!\n\nDo you want to send email notifications to all users about this new service?")) {
-        
-        // Show sending progress
-        alert(`📧 Sending email notifications to users about "${newService}"...`);
-        
-        // Send email notifications
-        const notificationSent = await sendEmailNotification(newService);
-        
-        if (notificationSent) {
-          alert("✅ Email notifications sent successfully!");
-        } else {
-          alert("⚠️ Service added, but email notifications failed. You can try again later.");
-        }
+    // Ask admin if they want to send notifications
+    if (window.confirm("✅ Service added successfully!\n\nDo you want to send email notifications to all users about this new service?")) {
+      
+      // Show sending progress
+      alert(`📧 Sending email notifications to users about "${newService}"...`);
+      
+      // Send email notifications
+      const notificationSent = await sendEmailNotification(newService);
+      
+      if (notificationSent) {
+        alert("✅ Email notifications sent successfully!");
+      } else {
+        alert("⚠️ Service added, but email notifications failed. You can try again later.");
       }
-      
-      // Refresh the page
-      window.location.reload();
-      
-    } else {
-      const error = await res.json();
-      alert(error.message || "❌ Failed to add service.");
     }
-  };
+    
+    // Clear the input and refresh services
+    setNewService("");
+    const refreshRes = await fetch(`${backendURL}/api/services`);
+    const refreshedData = await refreshRes.json();
+    setServices(refreshedData);
+    
+  } else {
+    const error = await res.json();
+    alert(error.message || "❌ Failed to add service.");
+  }
+};
 
   // ✅ Delete service
   const handleDelete = async (id) => {
