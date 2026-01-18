@@ -351,6 +351,7 @@ function ServiceDetails() {
         
         {steps.map((step, index) => {
           const stepNum = index + 1;
+          // eslint-disable-next-line no-unused-vars
           const stepFeedbacksList = stepFeedbacks[stepNum] || [];
           const hasUserRated = userHasRated[stepNum];
 
