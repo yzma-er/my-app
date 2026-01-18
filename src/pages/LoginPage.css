@@ -748,4 +748,27 @@
   background: white;
 }
 
-
+/* Mobile-specific centering */
+@media (max-width: 768px) {
+  .auth-wrapper-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  
+  .auth-right-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+  }
+  
+  .auth-container {
+    width: 100%;
+    max-width: 400px; /* Limit max width for better mobile appearance */
+    margin: 0 auto;
+  }
+}
