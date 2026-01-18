@@ -1,4 +1,4 @@
-// src/components/WelcomePopup.jsx
+// src/components/WelcomePopups.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import "./WelcomePopup.css";
 
