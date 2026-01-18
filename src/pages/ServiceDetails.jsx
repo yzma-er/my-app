@@ -1,4 +1,4 @@
-// src/pages/ServiceDetails.jsx - FIXED VERSION
+// src/pages/ServiceDetailss.jsx - FIXED VERSION
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import "./Services.css";
