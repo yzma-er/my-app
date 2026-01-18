@@ -494,9 +494,7 @@ function ServiceDetails() {
                     <i className="fas fa-download"></i>
                     Download Form
                   </a>
-                  <span style={{ fontSize: "14px", color: "#666" }}>
-                    {step.originalFormName && `(${step.originalFormName})`}
-                  </span>
+                  
                 </div>
               )}
 
