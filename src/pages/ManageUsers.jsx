@@ -340,15 +340,15 @@ function ManageUsers() {
   };
 
   // ✅ Delete user
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
+  //const handleDelete = async (id) => {
+    //if (!window.confirm("Are you sure you want to delete this user?")) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${backendURL}/api/admin/users/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    //try {
+      //const token = localStorage.getItem("token");
+      //const res = await fetch(`${backendURL}/api/admin/users/${id}`, {
+        //method: "DELETE",
+        //headers: { Authorization: `Bearer ${token}` },
+      //});
 
       if (res.ok) {
         setUsers((prev) => prev.filter((u) => u.user_id !== id));
