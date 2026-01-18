@@ -1,4 +1,4 @@
-// src/pages/ServicesPage.jsx - UPDATED WITH WELCOME POPUP
+// src/pages/ServicesPage.jsx - UPDATED WITH WELCOME POPUP.
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ServicesPage.css";
