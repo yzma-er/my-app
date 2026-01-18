@@ -54,15 +54,17 @@ function ViewFeedback() {
     fetchServices();
   }, [fetchFeedback, fetchServices]);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this feedback?")) return;
-    try {
-      await axios.delete(`${backendURL}/api/feedback/${id}`);
-      fetchFeedback();
-    } catch (err) {
-      console.error("❌ Error deleting feedback:", err);
-    }
-  };
+
+//Delete service
+  //const handleDelete = async (id) => {
+    //if (!window.confirm("Delete this feedback?")) return;
+    //try {
+     // await axios.delete(`${backendURL}/api/feedback/${id}`);
+     // fetchFeedback();
+    //} catch (err) {
+      //console.error("❌ Error deleting feedback:", err);
+    //}
+  //};
 
   // Filtered feedback based on service filter
   const filteredFeedback =
