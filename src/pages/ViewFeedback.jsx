@@ -1,4 +1,4 @@
-// src/pages/ViewFeedback.jsx - WORKING VERSION WITHOUT jspdf-autotable
+// src/pages/ViewFeedback.jsx - WORKING VERSION WITHOUT jspdf-autotable.
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
