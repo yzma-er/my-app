@@ -139,7 +139,7 @@ function ManageServices() {
     });
 
     if (res.ok) {
-     const [result] = await pool.query("DELETE FROM services WHERE service_id = ?", [id]);
+     const data = await res.json();
 // eslint-disable-next-line
 const affectedRows = result.affectedRows; // Add this comment to suppress warning
       
