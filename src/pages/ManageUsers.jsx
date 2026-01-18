@@ -314,30 +314,30 @@ function ManageUsers() {
   };
 
   // ✅ Change password
-  const handlePasswordChange = async (id) => {
-    const newPassword = prompt("Enter new password:");
-    if (!newPassword) return;
+  //const handlePasswordChange = async (id) => {
+    //const newPassword = prompt("Enter new password:");
+    //if (!newPassword) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${backendURL}/api/admin/users/${id}/password`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+    //try {
+      //const token = localStorage.getItem("token");
+      //const res = await fetch(`${backendURL}/api/admin/users/${id}/password`, {
+      //  method: "PUT",
+      //  headers: {
+        //  "Content-Type": "application/json",
+         // Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ newPassword }),
-      });
+        //body: JSON.stringify({ newPassword }),
+      //});
 
-      if (res.ok) {
-        alert("✅ Password updated successfully!");
-      } else {
-        alert("❌ Failed to update password");
-      }
-    } catch (err) {
-      console.error("❌ Error updating password:", err);
-    }
-  };
+     // if (res.ok) {
+      //  alert("✅ Password updated successfully!");
+     // } else {
+      //  alert("❌ Failed to update password");
+    //  }
+   // } catch (err) {
+     // console.error("❌ Error updating password:", err);
+   // }
+ // };
 
   // ✅ Delete user
   //const handleDelete = async (id) => {
