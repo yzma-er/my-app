@@ -1,4 +1,4 @@
-// src/pages/ManageUsers.jsx
+// src/pages/ManageUserss.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ManageUsers.css";
