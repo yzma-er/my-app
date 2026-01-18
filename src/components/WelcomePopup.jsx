@@ -20,7 +20,7 @@ function WelcomePopup({ userEmail, onClose }) {
       clearTimeout(timer);
       clearTimeout(autoCloseTimer);
     };
-  }, []);
+  }, [handleClose]);
 
   const handleClose = () => {
     setIsVisible(false);
