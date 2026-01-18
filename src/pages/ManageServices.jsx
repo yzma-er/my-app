@@ -139,7 +139,9 @@ function ManageServices() {
     });
 
     if (res.ok) {
-      const result = await res.json();
+     const [result] = await pool.query("DELETE FROM services WHERE service_id = ?", [id]);
+// eslint-disable-next-line
+const affectedRows = result.affectedRows; // Add this comment to suppress warning
       
       // Ask admin if they want to send notifications
       if (window.confirm("✅ Service added successfully!\n\nDo you want to send email notifications to all users about this new service?")) {
