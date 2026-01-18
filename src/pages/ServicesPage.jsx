@@ -71,7 +71,7 @@ function ServicesPage() {
       }
     };
     fetchCarousel();
-  }, []);
+  }, [backendURL]);
 
   // ✅ Auto-slide every 4 seconds
   useEffect(() => {
