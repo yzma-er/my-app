@@ -310,7 +310,7 @@ function RoleSelectionPage() {
               {index === 0 && (
                 <div className="carousel-welcome-message">
                   <h1 className="carousel-welcome-title">Welcome to ASP Digital Guidance System</h1>
-                  <p className="carousel-welcome-subtitle">Sign In Above to Continue</p>
+                  <p className="carousel-welcome-subtitle">A digital guidance system for the Auxiliary Services Program of Nueva Vizcaya State University</p>
                 </div>
               )}
             </div>
