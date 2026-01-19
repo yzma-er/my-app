@@ -45,7 +45,7 @@
 }
 
 .sidebar a {
-  color: #fff;
+  color: #000000;
   text-decoration: none;
   font-size: 20px;
   display: block;
@@ -55,8 +55,8 @@
 }
 
 .sidebar a:hover {
-  background: #ffff;
-  color: #104C08;
+  background: #000000;
+  color: #ffff;
 }
 
 /* ========= Sidebar Footer ========= */
