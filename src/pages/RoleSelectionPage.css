@@ -1286,5 +1286,120 @@ html {
   color: #4a5568;
 }
 
+/* Add these styles to your existing CSS file */
 
+/* ⭐ CAROUSEL SLIDE CONTAINER */
+.carousel-slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+/* ⭐ WELCOME MESSAGE OVERLAY */
+.carousel-welcome-message {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  text-align: left;
+  color: white;
+  z-index: 5;
+  max-width: 60%;
+  padding: 20px;
+  background: rgba(16, 76, 8, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.carousel-welcome-title {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: white;
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-welcome-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-weight: 500;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ⭐ REMOVE THE OLD WELCOME MESSAGE (from below the carousel) */
+/* Remove or comment out these lines from the original styles: */
+.role-container h1 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  color: #104C08;
+  padding: 0 10px;
+}
+
+.welcome-subtitle {
+  color: #4a5568;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  line-height: 1.6;
+  padding: 0 15px;
+}
+
+/* ⭐ RESPONSIVE DESIGN FOR CAROUSEL WELCOME MESSAGE */
+@media (max-width: 768px) {
+  .carousel-welcome-message {
+    top: 20px;
+    left: 20px;
+    padding: 15px;
+    max-width: 70%;
+  }
+  
+  .carousel-welcome-title {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  
+  .carousel-welcome-subtitle {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-welcome-message {
+    top: 15px;
+    left: 15px;
+    padding: 12px;
+    max-width: 75%;
+  }
+  
+  .carousel-welcome-title {
+    font-size: 1.2rem;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  
+  .carousel-welcome-subtitle {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .carousel-welcome-message {
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    max-width: 80%;
+  }
+  
+  .carousel-welcome-title {
+    font-size: 1rem;
+  }
+  
+  .carousel-welcome-subtitle {
+    font-size: 0.75rem;
+  }
+}
 
