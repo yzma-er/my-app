@@ -72,15 +72,44 @@ function LoginPage() {
     }
   };
 
-  // ADMIN LOGIN WITH SPLIT LAYOUT
+  // ADMIN LOGIN WITH SPLIT LAYOUT AND IMAGE
   if (role === "admin") {
     return (
       <div className="auth-wrapper-split">
-        {/* Left Side - NVSVU Image/Decoration */}
+        {/* Left Side - NVSVU Image */}
         <div className="auth-left-side admin-left-side">
-          <div className="auth-image-placeholder">
-            <div className="auth-image-content">
-              {/* NVSVU Logo */}
+          <div className="admin-image-container">
+            {/* Placeholder with gradient - REPLACE WITH ACTUAL IMAGE IF AVAILABLE */}
+            <div className="admin-image-placeholder">
+              <div className="admin-image-overlay">
+                {/* NVSVU Logo */}
+                <div className="nvsu-admin-logo">
+                  <div className="nvsu-logo-text">
+                    <span className="nvsu-n">N</span>
+                    <span className="nvsu-v">V</span>
+                    <span className="nvsu-s">S</span>
+                    <span className="nvsu-u">U</span>
+                  </div>
+                </div>
+                <h2>Nueva Vizcaya State University</h2>
+                <p className="admin-portal-text">
+                  Administrative Portal
+                </p>
+                <div className="admin-security-note">
+                  <span className="security-icon">🔐</span>
+                  <span>Secure Administrative Access</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* 
+            UNCOMMENT AND REPLACE WITH ACTUAL IMAGE:
+            <img 
+              src="/images/nvsu-campus.jpg" 
+              alt="Nueva Vizcaya State University Campus" 
+              className="admin-campus-image"
+            />
+            <div className="admin-image-overlay">
               <div className="nvsu-admin-logo">
                 <div className="nvsu-logo-text">
                   <span className="nvsu-n">N</span>
@@ -93,16 +122,12 @@ function LoginPage() {
               <p className="admin-portal-text">
                 Administrative Portal
               </p>
-              <div className="admin-image-decoration">
-                <div className="admin-decoration-circle"></div>
-                <div className="admin-decoration-shield"></div>
-                <div className="admin-decoration-book"></div>
-              </div>
               <div className="admin-security-note">
                 <span className="security-icon">🔐</span>
                 <span>Secure Administrative Access</span>
               </div>
             </div>
+            */}
           </div>
         </div>
 
