@@ -887,4 +887,216 @@
 
 /* Admin Right Side */
 .admin-right-side {
-  background: linear-gradient(135deg, #f8fdf8 0%, #ffffff
+  background: linear-gradient(135deg, #f8fdf8 0%, #ffffff 100%) !important;
+}
+
+.admin-login-title {
+  color: #1a3a1a !important;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.admin-label {
+  color: #333 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  font-size: 14px !important;
+  letter-spacing: 0.5px;
+}
+
+.admin-input {
+  border-color: #d0d0d0 !important;
+  background: white !important;
+}
+
+.admin-input:focus {
+  border-color: #1a3a1a !important;
+  box-shadow: 0 0 0 3px rgba(26, 58, 26, 0.1) !important;
+}
+
+.admin-password-toggle {
+  background: #f0f0f0 !important;
+  border: 2px solid #d0d0d0 !important;
+  color: #666 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 6px !important;
+  min-width: 60px;
+  min-height: 36px;
+}
+
+.admin-password-toggle:hover:not(:disabled) {
+  background: #e0e0e0 !important;
+  color: #333 !important;
+}
+
+.admin-hint {
+  color: #666;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+.admin-options {
+  margin-bottom: 32px;
+}
+
+.admin-button {
+  background: linear-gradient(135deg, #1a3a1a 0%, #0d240d 100%) !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 10px !important;
+}
+
+.admin-button:hover:not(:disabled) {
+  box-shadow: 0 8px 24px rgba(26, 58, 26, 0.3) !important;
+  transform: translateY(-2px);
+}
+
+.admin-footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e8e8e8;
+}
+
+/* Back button for admin */
+.back-button {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.back-button:hover:not(:disabled) {
+  color: #1a3a1a;
+  background-color: rgba(26, 58, 26, 0.1);
+}
+
+.back-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments for admin */
+@media (max-width: 1024px) {
+  .admin-image-overlay .nvsu-logo-text {
+    font-size: 56px;
+    letter-spacing: 8px;
+  }
+  
+  .admin-image-overlay h2 {
+    font-size: 28px;
+  }
+  
+  .admin-image-overlay .admin-portal-text {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+  
+  .admin-login-title {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-left-side {
+    display: none;
+  }
+  
+  .admin-right-side {
+    background: white !important;
+  }
+  
+  .admin-login-title {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-image-overlay {
+    padding: 20px;
+  }
+  
+  .admin-image-overlay .nvsu-logo-text {
+    font-size: 42px;
+    letter-spacing: 6px;
+  }
+  
+  .admin-image-overlay h2 {
+    font-size: 24px;
+  }
+  
+  .admin-image-overlay .admin-portal-text {
+    font-size: 16px;
+    letter-spacing: 1.5px;
+  }
+  
+  .admin-image-overlay .admin-security-note {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+  
+  .admin-login-title {
+    font-size: 28px;
+  }
+  
+  .admin-button {
+    padding: 16px;
+    font-size: 15px;
+  }
+}
+
+/* Make the auth wrapper a proper centering container */
+.auth-wrapper-split {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #FFF8EF;
+  overflow: hidden;
+}
+
+/* Ensure the form side properly centers content */
+.auth-right-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 40px;
+  background: white;
+}
+
+/* Mobile-specific centering */
+@media (max-width: 768px) {
+  .auth-wrapper-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  
+  .auth-right-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+  }
+  
+  .auth-container {
+    width: 100%;
+    max-width: 400px; /* Limit max width for better mobile appearance */
+    margin: 0 auto;
+  }
+}
