@@ -102,10 +102,9 @@ function LoginPage() {
               </div>
             </div>
             
-            {/* 
-            UNCOMMENT AND REPLACE WITH ACTUAL IMAGE:
+           
             <img 
-              src="/images/nvsu-campus.jpg" 
+              src="adminBuilding.jpg" 
               alt="Nueva Vizcaya State University Campus" 
               className="admin-campus-image"
             />
