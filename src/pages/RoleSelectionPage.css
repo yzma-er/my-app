@@ -1273,7 +1273,7 @@ html {
   color: #4a5568;
 }
 
-/* Add these styles to your existing CSS file */
+
 
 /* ⭐ CAROUSEL SLIDE CONTAINER */
 .carousel-slide {
@@ -1311,10 +1311,10 @@ html {
 
 .carousel-welcome-subtitle {
   font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: white;
   margin: 0;
   font-weight: 500;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+ 
 }
 
 /* ⭐ RESPONSIVE DESIGN FOR CAROUSEL WELCOME MESSAGE */
