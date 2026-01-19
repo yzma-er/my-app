@@ -88,9 +88,6 @@ function LoginPage() {
               className="admin-campus-image"
             />
              <div className="admin-image-overlay">
-               {/* Add your logo here */}
-              <div className="admin-logo-container">
-              
               
               <p className="admin-portal-text">
                 Administrative Portal
