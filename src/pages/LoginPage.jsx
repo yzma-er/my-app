@@ -100,12 +100,8 @@ function LoginPage() {
               <p className="admin-portal-text">
                 Administrative Portal
               </p>
-              <div className="admin-security-note">
-                <span className="security-icon">🔐</span>
-                <span>Secure Administrative Access</span>
-              </div>
+              
             </div>
-            */}
           </div>
         </div>
 
@@ -203,12 +199,7 @@ function LoginPage() {
                 </button>
               </form>
 
-              {/* Admin Footer */}
-              <div className="auth-footer admin-footer">
-                <p className="admin-note">
-                  🔒 Restricted access. Contact system administrator for credentials.
-                </p>
-              </div>
+            
             </div>
           </div>
         </div>
