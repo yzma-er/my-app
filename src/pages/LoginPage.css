@@ -62,7 +62,7 @@
 
 /* --- Left Side - Image/Decoration --- */
 .auth-left-side {
-  flex: 1;
+  flex: 1.8;
   background: linear-gradient(135deg, #104C08 0%, #1C7C0F 100%);
   display: flex;
   align-items: center;
@@ -70,6 +70,10 @@
   padding: 40px;
   position: relative;
   overflow: hidden;
+}
+
+admin-left-side {
+  flex: 1.8 !important; /* Admin left side even wider */
 }
 
 .auth-image-placeholder {
