@@ -72,110 +72,148 @@ function LoginPage() {
     }
   };
 
-  // Admin login UI (based on NVSVU reference)
+  // ADMIN LOGIN WITH SPLIT LAYOUT
   if (role === "admin") {
     return (
-      <div className="admin-login-wrapper">
-        <div className="admin-login-container">
-          {/* NVSVU Logo/Header */}
-          <div className="admin-login-header">
-            <div className="nvsu-logo">
-              <div className="nvsu-logo-text">
-                <span className="nvsu-n">N</span>
-                <span className="nvsu-v">V</span>
-                <span className="nvsu-s">S</span>
-                <span className="nvsu-u">U</span>
+      <div className="auth-wrapper-split">
+        {/* Left Side - NVSVU Image/Decoration */}
+        <div className="auth-left-side admin-left-side">
+          <div className="auth-image-placeholder">
+            <div className="auth-image-content">
+              {/* NVSVU Logo */}
+              <div className="nvsu-admin-logo">
+                <div className="nvsu-logo-text">
+                  <span className="nvsu-n">N</span>
+                  <span className="nvsu-v">V</span>
+                  <span className="nvsu-s">S</span>
+                  <span className="nvsu-u">U</span>
+                </div>
+              </div>
+              <h2>Nueva Vizcaya State University</h2>
+              <p className="admin-portal-text">
+                Administrative Portal
+              </p>
+              <div className="admin-image-decoration">
+                <div className="admin-decoration-circle"></div>
+                <div className="admin-decoration-shield"></div>
+                <div className="admin-decoration-book"></div>
+              </div>
+              <div className="admin-security-note">
+                <span className="security-icon">🔐</span>
+                <span>Secure Administrative Access</span>
               </div>
             </div>
-            <h1 className="admin-title">Nueva Vizcaya State University</h1>
-            <p className="admin-subtitle">Administrator Login</p>
           </div>
+        </div>
 
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="admin-login-form">
-            <div className="admin-input-group">
-              <label htmlFor="admin-email">Email Address</label>
-              <input
-                id="admin-email"
-                type="email"
-                placeholder="admin@nvsu.edu.ph"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-                className="admin-input"
-              />
-            </div>
-
-            <div className="admin-input-group">
-              <label htmlFor="admin-password">Password</label>
-              <div className="admin-password-container">
-                <input
-                  id="admin-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="admin-input"
-                />
-                <button
-                  type="button"
-                  className="admin-password-toggle"
-                  onClick={() => !loading && setShowPassword(!showPassword)}
+        {/* Right Side - Admin Login Form */}
+        <div className="auth-right-side admin-right-side">
+          <div className="auth-container">
+            <div className="auth-content">
+              {/* Header with Back Button */}
+              <div className="auth-header">
+                <button 
+                  className="back-button"
+                  onClick={() => navigate("/")}
                   disabled={loading}
                 >
-                  {showPassword ? "HIDE" : "SHOW"}
+                  ← Back to Home
                 </button>
+                <h1 className="admin-login-title">Admin Login</h1>
+                <p className="auth-welcome-text">
+                  Access administrative functions and system management
+                </p>
+              </div>
+
+              {/* Admin Login Form */}
+              <form onSubmit={handleLogin} className="auth-form">
+                <div className="auth-form-group">
+                  <label htmlFor="admin-email" className="admin-label">
+                    Admin Email
+                  </label>
+                  <input
+                    id="admin-email"
+                    type="email"
+                    placeholder="admin@nvsu.edu.ph"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={loading}
+                    className="auth-input admin-input"
+                  />
+                </div>
+
+                <div className="auth-form-group">
+                  <label htmlFor="admin-password" className="admin-label">
+                    Password
+                  </label>
+                  <div className="auth-password-container">
+                    <input
+                      id="admin-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      disabled={loading}
+                      className="auth-input admin-input"
+                    />
+                    <button
+                      type="button"
+                      className="auth-password-toggle admin-password-toggle"
+                      onClick={() => !loading && setShowPassword(!showPassword)}
+                      disabled={loading}
+                    >
+                      {showPassword ? "HIDE" : "SHOW"}
+                    </button>
+                  </div>
+                  <p className="auth-hint admin-hint">
+                    Use your administrator credentials provided by NVSU
+                  </p>
+                </div>
+
+                <div className="auth-options admin-options">
+                  <label className="auth-remember-me">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      disabled={loading}
+                    />
+                    <span>Keep me signed in</span>
+                  </label>
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="auth-button admin-button"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <div className="auth-loader"></div>
+                      AUTHENTICATING...
+                    </>
+                  ) : (
+                    "SIGN IN"
+                  )}
+                </button>
+              </form>
+
+              {/* Admin Footer */}
+              <div className="auth-footer admin-footer">
+                <p className="admin-note">
+                  🔒 Restricted access. Contact system administrator for credentials.
+                </p>
               </div>
             </div>
-
-            <div className="admin-options">
-              <label className="admin-remember-me">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  disabled={loading}
-                />
-                <span>Keep me signed in</span>
-              </label>
-            </div>
-
-            <button 
-              type="submit" 
-              className="admin-login-button"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <div className="admin-loader"></div>
-                  SIGNING IN...
-                </>
-              ) : (
-                "SIGN IN"
-              )}
-            </button>
-
-            <div className="admin-footer">
-              <button 
-                type="button"
-                className="back-to-home"
-                onClick={() => navigate("/")}
-                disabled={loading}
-              >
-                ← Back to Home
-              </button>
-              
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     );
   }
 
-  // User login UI (unchanged)
+  // USER LOGIN UI (unchanged)
   return (
     <div className="auth-wrapper-split">
       {/* Left Side - Image/Decoration */}
