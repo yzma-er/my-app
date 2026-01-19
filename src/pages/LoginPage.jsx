@@ -88,7 +88,7 @@ function LoginPage() {
               className="admin-campus-image"
             />
              <div className="admin-image-overlay">
-              <h2>Nueva Vizcaya State University</h2>
+              
               <p className="admin-portal-text">
                 Administrative Portal
               </p>
