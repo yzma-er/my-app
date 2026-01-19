@@ -167,9 +167,7 @@ function LoginPage() {
               >
                 ← Back to Home
               </button>
-              <p className="terms-note">
-                By signing in, you agree to the <a href="#" className="terms-link">Terms of Use</a>
-              </p>
+              
             </div>
           </form>
         </div>
