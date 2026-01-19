@@ -90,11 +90,7 @@ function LoginPage() {
              <div className="admin-image-overlay">
                {/* Add your logo here */}
               <div className="admin-logo-container">
-                <img 
-                  src="nvsu-logo.gif" 
-                  alt="Nueva Vizcaya State University Logo"
-                  className="admin-logo"
-                />
+              
               
               <p className="admin-portal-text">
                 Administrative Portal
