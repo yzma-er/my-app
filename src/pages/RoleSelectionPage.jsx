@@ -89,7 +89,7 @@ function RoleSelectionPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent(prev => (prev + 1) % images.length);
-    }, 7000);
+    }, 11000);
     return () => clearInterval(interval);
   }, [images.length]);
 
