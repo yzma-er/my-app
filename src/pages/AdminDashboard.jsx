@@ -44,7 +44,7 @@ function AdminDashboard() {
       <div
         className="admin-dashboard"
         style={{
-          backgroundImage: `url(${process.env.PUBLIC_URL + '/images/role-background.jpg'})`,
+          backgroundImage: `url(${process.env.PUBLIC_URL + '/images/adminBuilding.jpg'})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center center',
           backgroundRepeat: 'no-repeat',
