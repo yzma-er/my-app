@@ -1290,14 +1290,7 @@ html {
   left: 30px;
   text-align: left;
   color: white;
-  z-index: 5;
-  max-width: 60%;
-  padding: 20px;
-  background: rgba(16, 76, 8, 0.85);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  
 }
 
 .carousel-welcome-title {
