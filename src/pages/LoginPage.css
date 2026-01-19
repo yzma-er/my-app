@@ -798,19 +798,7 @@ admin-left-side {
   margin-bottom: 15px;
 }
 
-.admin-image-overlay .nvsu-logo-text span:nth-child(1) { color: #4CAF50; }
-.admin-image-overlay .nvsu-logo-text span:nth-child(2) { color: #8BC34A; }
-.admin-image-overlay .nvsu-logo-text span:nth-child(3) { color: #CDDC39; }
-.admin-image-overlay .nvsu-logo-text span:nth-child(4) { color: #4CAF50; }
 
-.admin-image-overlay h2 {
-  font-size: 36px;
-  color: white;
-  margin-bottom: 15px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
 
 .admin-image-overlay .admin-portal-text {
   font-size: 20px;
