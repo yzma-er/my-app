@@ -16,7 +16,7 @@
   flex-direction: column;
   justify-content: space-between; /* keeps footer at bottom */
   transition: transform 0.3s ease;
-  position: fixed;
+  position: right;
   top: 0;
   left: 0;
   bottom: 0;
