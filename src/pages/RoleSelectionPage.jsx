@@ -248,7 +248,7 @@ function RoleSelectionPage() {
             {isLoading ? (
               <div className="loading-container">
                 <div className="loading-spinner"></div>
-                <p>Loading service ratings...</p>
+                                <p>Loading service ratings...</p>
               </div>
             ) : serviceSummary.length > 0 ? (
               <div className="horizontal-scroll-container">
@@ -297,14 +297,23 @@ function RoleSelectionPage() {
         )}
       </div>
 
-      {/* ⭐ CAROUSEL WITH DOTS */}
+      {/* ⭐ CAROUSEL WITH DOTS AND WELCOME MESSAGE */}
       <div className="carousel-container">
         <div
           className="carousel-track"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
           {images.map((img, index) => (
-            <img key={index} src={img} alt={`Slide ${index + 1}`} className="carousel-image" />
+            <div key={index} className="carousel-slide">
+              <img src={img} alt={`Slide ${index + 1}`} className="carousel-image" />
+              {/* Welcome Message Overlay */}
+              {index === 0 && (
+                <div className="carousel-welcome-message">
+                  <h1 className="carousel-welcome-title">Welcome to ASP Digital Guidance System</h1>
+                  <p className="carousel-welcome-subtitle">Sign In Above to Continue</p>
+                </div>
+              )}
+            </div>
           ))}
         </div>
         
@@ -326,9 +335,6 @@ function RoleSelectionPage() {
       <h2>Auxiliary Services Program</h2>
       <h3>Nueva Vizcaya State University</h3>
       <p>Bayombong, Nueva Vizcaya</p>
-
-      <h1>Welcome to ASP Digital Guidance System</h1>
-      <p className="welcome-subtitle">Sign In Above to Continue</p>
 
       {/* ⭐ RECENT COMMENTS SECTION - MOVED BELOW WELCOME MESSAGE */}
       <div ref={commentsContainerRef} className="recent-comments-container">
@@ -379,7 +385,10 @@ function RoleSelectionPage() {
                     : comment.comment}"
                 </div>
                 
-                
+                <div className="privacy-notice">
+                  <i className="fas fa-shield-alt"></i>
+                  <span>Identity protected for privacy</span>
+                </div>
               </div>
             ))}
           </div>
