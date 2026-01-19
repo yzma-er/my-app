@@ -79,28 +79,7 @@ function LoginPage() {
         {/* Left Side - NVSVU Image */}
         <div className="auth-left-side admin-left-side">
           <div className="admin-image-container">
-            {/* Placeholder with gradient - REPLACE WITH ACTUAL IMAGE IF AVAILABLE */}
-            <div className="admin-image-placeholder">
-              <div className="admin-image-overlay">
-                {/* NVSVU Logo */}
-                <div className="nvsu-admin-logo">
-                  <div className="nvsu-logo-text">
-                    <span className="nvsu-n">N</span>
-                    <span className="nvsu-v">V</span>
-                    <span className="nvsu-s">S</span>
-                    <span className="nvsu-u">U</span>
-                  </div>
-                </div>
-                <h2>Nueva Vizcaya State University</h2>
-                <p className="admin-portal-text">
-                  Administrative Portal
-                </p>
-                <div className="admin-security-note">
-                  <span className="security-icon">🔐</span>
-                  <span>Secure Administrative Access</span>
-                </div>
-              </div>
-            </div>
+            
             
            
             <img 
