@@ -87,15 +87,6 @@ function LoginPage() {
               alt="Nueva Vizcaya State University Campus" 
               className="admin-campus-image"
             />
-            <div className="admin-image-overlay">
-              <div className="nvsu-admin-logo">
-                <div className="nvsu-logo-text">
-                  <span className="nvsu-n">N</span>
-                  <span className="nvsu-v">V</span>
-                  <span className="nvsu-s">S</span>
-                  <span className="nvsu-u">U</span>
-                </div>
-              </div>
               <h2>Nueva Vizcaya State University</h2>
               <p className="admin-portal-text">
                 Administrative Portal
