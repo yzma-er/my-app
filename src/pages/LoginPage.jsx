@@ -298,7 +298,7 @@ function LoginPage() {
                     onClick={() => !loading && setShowPassword(!showPassword)}
                     disabled={loading}
                   >
-                    {showPassword ? "🙈" : "👁️"}
+                    {showPassword ? "HIDE" : "SHOW"}
                   </button>
                 </div>
               </div>
