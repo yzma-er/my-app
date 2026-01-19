@@ -1303,7 +1303,7 @@ html {
 .carousel-welcome-title {
   font-size: 2rem;
   margin-bottom: 10px;
-  color: black;
+  color: white;
   font-weight: 700;
   line-height: 1.2;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -1311,7 +1311,7 @@ html {
 
 .carousel-welcome-subtitle {
   font-size: 1.1rem;
-  color: white;
+  color: green;
   margin: 0;
   font-weight: 500;
  
