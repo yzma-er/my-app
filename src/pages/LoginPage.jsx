@@ -110,23 +110,25 @@ function LoginPage() {
         </div>
 
         {/* Right Side - Admin Login Form */}
-        <div className="auth-right-side admin-right-side">
-          <div className="auth-container">
-            <div className="auth-content">
-              {/* Header with Back Button */}
-              <div className="auth-header">
-                <button 
-                  className="back-button"
-                  onClick={() => navigate("/")}
-                  disabled={loading}
-                >
-                  ← Back to Home
-                </button>
-                <h1 className="admin-login-title">Admin Login</h1>
-                <p className="auth-welcome-text">
-                  Access administrative functions and system management
-                </p>
-              </div>
+<div className="auth-right-side admin-right-side">
+  <div className="auth-container">
+    <div className="auth-content">
+      {/* Header with Back Button INLINE with Title */}
+      <div className="auth-header">
+        <div className="admin-header-inline">
+          <h1 className="admin-login-title">Admin Login</h1>
+          <button 
+            className="admin-back-button-inline"
+            onClick={() => navigate("/")}
+            disabled={loading}
+          >
+            ← Back to Home
+          </button>
+        </div>
+        <p className="auth-welcome-text">
+          Access administrative functions and system management
+        </p>
+      </div>
 
               {/* Admin Login Form */}
               <form onSubmit={handleLogin} className="auth-form">
