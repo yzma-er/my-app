@@ -94,10 +94,6 @@ function LoginPage() {
                   src="nvsu-logo.gif" 
                   alt="Nueva Vizcaya State University Logo"
                   className="admin-logo"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.style.display = 'none';
-                  }}
                 />
               
               <p className="admin-portal-text">
