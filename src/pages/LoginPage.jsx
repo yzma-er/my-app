@@ -72,6 +72,112 @@ function LoginPage() {
     }
   };
 
+  // Admin login UI (based on NVSVU reference)
+  if (role === "admin") {
+    return (
+      <div className="admin-login-wrapper">
+        <div className="admin-login-container">
+          {/* NVSVU Logo/Header */}
+          <div className="admin-login-header">
+            <div className="nvsu-logo">
+              <div className="nvsu-logo-text">
+                <span className="nvsu-n">N</span>
+                <span className="nvsu-v">V</span>
+                <span className="nvsu-s">S</span>
+                <span className="nvsu-u">U</span>
+              </div>
+            </div>
+            <h1 className="admin-title">Nueva Vizcaya State University</h1>
+            <p className="admin-subtitle">Administrator Login</p>
+          </div>
+
+          {/* Login Form */}
+          <form onSubmit={handleLogin} className="admin-login-form">
+            <div className="admin-input-group">
+              <label htmlFor="admin-email">Email Address</label>
+              <input
+                id="admin-email"
+                type="email"
+                placeholder="admin@nvsu.edu.ph"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+                className="admin-input"
+              />
+            </div>
+
+            <div className="admin-input-group">
+              <label htmlFor="admin-password">Password</label>
+              <div className="admin-password-container">
+                <input
+                  id="admin-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="admin-input"
+                />
+                <button
+                  type="button"
+                  className="admin-password-toggle"
+                  onClick={() => !loading && setShowPassword(!showPassword)}
+                  disabled={loading}
+                >
+                  {showPassword ? "HIDE" : "SHOW"}
+                </button>
+              </div>
+            </div>
+
+            <div className="admin-options">
+              <label className="admin-remember-me">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  disabled={loading}
+                />
+                <span>Keep me signed in</span>
+              </label>
+            </div>
+
+            <button 
+              type="submit" 
+              className="admin-login-button"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <div className="admin-loader"></div>
+                  SIGNING IN...
+                </>
+              ) : (
+                "SIGN IN"
+              )}
+            </button>
+
+            <div className="admin-footer">
+              <button 
+                type="button"
+                className="back-to-home"
+                onClick={() => navigate("/")}
+                disabled={loading}
+              >
+                ← Back to Home
+              </button>
+              <p className="terms-note">
+                By signing in, you agree to the <a href="#" className="terms-link">Terms of Use</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // User login UI (unchanged)
   return (
     <div className="auth-wrapper-split">
       {/* Left Side - Image/Decoration */}
@@ -79,13 +185,11 @@ function LoginPage() {
         <div className="auth-image-placeholder">
           <div className="auth-image-content">
             <div className="role-badge">
-              {role === "admin" ? "🔐 Admin Access" : "👤 User Access"}
+              👤 User Access
             </div>
-            <h2>{role === "admin" ? "Admin Portal" : "Digital Guidance"}</h2>
+            <h2>Digital Guidance</h2>
             <p>
-              {role === "admin" 
-                ? "Access the administrative dashboard" 
-                : "Auxiliary Services"}
+              Auxiliary Services
             </p>
             <div className="auth-image-decoration">
               <div className="auth-decoration-circle"></div>
@@ -100,40 +204,34 @@ function LoginPage() {
       <div className="auth-right-side">
         <div className="auth-container">
           <div className="auth-content">
-            
-
             {/* Header with Role Indicator and Back Button INLINE */}
-<div className="auth-header">
-  <div className="role-indicator-inline">
-    <span className={`role-tag ${role}-tag`}>
-      {role === "admin" ? "Administrator" : "User"} Login
-    </span>
-    <button 
-      className="back-button-inline"
-      onClick={() => navigate("/")}
-      disabled={loading}
-    >
-      ← Back to Home
-    </button>
-  </div>
-  <h1>{role === "admin" ? "Admin Login" : "Login"}</h1>
-  <p className="auth-welcome-text">
-    {role === "admin" 
-      ? "Access administrative functions and system management" 
-      : "Welcome back! Please login to your account."}
-  </p>
-</div>
+            <div className="auth-header">
+              <div className="role-indicator-inline">
+                <span className="role-tag user-tag">
+                  User Login
+                </span>
+                <button 
+                  className="back-button-inline"
+                  onClick={() => navigate("/")}
+                  disabled={loading}
+                >
+                  ← Back to Home
+                </button>
+              </div>
+              <h1>Login</h1>
+              <p className="auth-welcome-text">
+                Welcome back! Please login to your account.
+              </p>
+            </div>
 
             {/* Login Form */}
             <form onSubmit={handleLogin} className="auth-form">
               <div className="auth-form-group">
-                <label htmlFor="email">
-                  {role === "admin" ? "Admin Email" : "Email"}
-                </label>
+                <label htmlFor="email">Email</label>
                 <input
                   id="email"
                   type="email"
-                  placeholder={role === "admin" ? "admin@digitalguidance.com" : "user@gmail.com"}
+                  placeholder="user@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -164,11 +262,6 @@ function LoginPage() {
                     {showPassword ? "🙈" : "👁️"}
                   </button>
                 </div>
-                {role === "admin" && (
-                  <p className="auth-hint">
-                    Use your administrator credentials
-                  </p>
-                )}
               </div>
 
               <div className="auth-options">
@@ -181,57 +274,44 @@ function LoginPage() {
                   />
                   <span>Remember Me</span>
                 </label>
-                {role === "user" && (
-                  <Link 
-                    to="/forgot-password" 
-                    className="auth-link"
-                    onClick={(e) => loading && e.preventDefault()}
-                  >
-                    Forgot Password?
-                  </Link>
-                )}
+                <Link 
+                  to="/forgot-password" 
+                  className="auth-link"
+                  onClick={(e) => loading && e.preventDefault()}
+                >
+                  Forgot Password?
+                </Link>
               </div>
 
               <button 
                 type="submit" 
-                className={`auth-button ${role === "admin" ? "admin-button" : ""}`}
+                className="auth-button"
                 disabled={loading}
               >
                 {loading ? (
                   <>
                     <div className="auth-loader"></div>
-                    {role === "admin" ? "Authenticating..." : "Logging in..."}
+                    Logging in...
                   </>
                 ) : (
-                  role === "admin" ? "Access Dashboard" : "Login"
+                  "Login"
                 )}
               </button>
             </form>
 
-            {/* Only show signup link for user login */}
-            {role === "user" && (
-              <div className="auth-footer">
-                <p>
-                  Don't have an account?{" "}
-                  <Link 
-                    to="/signup" 
-                    className="auth-link auth-link-bold"
-                    onClick={(e) => loading && e.preventDefault()}
-                  >
-                    Sign up
-                  </Link>
-                </p>
-              </div>
-            )}
-
-            {/* Admin login shows different message */}
-            {role === "admin" && (
-              <div className="auth-footer">
-                <p className="admin-note">
-                  🔒 Restricted access. Contact system administrator for credentials.
-                </p>
-              </div>
-            )}
+            {/* Signup link for user login */}
+            <div className="auth-footer">
+              <p>
+                Don't have an account?{" "}
+                <Link 
+                  to="/signup" 
+                  className="auth-link auth-link-bold"
+                  onClick={(e) => loading && e.preventDefault()}
+                >
+                  Sign up
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
