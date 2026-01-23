@@ -47,7 +47,7 @@ function AdminDashboard() {
           flex: 1,
           backgroundImage: `url(${process.env.PUBLIC_URL + '/images/adminBuilding.jpg'})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center right', // Align to right to match sidebar
+          backgroundPosition: 'center center',
           backgroundRepeat: 'no-repeat',
           position: 'relative'
         }}>
