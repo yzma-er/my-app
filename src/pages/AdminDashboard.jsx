@@ -41,64 +41,114 @@ function AdminDashboard() {
         </div>
       )}
 
-      <div className="admin-dashboard">
-        {/* Main Content (left side with background image) */}
-        <main className="main-content" style={{ 
-          flex: 1,
-          backgroundImage: `url(${process.env.PUBLIC_URL + '/images/adminBuilding.jpg'})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat',
-          position: 'relative'
-        }}>
-          {/* Overlay for better text readability */}
-          <div className="content-overlay">
-            <Outlet />
+      <div className="admin-dashboard-split">
+        {/* Left Side - Image/Logo Section */}
+        <div className="admin-dashboard-left">
+          <div className="admin-dashboard-image-container">
+            {/* You can use the same image as login or a different one */}
+            <img 
+              src="adminBuilding.jpg" 
+              alt="Nueva Vizcaya State University Campus" 
+              className="admin-dashboard-image"
+            />
+            <div className="admin-dashboard-overlay">
+              {/* Logo */}
+              <div className="admin-dashboard-logo-container">
+                <img 
+                  src="nvsu-logo.png" // Your logo here
+                  alt="Nueva Vizcaya State University Logo"
+                  className="admin-dashboard-logo"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.style.display = 'none';
+                    document.querySelector('.admin-logo-fallback').style.display = 'block';
+                  }}
+                />
+                {/* Fallback text if logo doesn't load */}
+                <div className="admin-logo-fallback">
+                  <div className="nvsu-logo-text">
+                    <span className="nvsu-n">N</span>
+                    <span className="nvsu-v">V</span>
+                    <span className="nvsu-s">S</span>
+                    <span className="nvsu-u">U</span>
+                  </div>
+                </div>
+              </div>
+              
+              <h2>Nueva Vizcaya State University</h2>
+              <p className="admin-dashboard-subtitle">
+                Administrative Dashboard
+              </p>
+              
+              <div className="admin-dashboard-note">
+                <span className="admin-note-icon">⚙️</span>
+                <span>System Management & Control Panel</span>
+              </div>
+            </div>
           </div>
-        </main>
+        </div>
 
-        {/* Sidebar (right side) */}
-        <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
-          <div className="sidebar-content">
-            <h2>Admin Panel</h2>
-            <nav>
-              <ul>
-                <li>
-                  <Link to="/admin/services" onClick={() => setSidebarOpen(false)}>
-                    Manage Services
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/admin/users" onClick={() => setSidebarOpen(false)}>
-                    Manage Users
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/admin/manage-carousel" onClick={() => setSidebarOpen(false)}>
-                    Manage Carousel
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/admin/feedback" onClick={() => setSidebarOpen(false)}>
-                    View Feedback
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-          </div>
-
-          {/* Logout always visible at bottom */}
-          <div className="sidebar-footer">
-            <button className="logout-btn" onClick={handleLogout}>
-              Logout
+        {/* Right Side - Admin Content */}
+        <div className="admin-dashboard-right">
+          {/* Header with Menu Toggle */}
+          <div className="admin-dashboard-header">
+            <button className="admin-menu-toggle" onClick={toggleSidebar}>
+              {isSidebarOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
+            <h1>Admin Dashboard</h1>
           </div>
-        </aside>
 
-        {/* Menu toggle for mobile - now on right side */}
-        <button className="menu-toggle" onClick={toggleSidebar}>
-          {isSidebarOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
+          {/* Main Content Area */}
+          <div className="admin-main-content">
+            {/* Sidebar */}
+            <aside className={`admin-sidebar ${isSidebarOpen ? "open" : ""}`}>
+              <div className="admin-sidebar-content">
+                <h2>Admin Panel</h2>
+                <nav>
+                  <ul>
+                    <li>
+                      <Link to="/admin/services" onClick={() => setSidebarOpen(false)}>
+                        <span className="admin-icon">📋</span>
+                        <span>Manage Services</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/admin/users" onClick={() => setSidebarOpen(false)}>
+                        <span className="admin-icon">👥</span>
+                        <span>Manage Users</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/admin/manage-carousel" onClick={() => setSidebarOpen(false)}>
+                        <span className="admin-icon">🖼️</span>
+                        <span>Manage Carousel</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/admin/feedback" onClick={() => setSidebarOpen(false)}>
+                        <span className="admin-icon">💬</span>
+                        <span>View Feedback</span>
+                      </Link>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+
+              {/* Logout Button */}
+              <div className="admin-sidebar-footer">
+                <button className="admin-logout-btn" onClick={handleLogout}>
+                  <span className="logout-icon">🚪</span>
+                  Logout
+                </button>
+              </div>
+            </aside>
+
+            {/* Content Area */}
+            <div className="admin-content-area">
+              <Outlet />
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
