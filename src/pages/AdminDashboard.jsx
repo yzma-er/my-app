@@ -78,9 +78,7 @@ function AdminDashboard() {
               Administrative Dashboard
             </p>
             
-            <div className="admin-fullscreen-note">
-              
-            </div>
+           
           </div>
         </div>
 
