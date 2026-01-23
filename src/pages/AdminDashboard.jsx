@@ -79,8 +79,7 @@ function AdminDashboard() {
             </p>
             
             <div className="admin-fullscreen-note">
-              <span className="admin-fullscreen-icon">⚙️</span>
-              <span>System Management & Control Panel</span>
+              
             </div>
           </div>
         </div>
