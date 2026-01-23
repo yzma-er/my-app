@@ -10,7 +10,7 @@
 /* ========= Main Content (Left side with image) ========= */
 .main-content {
   flex: 1;
-  background-image: url('/images/adminBuilding.jpg'); /* Your image */
+  background-image: url('/public/adminBuilding.jpg'); /* Your image */
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
