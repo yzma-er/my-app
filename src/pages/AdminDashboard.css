@@ -100,9 +100,10 @@
 .admin-fullscreen-subtitle {
   font-size: 28px;
   font-weight: 600;
+  color: white;
   letter-spacing: 3px;
   text-transform: uppercase;
-  margin-bottom: 50px !important;
+  margin-bottom: 25px !important;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
   opacity: 0.95;
 }
