@@ -207,7 +207,7 @@ function RoleSelectionPage() {
       <nav className={`role-navbar ${isScrolled ? "scrolled" : ""}`}>
         <div className="role-navbar-left">
           <h2 className="role-navbar-logo">ASP DigiGuide</h2> <br></br>
-          <h5>Version 1.0</h5>
+          <p>Version 1.0</p>
         </div>
         
         <div className="role-navbar-buttons">
