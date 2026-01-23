@@ -21,7 +21,7 @@ function AdminDashboard() {
     // Navigate after showing notification
     setTimeout(() => {
       navigate("/");
-    }, 2000); // Show notification for 2 seconds before redirect
+    }, 2000);
   };
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
@@ -41,41 +41,23 @@ function AdminDashboard() {
         </div>
       )}
 
-      <div
-        className="admin-dashboard"
-        style={{
+      <div className="admin-dashboard">
+        {/* Main Content (left side with background image) */}
+        <main className="main-content" style={{ 
+          flex: 1,
           backgroundImage: `url(${process.env.PUBLIC_URL + '/images/adminBuilding.jpg'})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center center',
+          backgroundPosition: 'center right', // Align to right to match sidebar
           backgroundRepeat: 'no-repeat',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          overflow: 'auto',
-          display: 'flex',
-        }}
-      >
-        {/* 🔹 Overlay for opacity control */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.0)",
-            zIndex: 0,
-          }}
-        ></div>
+          position: 'relative'
+        }}>
+          {/* Overlay for better text readability */}
+          <div className="content-overlay">
+            <Outlet />
+          </div>
+        </main>
 
-        {/* ☰ Menu toggle for mobile */}
-        <button className="menu-toggle" onClick={toggleSidebar}>
-          {isSidebarOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-
-        {/* Sidebar */}
+        {/* Sidebar (right side) */}
         <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
           <div className="sidebar-content">
             <h2>Admin Panel</h2>
@@ -113,10 +95,10 @@ function AdminDashboard() {
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="main-content" style={{ flex: 1, position: 'relative', zIndex: 1 }}>
-          <Outlet />
-        </main>
+        {/* Menu toggle for mobile - now on right side */}
+        <button className="menu-toggle" onClick={toggleSidebar}>
+          {isSidebarOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
       </div>
     </>
   );
