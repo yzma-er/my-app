@@ -1,4 +1,4 @@
-/* src/pages/RoleSelectionPage.css - COMPLETE MERGED VERSIONn */
+/* src/pages/RoleSelectionPage.css - COMPLETE MERGED VERSION */
 
 /* Main container: center everything */
 .role-container {
@@ -47,6 +47,7 @@
   align-items: flex-start;
   gap: 2px; /* Space between logo and version */
 }
+
 .navbar-version {
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.7);
@@ -62,7 +63,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  line-height: 1;
+  line-height: 1; /* Ensure consistent line height */
 }
 
 .role-navbar-buttons {
@@ -332,7 +333,7 @@
   padding: 0 5px;
 }
 
-/* Carousel container - MOVED BELOW RATINGS */
+/* ⭐ CAROUSEL CONTAINER */
 .carousel-container {
   width: 100%;
   max-width: 1200px;
@@ -344,11 +345,21 @@
   order: 0; /* This makes it appear after ratings */
 }
 
+/* ⭐ CAROUSEL SLIDE CONTAINER */
+.carousel-slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+}
+
 /* Slide track */
 .carousel-track {
   display: flex;
   height: 100%;
   transition: transform 0.5s ease-in-out;
+  position: relative;
+  z-index: 1; /* Lower than welcome message */
 }
 
 /* Each image */
@@ -357,6 +368,42 @@
   height: 100%;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+/* ⭐ WELCOME MESSAGE OVERLAY - STATIONARY OVER CAROUSEL */
+.carousel-welcome-message {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  text-align: left;
+  color: white;
+  z-index: 5; /* Ensure it's above the slides */
+  pointer-events: none; /* Allow clicks to pass through to dots */
+}
+
+.carousel-welcome-title {
+  font-size: 3.5rem;
+  margin-bottom: 10px;
+  color: white;
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-welcome-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin: 0;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-welcome-subtitle2 {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin: 0;
+  font-weight: 550;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* CAROUSEL DOTS */
@@ -403,8 +450,6 @@
 }
 
 /* Headings */
-
-
 .role-container h2 {
   font-size: 1.8rem;
   margin-bottom: 5px;
@@ -425,8 +470,6 @@
   color: #333;
   padding: 0 10px;
 }
-
-
 
 /* ============================================
    ✅ RECENT COMMENTS SECTION STYLES
@@ -773,12 +816,6 @@
     gap: 0.8rem;
   }
 
-  .role-navbar-buttons {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
   .role-navbar-left {
     align-items: center;
     text-align: center;
@@ -788,9 +825,12 @@
   .navbar-version {
     font-size: 0.65rem;
   }
-  
-  .role-navbar-logo {
-    font-size: 1.3rem;
+
+  .role-navbar-buttons {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .role-navbar-btn {
@@ -810,6 +850,27 @@
     max-width: 95%;
     aspect-ratio: 16/9; /* Better aspect ratio for tablet */
     margin: 15px auto;
+  }
+
+  /* Responsive Design for Carousel Welcome Message */
+  .carousel-welcome-message {
+    top: 20px;
+    left: 20px;
+    padding: 15px;
+    max-width: 70%;
+  }
+  
+  .carousel-welcome-title {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  
+  .carousel-welcome-subtitle {
+    font-size: 0.95rem;
+  }
+  
+  .carousel-welcome-subtitle2 {
+    font-size: 0.60rem;
   }
 
   .carousel-dots {
@@ -912,19 +973,16 @@
   .role-navbar-logo {
     font-size: 1.2rem;
   }
+  
+  .navbar-version {
+    font-size: 0.6rem;
+  }
 
   .role-navbar-buttons {
     flex-direction: row; /* Keep buttons in row for mobile */
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.4rem;
-  }
-  .navbar-version {
-    font-size: 0.6rem;
-  }
-  
-  .role-navbar-logo {
-    font-size: 1.2rem;
   }
 
   .role-navbar-btn {
@@ -947,6 +1005,28 @@
     max-width: 100%;
     margin: 10px 0;
     border-radius: 8px;
+  }
+
+  /* Responsive Design for Carousel Welcome Message */
+  .carousel-welcome-message {
+    top: 15px;
+    left: 15px;
+    padding: 12px;
+    max-width: 75%;
+  }
+  
+  .carousel-welcome-title {
+    font-size: 1.2rem;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  
+  .carousel-welcome-subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .carousel-welcome-subtitle2 {
+    font-size: 0.55rem;
   }
 
   .carousel-dots {
@@ -1044,11 +1124,6 @@
     font-size: 1.3rem;
     margin-bottom: 1rem;
     padding: 0 5px;
-  }
-
-  .welcome-subtitle {
-    font-size: 1rem;
-    padding: 0 10px;
   }
 
   /* Ensure last card is fully visible */
@@ -1163,6 +1238,26 @@
 
   .role-container {
     padding-top: 140px;
+  }
+
+  /* Responsive Design for Carousel Welcome Message */
+  .carousel-welcome-message {
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    max-width: 80%;
+  }
+  
+  .carousel-welcome-title {
+    font-size: 1rem;
+  }
+  
+  .carousel-welcome-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .carousel-welcome-subtitle2 {
+    font-size: 0.45rem;
   }
 
   .role-card {
@@ -1300,113 +1395,4 @@ html {
   border: 1px dashed #cbd5e0;
   font-size: 0.9rem;
   color: #4a5568;
-}
-
-
-
-/* ⭐ CAROUSEL SLIDE CONTAINER */
-.carousel-slide {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  flex-shrink: 0;
-}
-
-/* ⭐ WELCOME MESSAGE OVERLAY */
-.carousel-welcome-message {
-  position: absolute;
-  top: 30px;
-  left: 30px;
-  text-align: left;
-  color: white;
-  
-}
-
-.carousel-welcome-title {
-  font-size: 3.5rem;
-  margin-bottom: 10px;
-  color: white;
-  font-weight: 700;
-  line-height: 1.2;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.carousel-welcome-subtitle {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.9) !important;
-  margin: 0;
-  font-weight: 600;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
- 
-}
- .carousel-welcome-subtitle2{
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.9) !important;
-    margin: 0;
-    font-weight: 550;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  }
-
-/* ⭐ RESPONSIVE DESIGN FOR CAROUSEL WELCOME MESSAGE */
-@media (max-width: 768px) {
-  .carousel-welcome-message {
-    top: 20px;
-    left: 20px;
-    padding: 15px;
-    max-width: 70%;
-  }
-  
-  .carousel-welcome-title {
-    font-size: 1.5rem;
-    margin-bottom: 8px;
-  }
-  
-  .carousel-welcome-subtitle {
-    font-size: 0.95rem;
-  }
-   .carousel-welcome-subtitle2{
-    font-size: 0.60rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .carousel-welcome-message {
-    top: 15px;
-    left: 15px;
-    padding: 12px;
-    max-width: 75%;
-  }
-  
-  .carousel-welcome-title {
-    font-size: 1.2rem;
-    margin-bottom: 6px;
-    line-height: 1.3;
-  }
-  
-  .carousel-welcome-subtitle {
-    font-size: 0.85rem;
-  }
-   .carousel-welcome-subtitle2{
-    font-size: 0.55rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .carousel-welcome-message {
-    top: 10px;
-    left: 10px;
-    padding: 10px;
-    max-width: 80%;
-  }
-  
-  .carousel-welcome-title {
-    font-size: 1rem;
-  }
-  
-  .carousel-welcome-subtitle {
-    font-size: 0.75rem;
-  }
-  .carousel-welcome-subtitle2{
-    font-size: 0.45rem;
-  }
 }
