@@ -206,7 +206,8 @@ function RoleSelectionPage() {
       {/* ⭐ NAVBAR */}
       <nav className={`role-navbar ${isScrolled ? "scrolled" : ""}`}>
         <div className="role-navbar-left">
-          <h2 className="role-navbar-logo">ASP DigiGuide</h2>
+          <h2 className="role-navbar-logo">ASP DigiGuide</h2> <br></br>
+          <h5>Version 1.0</h5>
         </div>
         
         <div className="role-navbar-buttons">
@@ -311,6 +312,7 @@ function RoleSelectionPage() {
                 <div className="carousel-welcome-message">
                   <h1 className="carousel-welcome-title">Welcome to ASP DigiGuide</h1>
                   <p className="carousel-welcome-subtitle">A digital guidance system for the Auxiliary Services Program of Nueva Vizcaya State University</p>
+                  <p className="carousel-welcome-subtitle2">Bayombong, Nueva Vizcaya</p>
                 </div>
               )}
             </div>
