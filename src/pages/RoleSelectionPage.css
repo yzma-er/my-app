@@ -1312,7 +1312,8 @@ html {
 }
  .carousel-welcome-subtitle2{
     font-size: 0.75rem;
-    color: white;
+    color: rgba(255, 255, 255, 0.9) !important;
+    margin: 0;
     font-weight: 550;
   }
 
