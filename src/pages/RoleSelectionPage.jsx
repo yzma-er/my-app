@@ -1,4 +1,4 @@
-// src/pages/RoleSelectionPage.jsx - UPDATED WITH POSITION AND PRIVACY
+// src/pages/RoleSelectionPage.jsx - UPDATED WITH STATIONARY WELCOME MESSAGE
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -206,7 +206,7 @@ function RoleSelectionPage() {
       {/* ⭐ NAVBAR */}
       <nav className={`role-navbar ${isScrolled ? "scrolled" : ""}`}>
         <div className="role-navbar-left">
-          <h2 className="role-navbar-logo">ASP DigiGuide</h2> 
+          <h2 className="role-navbar-logo">ASP DigiGuide</h2>
           <span className="navbar-version">Version 1.0</span>
         </div>
         
@@ -249,7 +249,7 @@ function RoleSelectionPage() {
             {isLoading ? (
               <div className="loading-container">
                 <div className="loading-spinner"></div>
-                                <p>Loading service ratings...</p>
+                <p>Loading service ratings...</p>
               </div>
             ) : serviceSummary.length > 0 ? (
               <div className="horizontal-scroll-container">
@@ -300,6 +300,13 @@ function RoleSelectionPage() {
 
       {/* ⭐ CAROUSEL WITH DOTS AND WELCOME MESSAGE */}
       <div className="carousel-container">
+        {/* WELCOME MESSAGE OVERLAY - STATIONARY OVER CAROUSEL */}
+        <div className="carousel-welcome-message">
+          <h1 className="carousel-welcome-title">Welcome to ASP DigiGuide</h1>
+          <p className="carousel-welcome-subtitle">A digital guidance system for the Auxiliary Services Program of Nueva Vizcaya State University</p>
+          <p className="carousel-welcome-subtitle2">Bayombong, Nueva Vizcaya</p>
+        </div>
+        
         <div
           className="carousel-track"
           style={{ transform: `translateX(-${current * 100}%)` }}
@@ -307,14 +314,6 @@ function RoleSelectionPage() {
           {images.map((img, index) => (
             <div key={index} className="carousel-slide">
               <img src={img} alt={`Slide ${index + 1}`} className="carousel-image" />
-              {/* Welcome Message Overlay */}
-              {index === 0 && (
-                <div className="carousel-welcome-message">
-                  <h1 className="carousel-welcome-title">Welcome to ASP DigiGuide</h1>
-                  <p className="carousel-welcome-subtitle">A digital guidance system for the Auxiliary Services Program of Nueva Vizcaya State University</p>
-                  <p className="carousel-welcome-subtitle2">Bayombong, Nueva Vizcaya</p>
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -334,7 +333,10 @@ function RoleSelectionPage() {
 
       {/* ⭐ LOGO AND HEADINGS */}
       <img src="/nvsu-logo.gif" alt="NVSU Logo" className="logo" />
-      
+      <h2>Auxiliary Services Program</h2>
+      <h3>Nueva Vizcaya State University</h3>
+      <p>Bayombong, Nueva Vizcaya</p>
+
       {/* ⭐ RECENT COMMENTS SECTION - MOVED BELOW WELCOME MESSAGE */}
       <div ref={commentsContainerRef} className="recent-comments-container">
         <h2 className="recent-comments-title">
