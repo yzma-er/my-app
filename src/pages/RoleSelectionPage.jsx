@@ -334,10 +334,7 @@ function RoleSelectionPage() {
 
       {/* ⭐ LOGO AND HEADINGS */}
       <img src="/nvsu-logo.gif" alt="NVSU Logo" className="logo" />
-      <h2>Auxiliary Services Program</h2>
-      <h3>Nueva Vizcaya State University</h3>
-      <p>Bayombong, Nueva Vizcaya</p>
-
+      
       {/* ⭐ RECENT COMMENTS SECTION - MOVED BELOW WELCOME MESSAGE */}
       <div ref={commentsContainerRef} className="recent-comments-container">
         <h2 className="recent-comments-title">
