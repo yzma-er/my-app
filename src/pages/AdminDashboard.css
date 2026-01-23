@@ -5,22 +5,43 @@
   color: #fff;
   font-family: "Poppins", sans-serif;
   position: relative;
+  flex-direction: row; /* Ensure left-to-right layout */
 }
 
-/* ========= Sidebar ========= */
+/* ========= Main Content (Left side with image) ========= */
+.main-content {
+  flex: 1;
+  background-position: right center; /* Align image to right edge */
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: relative;
+  margin-right: 260px; /* Space for sidebar */
+  min-height: 100vh;
+}
+
+.content-overlay {
+  background: rgba(0, 0, 0, 0.6); /* Dark overlay for readability */
+  min-height: 100vh;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========= Sidebar (Right side) ========= */
 .sidebar {
   width: 260px;
   background-color: #FFFFFF;
   padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* keeps footer at bottom */
+  justify-content: space-between;
   transition: transform 0.3s ease;
   position: fixed;
   top: 0;
-  left: 0;
+  right: 0; /* Changed from left to right */
   bottom: 0;
   z-index: 1000;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-content {
@@ -83,27 +104,11 @@
   background-color: #d32f2f;
 }
 
-/* ========= Main Content ========= */
-.main-content {
-  flex-grow: 1;
-  margin-left: 260px;
-  padding: 40px;
-  color: #fff;
-  z-index: 1;
-}
-
-.dashboard-overlay {
-  background: rgba(0, 0, 0, 0.55);
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
 /* ========= Mobile & Tablet ========= */
 .menu-toggle {
   position: fixed;
   top: 15px;
-  left: 15px;
+  right: 15px; /* Changed from left to right */
   background: rgba(0, 0, 0, 0.6);
   border: none;
   color: white;
@@ -111,7 +116,7 @@
   cursor: pointer;
   border-radius: 8px;
   padding: 6px 8px;
-  display: none; /* hidden on desktop */
+  display: none;
 }
 
 @media (max-width: 900px) {
@@ -120,10 +125,11 @@
   }
 
   .sidebar {
-    transform: translateX(-100%);
+    transform: translateX(100%); /* Slide in from right */
     position: fixed;
     width: 230px;
     height: 100%;
+    right: 0; /* Ensure it stays on right */
   }
 
   .sidebar.open {
@@ -131,38 +137,34 @@
   }
 
   .main-content {
-    margin-left: 0;
-    padding: 80px 20px;
+    margin-right: 0;
+    padding: 0;
+    width: 100%;
   }
 
-  .dashboard-overlay {
-    background: rgba(0, 0, 0, 1);
-    padding: 20px;
+  .content-overlay {
+    padding: 80px 20px 20px 20px;
+    min-height: 100vh;
   }
 }
 
-/* ========= Background Fix ========= */
-.admin-dashboard {
-
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+@media (min-width: 901px) {
+  .main-content {
+    background-position: calc(100% - 260px) center; /* Align image with sidebar edge */
+  }
 }
 
-
-/* Add to AdminDashboard.css */
-
-/* ========== LOGOUT SUCCESS NOTIFICATION ========== */
+/* ========= LOGOUT SUCCESS NOTIFICATION ========== */
 .logout-success-notification {
   position: fixed;
   top: 20px;
-  right: 20px;
+  right: 280px; /* Adjusted to account for sidebar */
   background: linear-gradient(135deg, #104C08, #1C7C0F);
   color: white;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 10px 25px rgba(16, 76, 8, 0.3);
-  z-index: 2000; /* Higher than admin dashboard */
+  z-index: 2000;
   animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-in 1.5s forwards;
   min-width: 300px;
   border-left: 5px solid #8BC34A;
@@ -236,7 +238,7 @@
 }
 
 /* Mobile notification */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .logout-success-notification {
     top: 10px;
     right: 10px;
