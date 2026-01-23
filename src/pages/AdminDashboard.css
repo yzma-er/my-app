@@ -89,7 +89,7 @@
 .admin-fullscreen-logo-fallback .nvsu-logo-text span:nth-child(4) { color: #4CAF50; }
 
 /* Text Styling */
-.admin-fullscreen-overlay h1 {
+.admin-fullscreen-title {
   font-size: 48px;
   font-weight: 800;
   margin-bottom: 20px;
@@ -100,10 +100,9 @@
 .admin-fullscreen-subtitle {
   font-size: 28px;
   font-weight: 600;
-  color: white;
   letter-spacing: 3px;
   text-transform: uppercase;
-  margin-bottom: 25px !important;
+  margin-bottom: 50px !important;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
   opacity: 0.95;
 }
@@ -127,6 +126,148 @@
 
 .admin-fullscreen-icon {
   font-size: 24px;
+}
+
+/* ========= MOBILE HEADER ========= */
+.mobile-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(26, 58, 26, 0.95);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 800;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: none; /* Hidden by default */
+}
+
+.mobile-header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.mobile-menu-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.mobile-header-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.mobile-logout-btn {
+  background: rgba(183, 28, 28, 0.8);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mobile-logout-btn:hover {
+  background: rgba(211, 47, 47, 0.9);
+}
+
+/* ========= MOBILE QUICK ACTIONS ========= */
+.mobile-quick-actions {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.mobile-home-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+}
+
+.mobile-home-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ========= MOBILE BOTTOM NAVIGATION ========= */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: rgba(26, 58, 26, 0.95);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 10px;
+  z-index: 800;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: none; /* Hidden by default */
+}
+
+.mobile-nav-item {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 10px;
+  min-width: 70px;
+}
+
+.mobile-nav-item.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.mobile-nav-item:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-nav-item span {
+  font-size: 12px;
+  font-weight: 500;
 }
 
 /* ========= SIDEBAR ========= */
@@ -259,7 +400,7 @@
   font-size: 20px;
 }
 
-/* ========= MENU TOGGLE ========= */
+/* ========= DESKTOP MENU TOGGLE ========= */
 .admin-fullscreen-menu-toggle {
   position: fixed;
   top: 30px;
@@ -304,46 +445,32 @@
 }
 
 /* ========= RESPONSIVE DESIGN ========= */
-@media (max-width: 1024px) {
-  .admin-fullscreen-overlay h1 {
-    font-size: 36px;
-  }
-  
-  .admin-fullscreen-subtitle {
-    font-size: 22px;
-  }
-  
-  .admin-fullscreen-logo {
-    max-width: 150px;
-    max-height: 150px;
-  }
-  
-  .admin-fullscreen-logo-fallback .nvsu-logo-text {
-    font-size: 60px;
-    letter-spacing: 10px;
-  }
-  
-  .admin-fullscreen-note {
-    font-size: 16px;
-    padding: 16px 30px;
-    max-width: 400px;
-  }
-}
 
+/* Tablet (768px and below) */
 @media (max-width: 768px) {
+  /* Show mobile elements */
+  .mobile-header,
+  .mobile-bottom-nav {
+    display: flex;
+  }
+  
+  /* Hide desktop elements */
+  .admin-fullscreen-menu-toggle {
+    display: none;
+  }
+  
+  .admin-fullscreen-sidebar-footer {
+    display: none;
+  }
+  
+  /* Adjust overlay for mobile header */
   .admin-fullscreen-overlay {
-    padding: 20px;
+    padding-top: 80px;
+    padding-bottom: 100px;
+    justify-content: flex-start;
   }
   
-  .admin-fullscreen-overlay h1 {
-    font-size: 28px;
-  }
-  
-  .admin-fullscreen-subtitle {
-    font-size: 18px;
-    letter-spacing: 2px;
-  }
-  
+  /* Adjust branding size */
   .admin-fullscreen-logo {
     max-width: 120px;
     max-height: 120px;
@@ -355,38 +482,39 @@
     gap: 8px;
   }
   
+  .admin-fullscreen-title {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+  
+  .admin-fullscreen-subtitle {
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 30px !important;
+  }
+  
   .admin-fullscreen-note {
     font-size: 14px;
     padding: 14px 20px;
     max-width: 300px;
+    margin-top: 20px;
   }
   
+  /* Full-width sidebar on mobile */
   .admin-fullscreen-sidebar {
-    width: 280px;
+    width: 100%;
   }
   
+  /* Adjust content area */
   .admin-fullscreen-content {
-    padding: 80px 20px 20px 20px;
-  }
-  
-  .admin-fullscreen-menu-toggle {
-    top: 20px;
-    right: 20px;
-    padding: 12px 15px;
-  }
-  
-  .menu-toggle-text {
-    display: none; /* Hide text on mobile */
+    padding: 80px 20px 100px 20px;
   }
 }
 
+/* Small phones (480px and below) */
 @media (max-width: 480px) {
-  .admin-fullscreen-overlay h1 {
-    font-size: 24px;
-  }
-  
-  .admin-fullscreen-subtitle {
-    font-size: 16px;
+  .admin-fullscreen-overlay {
+    padding: 70px 20px 90px 20px;
   }
   
   .admin-fullscreen-logo {
@@ -397,12 +525,24 @@
   .admin-fullscreen-logo-fallback .nvsu-logo-text {
     font-size: 36px;
     letter-spacing: 4px;
+    gap: 6px;
   }
   
-  .admin-fullscreen-sidebar {
-    width: 100%;
+  .admin-fullscreen-title {
+    font-size: 24px;
   }
   
+  .admin-fullscreen-subtitle {
+    font-size: 16px;
+  }
+  
+  .admin-fullscreen-note {
+    font-size: 13px;
+    padding: 12px 16px;
+    max-width: 280px;
+  }
+  
+  /* Smaller sidebar text */
   .sidebar-header h2 {
     font-size: 24px;
   }
@@ -410,6 +550,102 @@
   .admin-fullscreen-sidebar nav a {
     font-size: 16px;
     padding: 16px;
+  }
+  
+  .admin-icon {
+    font-size: 20px;
+  }
+  
+  /* Adjust mobile header */
+  .mobile-header {
+    height: 55px;
+    padding: 0 15px;
+  }
+  
+  .mobile-header-title {
+    font-size: 16px;
+  }
+  
+  /* Adjust bottom nav */
+  .mobile-bottom-nav {
+    height: 65px;
+  }
+  
+  .mobile-nav-item {
+    min-width: 60px;
+    padding: 8px 12px;
+  }
+  
+  .mobile-nav-item span {
+    font-size: 11px;
+  }
+}
+
+/* Very small phones (360px and below) */
+@media (max-width: 360px) {
+  .admin-fullscreen-logo {
+    max-width: 80px;
+    max-height: 80px;
+  }
+  
+  .admin-fullscreen-logo-fallback .nvsu-logo-text {
+    font-size: 32px;
+    letter-spacing: 3px;
+  }
+  
+  .admin-fullscreen-title {
+    font-size: 22px;
+  }
+  
+  .admin-fullscreen-subtitle {
+    font-size: 15px;
+    letter-spacing: 1.5px;
+  }
+  
+  .admin-fullscreen-note {
+    font-size: 12px;
+    padding: 10px 14px;
+    max-width: 250px;
+  }
+  
+  .mobile-nav-item span {
+    font-size: 10px;
+  }
+}
+
+/* Landscape mode on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .admin-fullscreen-overlay {
+    flex-direction: row;
+    gap: 30px;
+    justify-content: center;
+  }
+  
+  .admin-fullscreen-logo-container {
+    margin-bottom: 0;
+  }
+  
+  .admin-fullscreen-logo {
+    max-width: 100px;
+    max-height: 100px;
+  }
+  
+  .admin-fullscreen-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .admin-fullscreen-subtitle {
+    font-size: 16px;
+    margin-bottom: 20px !important;
+  }
+  
+  .admin-fullscreen-note {
+    display: none;
+  }
+  
+  .mobile-quick-actions {
+    display: none;
   }
 }
 
@@ -461,45 +697,10 @@
   opacity: 0.9;
 }
 
-/* Animations */
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(139, 195, 74, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(139, 195, 74, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(139, 195, 74, 0);
-  }
-}
-
 /* Mobile notification */
 @media (max-width: 768px) {
   .logout-success-notification {
-    top: 20px;
+    top: 80px;
     right: 20px;
     left: 20px;
     min-width: auto;
@@ -509,17 +710,17 @@
 
 /* ========= SCROLLBAR STYLING ========= */
 .admin-fullscreen-content::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .admin-fullscreen-content::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .admin-fullscreen-content::-webkit-scrollbar-thumb {
   background: rgba(26, 58, 26, 0.5);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .admin-fullscreen-content::-webkit-scrollbar-thumb:hover {
