@@ -43,7 +43,15 @@
 
 .role-navbar-left {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px; /* Space between logo and version */
+}
+.navbar-version {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 .role-navbar-logo {
@@ -54,6 +62,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  line-height: 1;
 }
 
 .role-navbar-buttons {
@@ -770,6 +779,19 @@
     flex-wrap: wrap;
     gap: 0.5rem;
   }
+  .role-navbar-left {
+    align-items: center;
+    text-align: center;
+    gap: 1px;
+  }
+  
+  .navbar-version {
+    font-size: 0.65rem;
+  }
+  
+  .role-navbar-logo {
+    font-size: 1.3rem;
+  }
 
   .role-navbar-btn {
     padding: 0.6rem 1rem;
@@ -896,6 +918,13 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.4rem;
+  }
+  .navbar-version {
+    font-size: 0.6rem;
+  }
+  
+  .role-navbar-logo {
+    font-size: 1.2rem;
   }
 
   .role-navbar-btn {
