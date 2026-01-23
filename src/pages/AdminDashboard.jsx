@@ -1,13 +1,26 @@
 // src/pages/AdminDashboard.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home } from "lucide-react";
 import "./AdminDashboard.css";
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [showLogoutSuccess, setShowLogoutSuccess] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -26,6 +39,13 @@ function AdminDashboard() {
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
+  // Close sidebar when clicking on a link (for mobile)
+  const handleNavClick = () => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  };
+
   return (
     <>
       {/* Logout Success Notification */}
@@ -35,7 +55,7 @@ function AdminDashboard() {
             <div className="logout-success-icon">✓</div>
             <div className="logout-success-message">
               <h3>Logged Out Successfully</h3>
-              <p>You have been securely logged out. Redirecting to home page...</p>
+              <p>Redirecting to home page...</p>
             </div>
           </div>
         </div>
@@ -50,10 +70,10 @@ function AdminDashboard() {
             className="admin-fullscreen-image"
           />
           <div className="admin-fullscreen-overlay">
-            {/* Logo and Branding */}
+            {/* Logo and Branding - Simplified on mobile */}
             <div className="admin-fullscreen-logo-container">
               <img 
-                src="nvsu-logo.png" // Your logo here
+                src="nvsu-logo.png"
                 alt="Nueva Vizcaya State University Logo"
                 className="admin-fullscreen-logo"
                 onError={(e) => {
@@ -62,7 +82,6 @@ function AdminDashboard() {
                   document.querySelector('.admin-fullscreen-logo-fallback').style.display = 'block';
                 }}
               />
-              {/* Fallback text if logo doesn't load */}
               <div className="admin-fullscreen-logo-fallback">
                 <div className="nvsu-logo-text">
                   <span className="nvsu-n">N</span>
@@ -73,20 +92,59 @@ function AdminDashboard() {
               </div>
             </div>
             
-            <h1>Nueva Vizcaya State University</h1>
+            <h1 className="admin-fullscreen-title">Nueva Vizcaya State University</h1>
             <p className="admin-fullscreen-subtitle">
               Administrative Dashboard
             </p>
             
-           
+            <div className="admin-fullscreen-note">
+              <span className="admin-fullscreen-icon">⚙️</span>
+              <span>System Management Panel</span>
+            </div>
+
+            {/* Mobile Quick Actions */}
+            {isMobile && (
+              <div className="mobile-quick-actions">
+                <button 
+                  className="mobile-home-btn"
+                  onClick={() => navigate("/")}
+                >
+                  <Home size={20} />
+                  <span>Home</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Menu Toggle */}
-        <button className="admin-fullscreen-menu-toggle" onClick={toggleSidebar}>
-          {isSidebarOpen ? <X size={28} /> : <Menu size={28} />}
-          <span className="menu-toggle-text">Menu</span>
-        </button>
+        {/* Mobile Header Bar */}
+        {isMobile && (
+          <div className="mobile-header">
+            <div className="mobile-header-left">
+              <button 
+                className="mobile-menu-btn"
+                onClick={toggleSidebar}
+              >
+                {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+              <span className="mobile-header-title">Admin Dashboard</span>
+            </div>
+            <button 
+              className="mobile-logout-btn"
+              onClick={handleLogout}
+            >
+              <span className="logout-icon">🚪</span>
+            </button>
+          </div>
+        )}
+
+        {/* Desktop Menu Toggle */}
+        {!isMobile && (
+          <button className="admin-fullscreen-menu-toggle" onClick={toggleSidebar}>
+            {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            <span className="menu-toggle-text">Menu</span>
+          </button>
+        )}
 
         {/* Sidebar */}
         <aside className={`admin-fullscreen-sidebar ${isSidebarOpen ? "open" : ""}`}>
@@ -101,25 +159,25 @@ function AdminDashboard() {
             <nav>
               <ul>
                 <li>
-                  <Link to="/admin/services" onClick={() => setSidebarOpen(false)}>
+                  <Link to="/admin/services" onClick={handleNavClick}>
                     <span className="admin-icon">📋</span>
                     <span>Manage Services</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/users" onClick={() => setSidebarOpen(false)}>
+                  <Link to="/admin/users" onClick={handleNavClick}>
                     <span className="admin-icon">👥</span>
                     <span>Manage Users</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/manage-carousel" onClick={() => setSidebarOpen(false)}>
+                  <Link to="/admin/manage-carousel" onClick={handleNavClick}>
                     <span className="admin-icon">🖼️</span>
                     <span>Manage Carousel</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/feedback" onClick={() => setSidebarOpen(false)}>
+                  <Link to="/admin/feedback" onClick={handleNavClick}>
                     <span className="admin-icon">💬</span>
                     <span>View Feedback</span>
                   </Link>
@@ -127,20 +185,49 @@ function AdminDashboard() {
               </ul>
             </nav>
 
-            {/* Logout Button */}
-            <div className="admin-fullscreen-sidebar-footer">
-              <button className="admin-fullscreen-logout-btn" onClick={handleLogout}>
-                <span className="logout-icon">🚪</span>
-                <span>Logout</span>
-              </button>
-            </div>
+            {/* Logout Button - Hidden on mobile (in header) */}
+            {!isMobile && (
+              <div className="admin-fullscreen-sidebar-footer">
+                <button className="admin-fullscreen-logout-btn" onClick={handleLogout}>
+                  <span className="logout-icon">🚪</span>
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
           </div>
         </aside>
 
-        {/* Main Content - Directly on the image */}
+        {/* Content Area - Adjusted for mobile */}
         <div className="admin-fullscreen-content">
           <Outlet />
         </div>
+
+        {/* Mobile Navigation Bar */}
+        {isMobile && (
+          <div className="mobile-bottom-nav">
+            <button 
+              className="mobile-nav-item"
+              onClick={() => navigate("/")}
+            >
+              <Home size={22} />
+              <span>Home</span>
+            </button>
+            <button 
+              className="mobile-nav-item active"
+              onClick={toggleSidebar}
+            >
+              <Menu size={22} />
+              <span>Menu</span>
+            </button>
+            <button 
+              className="mobile-nav-item"
+              onClick={handleLogout}
+            >
+              <span className="logout-icon">🚪</span>
+              <span>Logout</span>
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
